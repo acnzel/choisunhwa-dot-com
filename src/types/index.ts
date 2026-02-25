@@ -137,6 +137,19 @@ export interface Notice {
   created_at: string
 }
 
+// ─── 강사 후기 ────────────────────────────────────────────
+export interface SpeakerReview {
+  id: string
+  speaker_id: string
+  company: string
+  rating: 1 | 2 | 3 | 4 | 5
+  content: string
+  reviewed_at: string
+  is_visible: boolean
+  sort_order: number
+  created_at: string
+}
+
 // ─── 공통 ────────────────────────────────────────────────
 export interface PaginationMeta {
   page: number
