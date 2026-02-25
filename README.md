@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 최선화닷컴
 
-## Getting Started
+AI 기반 기업교육 강사 매칭 플랫폼
 
-First, run the development server:
+## 기술 스택
+
+| 영역 | 기술 |
+|------|------|
+| 프레임워크 | Next.js 15 (App Router) |
+| 언어 | TypeScript |
+| 스타일링 | Tailwind CSS |
+| 인증/DB | Supabase (PostgreSQL + Auth + Storage) |
+| 배포 | Vercel |
+
+## 시작하기
 
 ```bash
+# 의존성 설치
+npm install
+
+# 환경변수 설정
+cp .env.example .env.local
+# .env.local에 Supabase 프로젝트 정보 입력
+
+# 개발 서버 실행
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 프로젝트 구조
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+src/
+├── app/                          # Next.js App Router
+│   ├── (public)/                 # 퍼블릭 라우트
+│   │   ├── speakers/             # 강사 리스트/상세
+│   │   ├── lectures/             # 강연 커리큘럼
+│   │   ├── inquiry/              # 문의하기
+│   │   └── support/              # 고객지원
+│   ├── auth/                     # 인증 라우트
+│   └── mong-bab/                 # 어드민 (비공개 URL)
+├── components/
+│   ├── ui/                       # 공통 UI 컴포넌트
+│   ├── layout/                   # 헤더, 푸터, 사이드바
+│   ├── speakers/                 # 강사 관련 컴포넌트
+│   ├── lectures/                 # 강연 관련 컴포넌트
+│   ├── inquiry/                  # 문의 폼 컴포넌트
+│   ├── support/                  # 고객지원 컴포넌트
+│   └── admin/                    # 어드민 컴포넌트
+├── lib/
+│   ├── supabase/                 # Supabase 클라이언트
+│   ├── utils/                    # 유틸리티 함수
+│   ├── validations/              # Zod 스키마 검증
+│   └── hooks/                    # 커스텀 훅
+├── types/                        # TypeScript 타입 정의
+└── constants/                    # 상수 정의
+supabase/
+└── migrations/                   # DB 마이그레이션 파일
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 주요 URL
 
-## Learn More
+| URL | 설명 |
+|-----|------|
+| `/` | 홈 |
+| `/speakers` | 강사 소개 리스트 |
+| `/speakers/:id` | 강사 상세 |
+| `/lectures` | 강연 커리큘럼 |
+| `/lectures/:id` | 강연 상세 |
+| `/inquiry` | 문의하기 |
+| `/support/faq` | FAQ |
+| `/support/notice` | 공지사항 |
+| `/mong-bab/` | 어드민 (비공개) |
 
-To learn more about Next.js, take a look at the following resources:
+## 개발 가이드
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- [기획서](./docs/PRD.md) — 상세 기능 명세
+- [DB 스키마](./supabase/migrations/) — 마이그레이션 파일
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 팀
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| 역할 | 담당 |
+|------|------|
+| 개발 총괄 | @dev |
+| 백엔드 | @backend |
+| 프론트엔드 | @frontend |
+| QA | @qa |
