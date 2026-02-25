@@ -1,6 +1,12 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// 빌드 시점이 아닌 런타임에 초기화 (Vercel 빌드 에러 방지)
+function getResend() {
+  const apiKey = process.env.RESEND_API_KEY
+  if (!apiKey) throw new Error('RESEND_API_KEY 환경변수가 설정되지 않았습니다.')
+  return new Resend(apiKey)
+}
+
 const FROM = process.env.EMAIL_FROM ?? 'noreply@choisunhwa.com'
 
 // ─── 문의 접수 확인 이메일 ────────────────────────────────
@@ -19,7 +25,7 @@ export async function sendInquiryConfirmation({
     speaker_register: '강사등록',
   }[inquiryType]
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `[최선화닷컴] ${typeLabel} 문의가 접수되었습니다`,
@@ -62,7 +68,7 @@ export async function sendInquiryStatusUpdate({
     done: '처리 완료',
   }[status] ?? status
 
-  return resend.emails.send({
+  return getResend().emails.send({
     from: FROM,
     to,
     subject: `[최선화닷컴] 문의 처리 현황 안내 — ${statusLabel}`,
