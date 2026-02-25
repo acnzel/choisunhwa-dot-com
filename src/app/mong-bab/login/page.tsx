@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import GoogleLoginButton from '@/components/auth/GoogleLoginButton'
 
 export default function AdminLoginPage() {
   const router = useRouter()
@@ -72,6 +73,17 @@ export default function AdminLoginPage() {
               {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
+
+          <div className="relative my-5">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-100" />
+            </div>
+            <div className="relative flex justify-center text-xs text-gray-400">
+              <span className="px-3 bg-white">또는</span>
+            </div>
+          </div>
+
+          <GoogleLoginButton redirectTo="/mong-bab/dashboard" />
         </div>
       </div>
     </div>
