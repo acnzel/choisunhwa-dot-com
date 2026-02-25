@@ -25,16 +25,34 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const pathname = request.nextUrl.pathname
+  const isAdminRoute = pathname.startsWith('/mong-bab')
+  const isAdminLoginRoute = pathname === '/mong-bab/login'
 
-  // 어드민 라우트 보호 (/mong-bab/ 하위, 단 /mong-bab/login 제외)
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/mong-bab')
-  const isAdminLoginRoute = request.nextUrl.pathname === '/mong-bab/login'
+  // 어드민 라우트 보호
+  if (isAdminRoute && !isAdminLoginRoute) {
+    const { data: { user } } = await supabase.auth.getUser()
 
-  if (isAdminRoute && !isAdminLoginRoute && !user) {
-    const redirectUrl = request.nextUrl.clone()
-    redirectUrl.pathname = '/mong-bab/login'
-    return NextResponse.redirect(redirectUrl)
+    // 1. 비로그인 → 어드민 로그인 페이지로
+    if (!user) {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/mong-bab/login'
+      return NextResponse.redirect(redirectUrl)
+    }
+
+    // 2. 로그인했지만 role !== 'admin' → 메인으로 차단
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile || profile.role !== 'admin') {
+      const redirectUrl = request.nextUrl.clone()
+      redirectUrl.pathname = '/'
+      redirectUrl.searchParams.set('error', 'unauthorized')
+      return NextResponse.redirect(redirectUrl)
+    }
   }
 
   return supabaseResponse
@@ -43,6 +61,5 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/mong-bab/:path*',
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
