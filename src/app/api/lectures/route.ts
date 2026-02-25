@@ -4,7 +4,7 @@ import { PAGINATION } from '@/constants'
 
 /**
  * GET /api/lectures
- * 공개 강연 커리큘럼 리스트
+ * 공개 강연 목록. 필터/페이지네이션 지원.
  */
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -16,8 +16,8 @@ export async function GET(request: NextRequest) {
     10
   )
   const fields = searchParams.getAll('fields')
-  const keyword = searchParams.get('q')
   const speakerId = searchParams.get('speaker_id')
+  const keyword = searchParams.get('q')
 
   const from = (page - 1) * limit
   const to = from + limit - 1
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     .select(
       `
       id, title, thumbnail_url, fields, duration, target, summary, created_at,
-      speakers:speaker_id (id, name, photo_url)
+      speakers!inner(id, name, photo_url)
     `,
       { count: 'exact' }
     )
@@ -37,12 +37,12 @@ export async function GET(request: NextRequest) {
     query = query.overlaps('fields', fields)
   }
 
-  if (keyword) {
-    query = query.or(`title.ilike.%${keyword}%,summary.ilike.%${keyword}%`)
-  }
-
   if (speakerId) {
     query = query.eq('speaker_id', speakerId)
+  }
+
+  if (keyword) {
+    query = query.ilike('title', `%${keyword}%`)
   }
 
   query = query.order('created_at', { ascending: false }).range(from, to)

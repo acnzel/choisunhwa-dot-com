@@ -10,6 +10,7 @@ export async function GET(request: NextRequest) {
 
   const supabase = createAdminClient()
   const { searchParams } = new URL(request.url)
+
   const page = parseInt(searchParams.get('page') ?? '1', 10)
   const limit = parseInt(searchParams.get('limit') ?? String(PAGINATION.DEFAULT_LIMIT), 10)
   const from = (page - 1) * limit
@@ -18,7 +19,6 @@ export async function GET(request: NextRequest) {
   const { data, error: dbError, count } = await supabase
     .from('notices')
     .select('id, title, is_pinned, is_visible, published_at, created_at', { count: 'exact' })
-    .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false })
     .range(from, to)
 
@@ -34,24 +34,24 @@ export async function POST(request: NextRequest) {
   const { error } = await requireAdmin()
   if (error) return error
 
-  const body = await request.json()
+  let body: unknown
+  try { body = await request.json() } catch {
+    return NextResponse.json({ error: '잘못된 요청 형식입니다' }, { status: 400 })
+  }
+
   const parsed = NoticeSchema.safeParse(body)
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: '입력값을 확인해주세요', details: parsed.error.flatten() },
-      { status: 400 }
-    )
+    return NextResponse.json({ error: '입력값을 확인해주세요', details: parsed.error.flatten() }, { status: 422 })
+  }
+
+  const payload = {
+    ...parsed.data,
+    published_at: parsed.data.published_at ?? new Date().toISOString(),
   }
 
   const supabase = createAdminClient()
   const { data, error: dbError } = await supabase
-    .from('notices')
-    .insert({
-      ...parsed.data,
-      published_at: parsed.data.published_at ?? new Date().toISOString(),
-    })
-    .select()
-    .single()
+    .from('notices').insert(payload).select().single()
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ data }, { status: 201 })

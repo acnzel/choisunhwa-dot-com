@@ -22,22 +22,15 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from('inquiries')
-    .select(
-      'id, type, name, email, phone, company, status, assigned_admin_id, created_at',
-      { count: 'exact' }
-    )
+    .select('id, type, name, company, phone, email, status, assigned_admin_id, created_at', { count: 'exact' })
+    .order('created_at', { ascending: false })
 
   if (type) query = query.eq('type', type)
   if (status) query = query.eq('status', status)
-  if (keyword) {
-    query = query.or(
-      `name.ilike.%${keyword}%,company.ilike.%${keyword}%,phone.ilike.%${keyword}%,email.ilike.%${keyword}%`
-    )
-  }
+  if (keyword) query = query.or(`name.ilike.%${keyword}%,company.ilike.%${keyword}%,phone.ilike.%${keyword}%`)
   if (dateFrom) query = query.gte('created_at', dateFrom)
   if (dateTo) query = query.lte('created_at', dateTo)
-
-  query = query.order('created_at', { ascending: false }).range(from, to)
+  query = query.range(from, to)
 
   const { data, error: dbError, count } = await query
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })

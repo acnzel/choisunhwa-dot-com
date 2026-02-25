@@ -18,56 +18,34 @@ export async function GET(request: NextRequest) {
   const from = (page - 1) * limit
   const to = from + limit - 1
 
-  // auth.users는 service role로만 접근 가능
-  // profiles 테이블 기준으로 조회하되, email은 auth.users에서 별도로 가져와야 함
-  // 단순화: profiles에 email 컬럼 추가 없이 supabase admin API 활용
-  const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers({
-    page,
-    perPage: limit,
-  })
-
-  if (authError) {
-    return NextResponse.json({ error: authError.message }, { status: 500 })
-  }
-
-  // profiles 조회
-  const userIds = authUsers.users.map((u) => u.id)
-  const { data: profiles } = await supabase
+  let query = supabase
     .from('profiles')
-    .select('id, name, provider, status, marketing_agreed, created_at, last_login_at, role')
-    .in('id', userIds)
+    .select('id, name, provider, status, marketing_agreed, created_at, last_login_at', { count: 'exact' })
+    .order('created_at', { ascending: false })
 
-  const profileMap = new Map((profiles ?? []).map((p) => [p.id, p]))
+  if (keyword) query = query.or(`name.ilike.%${keyword}%`)
+  if (provider) query = query.eq('provider', provider)
+  if (status) query = query.eq('status', status)
+  query = query.range(from, to)
 
-  let merged = authUsers.users.map((u) => ({
-    id: u.id,
-    email: u.email,
-    ...profileMap.get(u.id),
-    email_confirmed_at: u.email_confirmed_at,
-  }))
+  const { data: profiles, error: dbError, count } = await query
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
-  // 클라이언트 사이드 필터 (supabase admin API는 서버사이드 필터 제한적)
-  if (keyword) {
-    merged = merged.filter(
-      (u) =>
-        u.email?.toLowerCase().includes(keyword.toLowerCase()) ||
-        (u as { name?: string }).name?.toLowerCase().includes(keyword.toLowerCase())
+  // auth.users에서 이메일 가져오기 (admin API)
+  const userIds = (profiles ?? []).map((p) => p.id)
+  let emailMap: Record<string, string> = {}
+
+  if (userIds.length > 0) {
+    const { data: { users } } = await supabase.auth.admin.listUsers()
+    emailMap = Object.fromEntries(
+      (users ?? []).filter((u) => userIds.includes(u.id)).map((u) => [u.id, u.email ?? ''])
     )
   }
-  if (provider) {
-    merged = merged.filter((u) => (u as { provider?: string }).provider === provider)
-  }
-  if (status) {
-    merged = merged.filter((u) => (u as { status?: string }).status === status)
-  }
+
+  const data = (profiles ?? []).map((p) => ({ ...p, email: emailMap[p.id] ?? '' }))
 
   return NextResponse.json({
-    data: merged,
-    meta: {
-      page,
-      limit,
-      total: authUsers.total ?? merged.length,
-      totalPages: Math.ceil((authUsers.total ?? merged.length) / limit),
-    },
+    data,
+    meta: { page, limit, total: count ?? 0, totalPages: Math.ceil((count ?? 0) / limit) },
   })
 }

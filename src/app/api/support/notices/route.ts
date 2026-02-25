@@ -4,7 +4,7 @@ import { PAGINATION } from '@/constants'
 
 /**
  * GET /api/support/notices
- * 공개 공지사항 목록 (고정 공지 항상 상단)
+ * 공개 공지사항 목록. 고정 공지 상단, 나머지 최신순.
  */
 export async function GET(request: NextRequest) {
   const supabase = await createClient()
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     searchParams.get('limit') ?? String(PAGINATION.DEFAULT_LIMIT),
     10
   )
+
   const from = (page - 1) * limit
   const to = from + limit - 1
 

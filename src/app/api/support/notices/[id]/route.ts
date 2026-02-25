@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 
 /**
  * GET /api/support/notices/:id
- * 공지사항 상세 + 이전/다음 공지
+ * 공지사항 상세 + 이전/다음 글 네비게이션
  */
 export async function GET(
   _request: NextRequest,
@@ -24,7 +24,7 @@ export async function GET(
     return NextResponse.json({ error: '공지사항을 찾을 수 없습니다' }, { status: 404 })
   }
 
-  // 이전 공지
+  // 이전 글 (더 오래된 것)
   const { data: prev } = await supabase
     .from('notices')
     .select('id, title')
@@ -34,7 +34,7 @@ export async function GET(
     .limit(1)
     .maybeSingle()
 
-  // 다음 공지
+  // 다음 글 (더 최신)
   const { data: next } = await supabase
     .from('notices')
     .select('id, title')
@@ -45,6 +45,10 @@ export async function GET(
     .maybeSingle()
 
   return NextResponse.json({
-    data: { ...notice, prev: prev ?? null, next: next ?? null },
+    data: {
+      ...notice,
+      prev: prev ?? null,
+      next: next ?? null,
+    },
   })
 }

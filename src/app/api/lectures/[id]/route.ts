@@ -17,9 +17,7 @@ export async function GET(
     .select(
       `
       *,
-      speakers:speaker_id (
-        id, name, title, company, photo_url, bio_short, bio_full, fields
-      )
+      speakers(id, name, title, company, photo_url, bio_short, fields)
     `
     )
     .eq('id', id)
@@ -30,19 +28,21 @@ export async function GET(
     return NextResponse.json({ error: '강연을 찾을 수 없습니다' }, { status: 404 })
   }
 
-  // 관련 강연 (같은 분야, 최대 4개)
-  const { data: related } = await supabase
-    .from('lectures')
-    .select('id, title, thumbnail_url, fields, duration, summary, speakers:speaker_id(name)')
-    .eq('is_visible', true)
-    .neq('id', id)
-    .overlaps('fields', lecture.fields ?? [])
-    .limit(4)
+  // 같은 분야 관련 강연 (최대 4개, 본인 제외)
+  const related = lecture.fields?.length > 0
+    ? await supabase
+        .from('lectures')
+        .select('id, title, thumbnail_url, fields, duration, summary, speakers(id, name)')
+        .eq('is_visible', true)
+        .neq('id', id)
+        .overlaps('fields', lecture.fields)
+        .limit(4)
+    : { data: [] }
 
   return NextResponse.json({
     data: {
       ...lecture,
-      related: related ?? [],
+      related_lectures: related.data ?? [],
     },
   })
 }
