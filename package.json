@@ -21,11 +21,12 @@
     "next": "16.1.6",
     "react": "19.2.3",
     "react-dom": "19.2.3",
-    "resend": "^6.9.2"
+    "resend": "^6.9.2",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4"
   },
   "devDependencies": {
     "@playwright/test": "^1.58.2",
-    "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@testing-library/user-event": "^14.6.1",
@@ -37,7 +38,6 @@
     "eslint-config-next": "16.1.6",
     "jsdom": "^28.1.0",
     "playwright": "^1.58.2",
-    "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"
   }
