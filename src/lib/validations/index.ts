@@ -75,7 +75,7 @@ export const LectureSchema = z.object({
     .array(z.object({ time: z.string(), content: z.string() }))
     .default([]),
   effects: z.array(z.string()).default([]),
-  content_json: z.record(z.unknown()).nullable().optional(),
+  content_json: z.record(z.string(), z.unknown()).nullable().optional(),
   is_visible: z.boolean().default(false),
 })
 

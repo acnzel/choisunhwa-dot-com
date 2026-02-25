@@ -97,7 +97,7 @@ export interface Inquiry {
   file_url?: string
   status: InquiryStatus
   assigned_admin_id?: string
-  created_at: string
+  created_at?: string // DB 생성값, 선택적
 }
 
 export interface InquiryMemo {
