@@ -183,3 +183,25 @@ NEXT_PUBLIC_SITE_URL=https://choisunhwa-dot-com.vercel.app
 - [x] 강사 리뷰 → Phase 1 포함
 - [x] 이메일 서비스 → Resend
 - [x] 파일 스토리지 → Supabase Storage (`public-assets` bucket)
+
+---
+
+## [2025-07] @frontend 추가 작업 완료
+
+### 어드민 강사 CRUD 완성
+- **문제**: `/mong-bab/speakers/[id]` 404 → 편집 페이지 신규 구현
+- **문제**: 어드민 강사 목록에서 `is_visible=false` 강사가 안 보이는 버그 → `createAdminClient()` 로 RLS 우회
+- **추가**: 인라인 공개 토글 스위치 (페이지 리로드 없이)
+- **추가**: 신규 강사 등록 폼 (`/mong-bab/speakers/new`)
+- **추가**: `src/app/actions/admin.ts` — Server Actions (upsertSpeaker, toggleVisibility, deleteSpeaker 등)
+
+### F-4, F-5 완료
+- F-4: `/inquiry/lecture` 로그인 시 이름/이메일 자동 채움
+- F-5: `/auth/login`, `/auth/signup` 이미 로그인 상태면 홈 리디렉션
+
+### 남은 작업
+- 어드민 강연 편집 페이지 (`/mong-bab/lectures/[id]`) — 미완
+- F-1/F-2 헤더 분리 — 백엔드에서 ConditionalLayout + 인증 상태 반영 이미 구현됨. 이슈 없으면 패스.
+- F-3 어드민 로그인 레이아웃 — 현재 AdminSidebar가 login 페이지에서 null 반환. 정상 동작 중.
+
+**→ @qa_cshdotcom_bot**: 강사 공개 토글 + 편집 저장 동작 테스트 부탁해
