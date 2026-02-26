@@ -4,6 +4,7 @@ import Image from 'next/image'
 import type { Speaker } from '@/types'
 import { SPEAKER_FIELDS } from '@/constants'
 import ToggleVisible from './ToggleVisible'
+import ClickableRow from '@/components/admin/ClickableRow'
 
 export const dynamic = 'force-dynamic'
 
@@ -56,7 +57,7 @@ export default async function AdminSpeakersPage() {
               </tr>
             ) : (
               speakers.map((s) => (
-                <tr key={s.id} className="hover:bg-gray-50 transition-colors">
+                <ClickableRow key={s.id} href={`/mong-bab/speakers/${s.id}`}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="relative w-9 h-9 rounded-full overflow-hidden bg-gray-100 flex-shrink-0">
@@ -88,14 +89,9 @@ export default async function AdminSpeakersPage() {
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-center">{s.sort_order}</td>
                   <td className="px-4 py-3">
-                    <Link
-                      href={`/mong-bab/speakers/${s.id}`}
-                      className="text-xs font-medium text-[#1a1a2e] hover:underline"
-                    >
-                      편집
-                    </Link>
+                    <span className="text-xs font-medium text-[#1a1a2e]">→ 편집</span>
                   </td>
-                </tr>
+                </ClickableRow>
               ))
             )}
           </tbody>

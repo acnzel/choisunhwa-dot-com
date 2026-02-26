@@ -2,6 +2,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Lecture, Speaker } from '@/types'
 import { SPEAKER_FIELDS, LECTURE_DURATIONS } from '@/constants'
+import ClickableRow from '@/components/admin/ClickableRow'
 
 const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
 const DURATION_MAP = Object.fromEntries(LECTURE_DURATIONS.map((d) => [d.value, d.label]))
@@ -53,7 +54,7 @@ export default async function AdminLecturesPage() {
               </tr>
             ) : (
               lectures.map((l) => (
-                <tr key={l.id} className="hover:bg-gray-50 transition-colors">
+                <ClickableRow key={l.id} href={`/mong-bab/lectures/${l.id}`}>
                   <td className="px-4 py-3 font-medium text-gray-800 max-w-xs">
                     <p className="line-clamp-1">{l.title}</p>
                   </td>
@@ -74,11 +75,9 @@ export default async function AdminLecturesPage() {
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <Link href={`/mong-bab/lectures/${l.id}`} className="text-xs text-[#1a1a2e] hover:underline">
-                      수정
-                    </Link>
+                    <span className="text-xs text-[#1a1a2e]">→ 편집</span>
                   </td>
-                </tr>
+                </ClickableRow>
               ))
             )}
           </tbody>

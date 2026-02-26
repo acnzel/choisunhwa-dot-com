@@ -38,7 +38,11 @@ export default async function AdminSupportPage() {
               <p className="text-center py-8 text-sm text-gray-400">등록된 FAQ가 없습니다.</p>
             ) : (
               faqs.map((faq) => (
-                <div key={faq.id} className="flex items-center justify-between px-5 py-3">
+                <Link
+                  key={faq.id}
+                  href={`/mong-bab/support/faq/${faq.id}`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-blue-50/60 transition-colors"
+                >
                   <div>
                     <span className="text-xs text-gray-400 mr-2">[{faq.category?.name ?? '미분류'}]</span>
                     <span className="text-sm text-gray-700">{faq.question}</span>
@@ -47,11 +51,9 @@ export default async function AdminSupportPage() {
                     <span className={`text-xs px-2 py-0.5 rounded-full ${faq.is_visible ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
                       {faq.is_visible ? '공개' : '비공개'}
                     </span>
-                    <Link href={`/mong-bab/support/faq/${faq.id}`} className="text-xs text-[#1a1a2e] hover:underline">
-                      수정
-                    </Link>
+                    <span className="text-xs text-[#1a1a2e]">→ 편집</span>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>
@@ -75,7 +77,11 @@ export default async function AdminSupportPage() {
               <p className="text-center py-8 text-sm text-gray-400">등록된 공지사항이 없습니다.</p>
             ) : (
               notices.map((n) => (
-                <div key={n.id} className="flex items-center justify-between px-5 py-3">
+                <Link
+                  key={n.id}
+                  href={`/mong-bab/support/notice/${n.id}`}
+                  className="flex items-center justify-between px-5 py-3 hover:bg-blue-50/60 transition-colors"
+                >
                   <div className="flex items-center gap-2">
                     {n.is_pinned && (
                       <span className="text-xs font-bold text-white bg-[#1a1a2e] px-1.5 py-0.5 rounded">공지</span>
@@ -89,11 +95,9 @@ export default async function AdminSupportPage() {
                     <span className="text-xs text-gray-400">
                       {new Date(n.published_at).toLocaleDateString('ko-KR')}
                     </span>
-                    <Link href={`/mong-bab/support/notice/${n.id}`} className="text-xs text-[#1a1a2e] hover:underline">
-                      수정
-                    </Link>
+                    <span className="text-xs text-[#1a1a2e]">→ 편집</span>
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>

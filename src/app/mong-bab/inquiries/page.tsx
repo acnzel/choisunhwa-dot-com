@@ -1,7 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
-import Link from 'next/link'
 import type { Inquiry } from '@/types'
 import { INQUIRY_STATUSES, INQUIRY_TYPES } from '@/constants'
+import ClickableRow from '@/components/admin/ClickableRow'
 
 const STATUS_COLOR: Record<string, string> = {
   new: 'bg-blue-100 text-blue-700',
@@ -55,7 +55,7 @@ export default async function AdminInquiriesPage() {
                 </tr>
               ) : (
                 inquiries.map((inquiry) => (
-                  <tr key={inquiry.id} className="hover:bg-gray-50 transition-colors">
+                  <ClickableRow key={inquiry.id} href={`/mong-bab/inquiries/${inquiry.id}`}>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
                         {typeMap[inquiry.type] ?? inquiry.type}
@@ -73,14 +73,9 @@ export default async function AdminInquiriesPage() {
                       {inquiry.created_at ? new Date(inquiry.created_at).toLocaleDateString('ko-KR') : '-'}
                     </td>
                     <td className="px-4 py-3">
-                      <Link
-                        href={`/mong-bab/inquiries/${inquiry.id}`}
-                        className="text-xs text-[#1a1a2e] hover:underline"
-                      >
-                        상세
-                      </Link>
+                      <span className="text-xs text-[#1a1a2e]">→ 상세</span>
                     </td>
-                  </tr>
+                  </ClickableRow>
                 ))
               )}
             </tbody>
