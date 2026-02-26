@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Lecture, Speaker } from '@/types'
 import { SPEAKER_FIELDS, LECTURE_DURATIONS } from '@/constants'
@@ -9,7 +9,7 @@ const DURATION_MAP = Object.fromEntries(LECTURE_DURATIONS.map((d) => [d.value, d
 type LectureWithSpeaker = Lecture & { speaker: Pick<Speaker, 'name'> }
 
 async function getLectures(): Promise<LectureWithSpeaker[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('lectures')
     .select('*, speaker:speakers(name)')
