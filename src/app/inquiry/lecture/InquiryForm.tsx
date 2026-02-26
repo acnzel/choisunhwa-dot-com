@@ -7,11 +7,13 @@ import { BUDGET_RANGES } from '@/constants'
 interface Props {
   defaultSpeaker?: string
   defaultLecture?: string
+  defaultName?: string    // F-4: 로그인 시 자동 채움
+  defaultEmail?: string   // F-4: 로그인 시 자동 채움
 }
 
 const initialState = { error: '' }
 
-export default function InquiryForm({ defaultSpeaker = '', defaultLecture = '' }: Props) {
+export default function InquiryForm({ defaultSpeaker = '', defaultLecture = '', defaultName = '', defaultEmail = '' }: Props) {
   const [state, formAction, pending] = useActionState(
     async (_prev: typeof initialState, formData: FormData) => {
       try {
@@ -61,6 +63,7 @@ export default function InquiryForm({ defaultSpeaker = '', defaultLecture = '' }
             required
             maxLength={50}
             placeholder="홍길동"
+            defaultValue={defaultName}
             className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#1a1a2e] bg-white"
           />
         </div>
@@ -92,6 +95,7 @@ export default function InquiryForm({ defaultSpeaker = '', defaultLecture = '' }
             name="email"
             required
             placeholder="example@company.com"
+            defaultValue={defaultEmail}
             className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#1a1a2e] bg-white"
           />
         </div>

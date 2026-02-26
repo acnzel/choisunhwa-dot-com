@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { createClient } from '@/lib/supabase/server'
 import InquiryForm from './InquiryForm'
 
 export const metadata: Metadata = {
@@ -12,6 +13,23 @@ interface Props {
 
 export default async function LectureInquiryPage({ searchParams }: Props) {
   const params = await searchParams
+
+  // F-4: 로그인 상태이면 이름/이메일 자동 채움
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  let defaultName = ''
+  let defaultEmail = user?.email ?? ''
+
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('name')
+      .eq('id', user.id)
+      .single()
+    defaultName = profile?.name || user.user_metadata?.full_name || user.user_metadata?.name || ''
+  }
+
   return (
     <div className="min-h-screen">
       <div className="bg-white border-b border-gray-100">
@@ -27,6 +45,8 @@ export default async function LectureInquiryPage({ searchParams }: Props) {
         <InquiryForm
           defaultSpeaker={params.speaker ?? ''}
           defaultLecture={params.lecture ?? ''}
+          defaultName={defaultName}
+          defaultEmail={defaultEmail}
         />
       </div>
     </div>

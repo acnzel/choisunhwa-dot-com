@@ -60,14 +60,19 @@ test.describe('강연 커리큘럼', () => {
 })
 
 test.describe('내비게이션', () => {
-  test('헤더 네비게이션 링크가 올바르게 동작한다', async ({ page }) => {
+  test('헤더 네비게이션이 데스크탑에서 표시된다', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/')
-    const nav = page.getByRole('navigation')
+    await page.waitForLoadState('networkidle')
+    // nav는 aria-label="주요 메뉴"로 구현됨
+    const nav = page.locator('nav[aria-label="주요 메뉴"]')
     await expect(nav).toBeVisible()
   })
 
   test('홈 페이지에서 강사 섹션 링크가 동작한다', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/')
+    await page.waitForLoadState('networkidle')
     const speakersLink = page.getByRole('link', { name: /강사/i }).first()
     if (await speakersLink.isVisible()) {
       await speakersLink.click()

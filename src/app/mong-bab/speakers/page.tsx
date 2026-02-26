@@ -3,6 +3,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 import type { Speaker } from '@/types'
 import { SPEAKER_FIELDS } from '@/constants'
+import ToggleVisible from './ToggleVisible'
+
+export const dynamic = 'force-dynamic'
 
 const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
 
@@ -21,7 +24,10 @@ export default async function AdminSpeakersPage() {
   return (
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-[#1a1a2e]">강사 관리</h1>
+        <div>
+          <h1 className="text-2xl font-bold text-[#1a1a2e]">강사 관리</h1>
+          <p className="text-sm text-gray-400 mt-0.5">총 {speakers.length}명 (공개: {speakers.filter(s => s.is_visible).length}명)</p>
+        </div>
         <Link
           href="/mong-bab/speakers/new"
           className="px-4 py-2 bg-[#1a1a2e] text-white text-sm font-medium rounded-xl hover:bg-[#16213e] transition-colors"
@@ -36,9 +42,9 @@ export default async function AdminSpeakersPage() {
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-4 py-3 font-medium text-gray-500">강사</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">분야</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">공개 여부</th>
-              <th className="text-left px-4 py-3 font-medium text-gray-500">노출 순서</th>
-              <th className="px-4 py-3" />
+              <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">공개</th>
+              <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">순서</th>
+              <th className="px-4 py-3 w-16" />
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
@@ -57,12 +63,14 @@ export default async function AdminSpeakersPage() {
                         {s.photo_url ? (
                           <Image src={s.photo_url} alt={s.name} fill className="object-cover" sizes="36px" />
                         ) : (
-                          <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-sm">?</div>
+                          <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xs font-bold">
+                            {s.name.charAt(0)}
+                          </div>
                         )}
                       </div>
                       <div>
                         <p className="font-medium text-gray-800">{s.name}</p>
-                        <p className="text-xs text-gray-400">{s.title}</p>
+                        <p className="text-xs text-gray-400">{s.title}{s.company ? ` · ${s.company}` : ''}</p>
                       </div>
                     </div>
                   </td>
@@ -76,14 +84,15 @@ export default async function AdminSpeakersPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${s.is_visible ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {s.is_visible ? '공개' : '비공개'}
-                    </span>
+                    <ToggleVisible speakerId={s.id} isVisible={s.is_visible} />
                   </td>
-                  <td className="px-4 py-3 text-gray-500">{s.sort_order}</td>
+                  <td className="px-4 py-3 text-gray-500 text-center">{s.sort_order}</td>
                   <td className="px-4 py-3">
-                    <Link href={`/mong-bab/speakers/${s.id}`} className="text-xs text-[#1a1a2e] hover:underline">
-                      수정
+                    <Link
+                      href={`/mong-bab/speakers/${s.id}`}
+                      className="text-xs font-medium text-[#1a1a2e] hover:underline"
+                    >
+                      편집
                     </Link>
                   </td>
                 </tr>
