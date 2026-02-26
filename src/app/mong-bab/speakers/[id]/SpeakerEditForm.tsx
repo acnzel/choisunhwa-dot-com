@@ -27,6 +27,30 @@ export default function SpeakerEditForm({ speaker }: Props) {
   )
   const [isVisible, setIsVisible] = useState(speaker.is_visible)
   const [deleting, setDeleting] = useState(false)
+  const [photoUrl, setPhotoUrl] = useState(speaker.photo_url ?? '')
+  const [uploading, setUploading] = useState(false)
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setUploading(true)
+    setUploadError(null)
+    const fd = new FormData()
+    fd.append('file', file)
+    fd.append('bucket', 'speakers')
+    try {
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd })
+      const json = await res.json()
+      if (!res.ok) { setUploadError(json.error ?? '업로드 실패'); return }
+      setPhotoUrl(json.data.url)
+    } catch {
+      setUploadError('업로드 중 오류 발생')
+    } finally {
+      setUploading(false)
+      e.target.value = ''
+    }
+  }
 
   const [state, formAction, pending] = useActionState(
     async (_prev: typeof initialState, formData: FormData) => {
@@ -128,26 +152,50 @@ export default function SpeakerEditForm({ speaker }: Props) {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">프로필 이미지 URL</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">프로필 이미지</label>
           <div className="flex gap-3 items-start">
-            <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
-              {speaker.photo_url ? (
-                <Image src={speaker.photo_url} alt={speaker.name} fill className="object-cover" sizes="64px" />
+            {/* 미리보기 */}
+            <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0 border border-gray-200">
+              {photoUrl ? (
+                <Image src={photoUrl} alt={speaker.name} fill className="object-cover" sizes="64px" />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-gray-300 text-xl font-bold">
                   {speaker.name.charAt(0)}
                 </div>
               )}
             </div>
-            <input
-              type="url"
-              name="photo_url"
-              defaultValue={speaker.photo_url ?? ''}
-              placeholder="https://... (Supabase Storage URL)"
-              className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
-            />
+            <div className="flex-1 space-y-2">
+              {/* 파일 업로드 버튼 */}
+              <label className={`inline-flex items-center gap-2 px-3 py-2 text-sm border rounded-lg cursor-pointer transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                {uploading ? '업로드 중...' : '이미지 업로드'}
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  disabled={uploading}
+                  onChange={handlePhotoUpload}
+                />
+              </label>
+              {/* URL 직접 입력 (fallback) */}
+              <input
+                type="hidden"
+                name="photo_url"
+                value={photoUrl}
+              />
+              <input
+                type="url"
+                value={photoUrl}
+                onChange={(e) => setPhotoUrl(e.target.value)}
+                placeholder="또는 URL 직접 입력..."
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+              />
+              {uploadError && <p className="text-xs text-red-500">{uploadError}</p>}
+              <p className="text-xs text-gray-400">JPG, PNG, WebP / 최대 2MB</p>
+            </div>
           </div>
-          <p className="text-xs text-gray-400 mt-1">Supabase Storage에 이미지 업로드 후 URL 입력</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
