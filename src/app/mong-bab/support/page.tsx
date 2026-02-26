@@ -1,9 +1,9 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Faq, Notice } from '@/types'
 
 async function getData() {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const [{ data: faqs }, { data: notices }] = await Promise.all([
     supabase.from('faqs').select('*, category:faq_categories(name)').order('sort_order', { ascending: true }).limit(10),
     supabase.from('notices').select('*').order('created_at', { ascending: false }).limit(10),

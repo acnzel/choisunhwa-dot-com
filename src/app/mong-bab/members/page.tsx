@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 
 interface Profile {
   id: string
@@ -11,7 +11,7 @@ interface Profile {
 }
 
 async function getMembers(): Promise<Profile[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('profiles')
     .select('*')

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Inquiry } from '@/types'
 import { INQUIRY_STATUSES, INQUIRY_TYPES } from '@/constants'
@@ -11,7 +11,7 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 async function getInquiries(): Promise<Inquiry[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('inquiries')
     .select('*')
