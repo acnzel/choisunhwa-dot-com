@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Speaker } from '@/types'
@@ -7,7 +7,7 @@ import { SPEAKER_FIELDS } from '@/constants'
 const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
 
 async function getSpeakers(): Promise<Speaker[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data } = await supabase
     .from('speakers')
     .select('*')
