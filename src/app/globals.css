@@ -60,7 +60,12 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;   /* 가로 스크롤 원천 차단 */
+  max-width: 100%;
+}
 
 body {
   font-family: var(--font-body);
@@ -70,10 +75,15 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
+  width: 100%;
+  max-width: 100%;
 }
 
 a { color: inherit; text-decoration: none; cursor: pointer; }
 img { display: block; max-width: 100%; }
+
+/* 어드민 테이블 래퍼 — 좁은 화면에서 가로 스크롤 */
+.table-scroll-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; }
 
 /* 클릭 가능한 모든 요소 — hand 커서 */
 a,

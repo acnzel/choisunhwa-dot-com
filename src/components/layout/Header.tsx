@@ -69,10 +69,11 @@ export default function Header() {
         href="/"
         style={{
           fontFamily: 'var(--font-english)',
-          fontSize: '18px',
-          letterSpacing: '0.06em',
+          fontSize: 'clamp(13px, 3.5vw, 18px)',
+          letterSpacing: '0.05em',
           color: 'var(--color-ink)',
           lineHeight: 1,
+          flexShrink: 0,
         }}
       >
         CHOISUNHWA.COM
@@ -187,18 +188,20 @@ export default function Header() {
           style={{
             fontFamily: 'var(--font-body)',
             fontSize: '11px', fontWeight: 700,
-            letterSpacing: '0.1em',
+            letterSpacing: '0.08em',
             color: 'var(--color-bg)',
             background: 'var(--color-green)',
-            padding: '9px 20px',
+            padding: '8px 14px',
             transition: 'background 0.2s',
             whiteSpace: 'nowrap',
             display: 'inline-block',
+            flexShrink: 0,
           }}
           onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-rust)')}
           onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-green)')}
         >
-          매칭 시작하기 →
+          <span className="hidden sm:inline">매칭 시작하기 →</span>
+          <span className="sm:hidden">의뢰 →</span>
         </Link>
 
         {/* 모바일 햄버거 */}

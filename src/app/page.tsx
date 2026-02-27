@@ -66,11 +66,22 @@ export default async function HomePage() {
         .insight-hero-card:hover { background: #223630; }
         .insight-card-plain { transition: background 0.15s; }
         .insight-card-plain:hover { background: var(--color-surface); }
+        /* ── 모바일 전반 ── */
         @media (max-width: 768px) {
+          /* 그리드 1열 전환 */
           .inquiry-grid { grid-template-columns: 1fr !important; }
-          .about-grid { grid-template-columns: 1fr !important; }
-          .insight-hero-card { grid-column: span 1 !important; }
+          .about-grid   { grid-template-columns: 1fr !important; }
           .insight-grid { grid-template-columns: 1fr !important; }
+          .insight-hero-card { grid-column: span 1 !important; min-height: 220px !important; }
+
+          /* Hero CTA 버튼 세로 배열 */
+          .hero-actions { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
+
+          /* 섹션 헤더 한 줄 wrap 허용 */
+          .section-head-row { flex-wrap: wrap !important; gap: 8px !important; }
+
+          /* About left: 하단 보더로 구분 */
+          .about-left-col { border-right: none !important; border-bottom: 1px solid var(--color-border) !important; }
         }
       `}</style>
 
@@ -127,7 +138,7 @@ export default async function HomePage() {
               강사 섭외부터 현장 운영, 사후 관리까지 — 한 팀이 끝까지 함께합니다.
             </p>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+            <div className="hero-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
               <Link href="/speakers" className="btn-fill-green">연사 라인업 보기 →</Link>
               <Link href="/inquiry" className="btn-ghost-ink">강연 의뢰하기 →</Link>
             </div>
@@ -319,7 +330,7 @@ export default async function HomePage() {
           </div>
 
           <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <div style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)', borderRight: '1px solid var(--color-border)' }}>
+            <div className="about-left-col" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)', borderRight: '1px solid var(--color-border)' }}>
               <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 2 }}>
                 강연 기획은 <strong style={{ color: 'var(--color-ink)', fontWeight: 600 }}>단순한 섭외가 아닙니다.</strong><br />
                 기업의 목적을 이해하고, 그에 맞는 강사를 찾고,<br />
