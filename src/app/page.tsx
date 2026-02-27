@@ -69,10 +69,10 @@ export default async function HomePage() {
         /* ── 모바일 전반 ── */
         @media (max-width: 768px) {
           /* 그리드 1열 전환 */
-          .inquiry-grid { grid-template-columns: 1fr !important; }
+          .inquiry-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
           .about-grid   { grid-template-columns: 1fr !important; }
           .insight-grid { grid-template-columns: 1fr !important; }
-          .insight-hero-card { grid-column: span 1 !important; min-height: 220px !important; }
+          .insight-hero-card { grid-column: span 1 !important; min-height: 200px !important; }
 
           /* Hero CTA 버튼 세로 배열 */
           .hero-actions { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
@@ -82,6 +82,12 @@ export default async function HomePage() {
 
           /* About left: 하단 보더로 구분 */
           .about-left-col { border-right: none !important; border-bottom: 1px solid var(--color-border) !important; }
+
+          /* 모바일 패딩 축소 */
+          .inquiry-panel-l, .inquiry-panel-r, .about-panel-l, .about-panel-r {
+            padding-top: 28px !important;
+            padding-bottom: 28px !important;
+          }
         }
       `}</style>
 
@@ -92,7 +98,7 @@ export default async function HomePage() {
 
         {/* ── HERO ── */}
         <section style={{
-          minHeight: 'clamp(420px, 72vh, calc(100vh - var(--nav-height) - 38px))',
+          minHeight: 'clamp(360px, 60vh, calc(100vh - var(--nav-height) - 38px))',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -270,7 +276,7 @@ export default async function HomePage() {
 
           <div className="inquiry-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '480px' }}>
             {/* 좌측 다크 */}
-            <div style={{
+            <div className="inquiry-panel-l" style={{
               background: 'var(--color-ink)',
               padding: 'clamp(40px, 6vw, 60px) var(--space-page)',
               display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
@@ -286,7 +292,7 @@ export default async function HomePage() {
             </div>
 
             {/* 우측 스텝 */}
-            <div style={{ padding: 'clamp(36px, 5vw, 48px) var(--space-page)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            <div className="inquiry-panel-r" style={{ padding: 'clamp(36px, 5vw, 48px) var(--space-page)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.9, marginBottom: '36px' }}>
                   복잡하게 생각하지 않아도 됩니다.<br />
@@ -331,7 +337,7 @@ export default async function HomePage() {
           </div>
 
           <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <div className="about-left-col" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)', borderRight: '1px solid var(--color-border)' }}>
+            <div className="about-left-col about-panel-l" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)', borderRight: '1px solid var(--color-border)' }}>
               <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 2 }}>
                 강연 기획은 <strong style={{ color: 'var(--color-ink)', fontWeight: 600 }}>단순한 섭외가 아닙니다.</strong><br />
                 기업의 목적을 이해하고, 그에 맞는 강사를 찾고,<br />
@@ -341,7 +347,7 @@ export default async function HomePage() {
                 한 팀이 처음부터 끝까지.
               </p>
             </div>
-            <div style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)' }}>
+            <div className="about-panel-r" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)' }}>
               <ol style={{ listStyle: 'none' }}>
                 {[
                   { step: '01', title: '강연 목적 및 대상 분석', desc: '기업의 니즈를 먼저 이해합니다' },
