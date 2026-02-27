@@ -19,8 +19,14 @@ const initialState = { error: '' }
 
 export default function SpeakerEditForm({ speaker }: Props) {
   const router = useRouter()
+  const allCareers = (speaker.careers as Career[]) ?? []
   const [careers, setCareers] = useState<Career[]>(
-    (speaker.careers as Career[]) ?? []
+    allCareers.filter((c) => !c.content.startsWith('[학력]'))
+  )
+  const [education, setEducation] = useState<Career[]>(
+    allCareers
+      .filter((c) => c.content.startsWith('[학력]'))
+      .map((c) => ({ ...c, content: c.content.replace(/^\[학력\]\s*/, '') }))
   )
   const [histories, setHistories] = useState<LectureHistory[]>(
     (speaker.lecture_histories as LectureHistory[]) ?? []
@@ -54,7 +60,11 @@ export default function SpeakerEditForm({ speaker }: Props) {
 
   const [state, formAction, pending] = useActionState(
     async (_prev: typeof initialState, formData: FormData) => {
-      formData.set('careers_json', JSON.stringify(careers))
+      const mergedCareers = [
+        ...careers,
+        ...education.map((e) => ({ ...e, content: `[학력] ${e.content}` })),
+      ]
+      formData.set('careers_json', JSON.stringify(mergedCareers))
       formData.set('lecture_histories_json', JSON.stringify(histories))
       formData.set('is_visible', String(isVisible))
       try {
@@ -84,6 +94,13 @@ export default function SpeakerEditForm({ speaker }: Props) {
   function removeCareer(i: number) { setCareers(careers.filter((_, idx) => idx !== i)) }
   function updateCareer(i: number, field: keyof Career, value: string) {
     setCareers(careers.map((c, idx) => idx === i ? { ...c, [field]: value } : c))
+  }
+
+  // Education 동적 추가/삭제
+  function addEducation() { setEducation([...education, { year: '', content: '' }]) }
+  function removeEducation(i: number) { setEducation(education.filter((_, idx) => idx !== i)) }
+  function updateEducation(i: number, field: keyof Career, value: string) {
+    setEducation(education.map((e, idx) => idx === i ? { ...e, [field]: value } : e))
   }
 
   // History 동적 추가/삭제
@@ -313,6 +330,50 @@ export default function SpeakerEditForm({ speaker }: Props) {
         </div>
       </section>
 
+      {/* 학력 */}
+      <section className="bg-white rounded-2xl border border-gray-100 p-6">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="text-base font-semibold text-[#1a1a2e]">학력</h2>
+          <button
+            type="button"
+            onClick={addEducation}
+            className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+          >
+            + 추가
+          </button>
+        </div>
+        <div className="space-y-2">
+          {education.map((e, i) => (
+            <div key={i} className="flex gap-2">
+              <input
+                type="text"
+                placeholder="연도"
+                value={e.year}
+                onChange={(ev) => updateEducation(i, 'year', ev.target.value)}
+                className="w-20 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+              />
+              <input
+                type="text"
+                placeholder="학교/학위"
+                value={e.content}
+                onChange={(ev) => updateEducation(i, 'content', ev.target.value)}
+                className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+              />
+              <button
+                type="button"
+                onClick={() => removeEducation(i)}
+                className="text-gray-300 hover:text-red-400 transition-colors px-1"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+          {education.length === 0 && (
+            <p className="text-xs text-gray-400 text-center py-3">학력이 없습니다. + 추가를 눌러 추가하세요.</p>
+          )}
+        </div>
+      </section>
+
       {/* 강연 이력 */}
       <section className="bg-white rounded-2xl border border-gray-100 p-6">
         <div className="flex items-center justify-between mb-3">
@@ -354,7 +415,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
       <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
         <h2 className="text-base font-semibold text-[#1a1a2e]">미디어 & 언론</h2>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">유튜브/영상 링크 (한 줄에 하나씩)</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">참고영상 링크 (한 줄에 하나씩, 유튜브 URL)</label>
           <textarea
             name="media_links"
             defaultValue={speaker.media_links.join('\n')}
@@ -364,12 +425,12 @@ export default function SpeakerEditForm({ speaker }: Props) {
           />
         </div>
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">뉴스/언론 링크 (한 줄에 하나씩)</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">저서 (한 줄에 하나씩)</label>
           <textarea
             name="news_links"
             defaultValue={speaker.news_links.join('\n')}
             rows={3}
-            placeholder="https://news.com/..."
+            placeholder="책 제목 1&#10;책 제목 2&#10;..."
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none"
           />
         </div>
