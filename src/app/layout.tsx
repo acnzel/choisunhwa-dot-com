@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body className="min-h-screen flex flex-col bg-[#fafafa]">
+      <body className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)' }}>
         <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>

@@ -1,277 +1,685 @@
+import { createClient } from '@/lib/supabase/server'
+import type { Speaker, Notice } from '@/types'
+import { SPEAKER_FIELDS } from '@/constants'
 import Link from 'next/link'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/server'
-import type { Speaker, Lecture } from '@/types'
-import { SPEAKER_FIELDS } from '@/constants'
+import HeroTicker from './HeroTicker'
+import SpeakerTabs from './SpeakerTabs'
 
-async function getFeaturedSpeakers(): Promise<Speaker[]> {
+const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
+
+async function getData() {
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('speakers')
-    .select('*')
-    .eq('is_visible', true)
-    .order('sort_order', { ascending: true })
-    .limit(4)
-  return (data as Speaker[]) ?? []
+  const [{ data: speakers }, { data: notices }] = await Promise.all([
+    supabase
+      .from('speakers')
+      .select('id, name, title, company, photo_url, fields, is_visible')
+      .eq('is_visible', true)
+      .order('sort_order', { ascending: true })
+      .limit(8),
+    supabase
+      .from('notices')
+      .select('id, title, content, is_pinned, published_at')
+      .eq('is_visible', true)
+      .order('published_at', { ascending: false })
+      .limit(4),
+  ])
+  return {
+    speakers: (speakers as Speaker[]) ?? [],
+    notices: (notices as Notice[]) ?? [],
+  }
 }
-
-async function getFeaturedLectures(): Promise<(Lecture & { speaker: Pick<Speaker, 'name' | 'title'> })[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('lectures')
-    .select('*, speaker:speakers(name, title)')
-    .eq('is_visible', true)
-    .limit(4)
-  return (data as (Lecture & { speaker: Pick<Speaker, 'name' | 'title'> })[]) ?? []
-}
-
-const VALUES = [
-  {
-    icon: '🎯',
-    title: '정확한 매칭',
-    desc: '기업의 목적과 대상에 맞는 강사를 정확하게 연결합니다.',
-  },
-  {
-    icon: '✅',
-    title: '검증된 강사진',
-    desc: '직접 검증한 전문 강사들과 실제 강연 이력을 투명하게 공개합니다.',
-  },
-  {
-    icon: '📊',
-    title: '성과 중심',
-    desc: '강연 후 피드백과 성과 데이터로 지속적인 품질을 보장합니다.',
-  },
-]
-
-const FIELD_MAP: Record<string, string> = Object.fromEntries(
-  SPEAKER_FIELDS.map((f) => [f.value, f.label])
-)
 
 export default async function HomePage() {
-  const [speakers, lectures] = await Promise.all([
-    getFeaturedSpeakers(),
-    getFeaturedLectures(),
-  ])
+  const { speakers, notices } = await getData()
+
+  const sectionBorder = '1px solid var(--color-border)'
 
   return (
-    <div>
-      {/* 히어로 섹션 */}
-      <section className="relative bg-[#1a1a2e] text-white overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] opacity-90" />
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-28 sm:py-36">
-          <div className="max-w-2xl">
-            <p className="text-sm font-medium text-blue-300 tracking-widest uppercase mb-4">
-              강연 기획의 새로운 기준
-            </p>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-tight tracking-tight">
-              올바른 강사와의<br />
-              <span className="text-blue-300">정확한 연결</span>
-            </h1>
-            <p className="mt-6 text-lg text-gray-300 leading-relaxed max-w-xl">
-              최선화닷컴은 기업과 검증된 강사를 연결하는 강연 기획 전문 플랫폼입니다.
-              강연 기획부터 강사 섭외, 사후 관리까지 원스톱으로 제공합니다.
-            </p>
-            <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/speakers"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#1a1a2e] font-semibold rounded-full hover:bg-gray-100 transition-colors text-sm"
-              >
-                강사 찾아보기 →
-              </Link>
-              <Link
-                href="/inquiry"
-                className="inline-flex items-center justify-center px-6 py-3 border border-white/30 text-white font-medium rounded-full hover:bg-white/10 transition-colors text-sm"
-              >
-                강연 문의하기
-              </Link>
-            </div>
-          </div>
+    <div style={{ paddingTop: 'var(--nav-height)' }}>
+
+      {/* ── TICKER ── */}
+      <HeroTicker speakerCount={speakers.length} />
+
+      {/* ── HERO ── */}
+      <section
+        style={{
+          minHeight: 'calc(100vh - var(--nav-height) - 38px)',
+          display: 'grid',
+          gridTemplateRows: '1fr auto',
+          padding: '0 var(--space-page) clamp(40px,6vw,56px)',
+          borderBottom: sectionBorder,
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        {/* 워터마크 */}
+        <div
+          aria-hidden
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-42%, -50%)',
+            fontFamily: 'var(--font-english)',
+            fontSize: 'clamp(120px, 22vw, 320px)',
+            color: 'var(--color-border)',
+            pointerEvents: 'none',
+            userSelect: 'none',
+            lineHeight: 1,
+            letterSpacing: '-0.02em',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          SPEAK
         </div>
-        {/* 데코 */}
-        <div className="absolute right-0 top-0 w-1/2 h-full hidden lg:block opacity-10">
-          <div className="w-full h-full bg-gradient-to-l from-blue-400 to-transparent" />
-        </div>
-      </section>
 
-      {/* 핵심 가치 */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-2xl sm:text-3xl font-bold text-[#1a1a2e]">
-              왜 최선화닷컴인가요?
-            </h2>
-            <p className="mt-3 text-gray-500 text-sm">
-              단순 소개를 넘어, 교육 효과를 설계합니다.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {VALUES.map(({ icon, title, desc }) => (
-              <div key={title} className="p-6 rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all">
-                <span className="text-3xl">{icon}</span>
-                <h3 className="mt-4 text-lg font-semibold text-[#1a1a2e]">{title}</h3>
-                <p className="mt-2 text-sm text-gray-500 leading-relaxed">{desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 주요 강사 */}
-      <section className="py-20 bg-[#fafafa]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1a1a2e]">주요 강사</h2>
-              <p className="mt-2 text-sm text-gray-500">검증된 전문가들을 만나보세요</p>
-            </div>
-            <Link href="/speakers" className="text-sm text-gray-500 hover:text-[#1a1a2e] transition-colors hidden sm:block">
-              전체 보기 →
-            </Link>
-          </div>
-
-          {speakers.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 text-sm">등록된 강사가 없습니다.</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-              {speakers.map((speaker) => (
-                <Link
-                  key={speaker.id}
-                  href={`/speakers/${speaker.id}`}
-                  className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow"
-                >
-                  <div className="relative aspect-[4/3] bg-gray-100">
-                    {speaker.photo_url ? (
-                      <Image
-                        src={speaker.photo_url}
-                        alt={speaker.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                        <svg className="w-16 h-16" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <div className="flex flex-wrap gap-1 mb-2">
-                      {speaker.fields.slice(0, 2).map((f) => (
-                        <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
-                          {FIELD_MAP[f] ?? f}
-                        </span>
-                      ))}
-                    </div>
-                    <h3 className="font-semibold text-[#1a1a2e] group-hover:text-blue-800 transition-colors">
-                      {speaker.name}
-                    </h3>
-                    <p className="text-xs text-gray-500 mt-0.5">{speaker.title}</p>
-                    <p className="text-sm text-gray-600 mt-2 line-clamp-2">{speaker.bio_short}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-
-          <div className="mt-6 text-center sm:hidden">
-            <Link href="/speakers" className="text-sm text-gray-500 hover:text-[#1a1a2e] transition-colors">
-              전체 강사 보기 →
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* 추천 강연 */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-end justify-between mb-10">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#1a1a2e]">추천 강연</h2>
-              <p className="mt-2 text-sm text-gray-500">기업이 선택하는 검증된 커리큘럼</p>
-            </div>
-            <Link href="/lectures" className="text-sm text-gray-500 hover:text-[#1a1a2e] transition-colors hidden sm:block">
-              전체 보기 →
-            </Link>
-          </div>
-
-          {lectures.length === 0 ? (
-            <div className="text-center py-16 text-gray-400 text-sm">등록된 강연이 없습니다.</div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-              {lectures.map((lecture) => (
-                <Link
-                  key={lecture.id}
-                  href={`/lectures/${lecture.id}`}
-                  className="group flex gap-4 p-5 bg-[#fafafa] rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
-                >
-                  <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
-                    {lecture.thumbnail_url ? (
-                      <Image
-                        src={lecture.thumbnail_url}
-                        alt={lecture.title}
-                        fill
-                        className="object-cover"
-                        sizes="80px"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.069A1 1 0 0121 8.882v6.236a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap gap-1 mb-1.5">
-                      {lecture.fields.slice(0, 2).map((f) => (
-                        <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
-                          {FIELD_MAP[f] ?? f}
-                        </span>
-                      ))}
-                    </div>
-                    <h3 className="font-semibold text-[#1a1a2e] group-hover:text-blue-800 transition-colors line-clamp-1">
-                      {lecture.title}
-                    </h3>
-                    {lecture.speaker && (
-                      <p className="text-xs text-gray-500 mt-0.5">{lecture.speaker.name}</p>
-                    )}
-                    <p className="text-sm text-gray-600 mt-1.5 line-clamp-2">{lecture.summary}</p>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* 문의 CTA */}
-      <section className="py-20 bg-[#1a1a2e]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white">
-            어떤 강연이 필요하신가요?
-          </h2>
-          <p className="mt-4 text-gray-400 text-sm leading-relaxed max-w-lg mx-auto">
-            강연 주제, 대상, 예산을 알려주시면
-            맞춤 강사를 1~2 영업일 내에 제안해드립니다.
+        {/* 메인 콘텐츠 */}
+        <div
+          style={{
+            alignSelf: 'flex-end',
+            position: 'relative',
+            zIndex: 1,
+            maxWidth: '860px',
+            paddingTop: '100px',
+          }}
+        >
+          <p
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              fontSize: '11px',
+              fontWeight: 500,
+              letterSpacing: '0.14em',
+              color: 'var(--color-muted)',
+              marginBottom: '20px',
+              textTransform: 'uppercase',
+            }}
+          >
+            <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--color-muted)' }} />
+            강연 기획의 새로운 기준
           </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 900,
+              fontSize: 'clamp(40px, 6vw, 88px)',
+              lineHeight: 1.12,
+              letterSpacing: '-0.03em',
+              marginBottom: '28px',
+            }}
+          >
+            올바른 강사와의
+            <span
+              style={{
+                color: 'var(--color-rust)',
+                fontWeight: 400,
+                display: 'block',
+                fontFamily: 'var(--font-display)',
+              }}
+            >
+              정확한 연결.
+            </span>
+          </h1>
+
+          <p
+            style={{
+              fontSize: '14px',
+              fontWeight: 300,
+              color: 'var(--color-subtle)',
+              lineHeight: 1.9,
+              maxWidth: '420px',
+              marginBottom: '44px',
+            }}
+          >
+            최선화닷컴은 기업과 검증된 강사를 연결하는 강연 기획 플랫폼입니다.
+            강사 섭외부터 현장 운영, 사후 관리까지 — 한 팀이 끝까지 함께합니다.
+          </p>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+            <Link
+              href="/speakers"
+              style={{
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: 'var(--color-bg)',
+                background: 'var(--color-green)',
+                padding: '13px 26px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-rust)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-green)')}
+            >
+              연사 라인업 보기 →
+            </Link>
+            <Link
+              href="/inquiry"
+              style={{
+                fontSize: '12px',
+                fontWeight: 500,
+                letterSpacing: '0.06em',
+                color: 'var(--color-ink)',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+              }}
+            >
+              강연 의뢰하기 →
+            </Link>
+          </div>
+        </div>
+
+        {/* 스크롤 힌트 */}
+        <span
+          aria-hidden
+          style={{
+            position: 'absolute',
+            right: 'var(--space-page)',
+            bottom: 'clamp(40px,6vw,56px)',
+            writingMode: 'vertical-rl',
+            fontSize: '10px',
+            letterSpacing: '0.16em',
+            color: 'var(--color-muted)',
+            textTransform: 'uppercase',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          Scroll
+          <span style={{ width: '1px', height: '44px', background: 'var(--color-muted)', display: 'block' }} />
+        </span>
+      </section>
+
+      {/* ── SPEAKERS ── */}
+      <section style={{ borderBottom: sectionBorder }} id="speakers">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            padding: '28px var(--space-page) 22px',
+            borderBottom: sectionBorder,
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 900,
+              fontSize: 'clamp(26px, 3vw, 44px)',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+            }}
+          >
+            연사 라인업{' '}
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 300,
+                fontSize: '13px',
+                letterSpacing: 0,
+                color: 'var(--color-muted)',
+                marginLeft: '8px',
+              }}
+            >
+              Speaker Lineup
+            </span>
+          </h2>
+          <Link
+            href="/speakers"
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              color: 'var(--color-subtle)',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            전체 보기 →
+          </Link>
+        </div>
+
+        {/* 탭 + 테이블 (클라이언트 컴포넌트) */}
+        <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} />
+      </section>
+
+      {/* ── INSIGHT ── */}
+      <section style={{ borderBottom: sectionBorder }} id="insight">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            padding: '28px var(--space-page) 22px',
+            borderBottom: sectionBorder,
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 900,
+              fontSize: 'clamp(26px, 3vw, 44px)',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+            }}
+          >
+            인사이트{' '}
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 300,
+                fontSize: '13px',
+                letterSpacing: 0,
+                color: 'var(--color-muted)',
+                marginLeft: '8px',
+              }}
+            >
+              Insight
+            </span>
+          </h2>
+          <Link
+            href="/support/notice"
+            style={{
+              fontSize: '11px',
+              fontWeight: 600,
+              letterSpacing: '0.1em',
+              color: 'var(--color-subtle)',
+              textTransform: 'uppercase',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+            }}
+          >
+            전체 보기 →
+          </Link>
+        </div>
+
+        {/* 매거진 그리드 */}
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            borderLeft: sectionBorder,
+          }}
+        >
+          {/* 히어로 카드 (첫 번째 공지 or 기본) */}
+          {(() => {
+            const hero = notices[0]
+            return (
+              <Link
+                href={hero ? `/support/notice/${hero.id}` : '/support/notice'}
+                style={{
+                  gridColumn: 'span 2',
+                  background: 'var(--color-green)',
+                  padding: 'clamp(24px, 3vw, 36px)',
+                  borderRight: sectionBorder,
+                  borderBottom: sectionBorder,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  minHeight: '280px',
+                  cursor: 'pointer',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = '#223630')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-green)')}
+              >
+                <div>
+                  <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-ochre)', marginBottom: '12px' }}>
+                    {hero?.is_pinned ? '📌 공지' : '에디터 픽'}
+                  </div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 26px)', letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '10px', color: 'var(--color-bg)' }}>
+                    {hero?.title ?? '최선화닷컴 강연 기획의 새로운 기준'}
+                  </div>
+                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(247,243,238,0.65)', lineHeight: 1.75 }}>
+                    {hero?.content ? hero.content.substring(0, 80) + (hero.content.length > 80 ? '...' : '') : '검증된 강사와의 정확한 연결. 기업 강연의 처음부터 끝까지 함께합니다.'}
+                  </p>
+                </div>
+                <div style={{ fontSize: '11px', color: 'rgba(247,243,238,0.45)', letterSpacing: '0.04em', marginTop: '16px' }}>
+                  {hero ? new Date(hero.published_at).toLocaleDateString('ko-KR') : ''} · Editor&apos;s Pick
+                </div>
+              </Link>
+            )
+          })()}
+
+          {/* 나머지 카드 */}
+          {(notices.length > 1 ? notices.slice(1, 4) : [null, null, null]).map((notice, i) => (
+            <Link
+              key={i}
+              href={notice ? `/support/notice/${notice.id}` : '/support/notice'}
+              style={{
+                padding: 'clamp(20px, 2.5vw, 28px)',
+                borderRight: sectionBorder,
+                borderBottom: sectionBorder,
+                cursor: 'pointer',
+                transition: 'background 0.15s',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '10px',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-surface)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+            >
+              <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
+                {['현장 리포트', 'Off Stage', 'Coming Up'][i]}
+              </div>
+              <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '16px', letterSpacing: '-0.02em', lineHeight: 1.45, color: 'var(--color-ink)' }}>
+                {notice?.title ?? '업데이트 예정'}
+              </div>
+              <div style={{ fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.04em', marginTop: 'auto' }}>
+                {notice ? new Date(notice.published_at).toLocaleDateString('ko-KR') : '—'}
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* ── INQUIRY ── */}
+      <section style={{ borderBottom: sectionBorder }} id="inquiry">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            justifyContent: 'space-between',
+            padding: '28px var(--space-page) 22px',
+            borderBottom: sectionBorder,
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 900,
+              fontSize: 'clamp(26px, 3vw, 44px)',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+            }}
+          >
+            강연 의뢰하기{' '}
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 300,
+                fontSize: '13px',
+                letterSpacing: 0,
+                color: 'var(--color-muted)',
+                marginLeft: '8px',
+              }}
+            >
+              Inquiry
+            </span>
+          </h2>
+        </div>
+
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            minHeight: '480px',
+          }}
+          className="inquiry-grid"
+        >
+          {/* 좌측 다크 패널 */}
+          <div
+            style={{
+              background: 'var(--color-ink)',
+              padding: 'clamp(40px, 6vw, 60px) var(--space-page)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              borderRight: sectionBorder,
+            }}
+          >
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 900,
+                fontSize: 'clamp(48px, 6.5vw, 96px)',
+                lineHeight: 0.95,
+                letterSpacing: '-0.02em',
+                color: 'var(--color-bg)',
+              }}
+            >
+              강연,<br />
+              <em style={{ display: 'block', color: 'var(--color-rust)', fontStyle: 'normal' }}>
+                지금<br />시작.
+              </em>
+            </div>
+            <p
+              style={{
+                fontSize: '12px',
+                fontWeight: 300,
+                color: 'rgba(247,243,238,0.45)',
+                letterSpacing: '0.06em',
+                lineHeight: 1.8,
+              }}
+            >
+              강연 주제 · 대상 · 예산을 알려주시면<br />
+              1–2 영업일 내 맞춤 강사를 제안드립니다.
+            </p>
+          </div>
+
+          {/* 우측 스텝 */}
+          <div
+            style={{
+              padding: 'clamp(36px, 5vw, 48px) var(--space-page)',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+            }}
+          >
+            <div>
+              <p
+                style={{
+                  fontSize: '14px',
+                  fontWeight: 300,
+                  color: 'var(--color-subtle)',
+                  lineHeight: 1.9,
+                  marginBottom: '36px',
+                }}
+              >
+                복잡하게 생각하지 않아도 됩니다.<br />
+                어떤 강연이 필요한지 간단히 알려주시면<br />
+                나머지는 최선화닷컴이 함께 설계합니다.
+              </p>
+              <ol style={{ listStyle: 'none', marginBottom: '40px' }}>
+                {[
+                  '강연 목적과 대상을 알려주세요',
+                  '예산과 희망 일정을 공유해주세요',
+                  '24–48시간 내 맞춤 강사를 제안드립니다',
+                  '확정 후 전담 담당자가 끝까지 함께합니다',
+                ].map((step, i) => (
+                  <li
+                    key={i}
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '32px 1fr',
+                      gap: '14px',
+                      padding: '14px 0',
+                      borderBottom: i < 3 ? sectionBorder : 'none',
+                      fontSize: '13px',
+                      alignItems: 'center',
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontFamily: 'var(--font-english)',
+                        fontSize: '16px',
+                        color: 'var(--color-muted)',
+                      }}
+                    >
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            </div>
             <Link
               href="/inquiry/lecture"
-              className="inline-flex items-center justify-center px-6 py-3 bg-white text-[#1a1a2e] font-semibold rounded-full hover:bg-gray-100 transition-colors text-sm"
+              style={{
+                alignSelf: 'flex-start',
+                fontSize: '12px',
+                fontWeight: 700,
+                letterSpacing: '0.08em',
+                color: 'var(--color-bg)',
+                background: 'var(--color-green)',
+                padding: '13px 26px',
+                transition: 'background 0.2s',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.background = 'var(--color-rust)')}
+              onMouseLeave={e => (e.currentTarget.style.background = 'var(--color-green)')}
             >
-              강연 기획 문의 →
-            </Link>
-            <Link
-              href="/inquiry/register"
-              className="inline-flex items-center justify-center px-6 py-3 border border-white/30 text-white font-medium rounded-full hover:bg-white/10 transition-colors text-sm"
-            >
-              강사 등록 문의
+              프로젝트 시작하기 →
             </Link>
           </div>
         </div>
       </section>
+
+      {/* ── ABOUT ── */}
+      <section style={{ borderBottom: sectionBorder }} id="about">
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'baseline',
+            padding: '28px var(--space-page) 22px',
+            borderBottom: sectionBorder,
+          }}
+        >
+          <h2
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontWeight: 900,
+              fontSize: 'clamp(26px, 3vw, 44px)',
+              letterSpacing: '-0.03em',
+              lineHeight: 1,
+            }}
+          >
+            최선화닷컴 이야기{' '}
+            <span
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontWeight: 300,
+                fontSize: '13px',
+                letterSpacing: 0,
+                color: 'var(--color-muted)',
+                marginLeft: '8px',
+              }}
+            >
+              About
+            </span>
+          </h2>
+        </div>
+
+        <div
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}
+          className="about-grid"
+        >
+          <div
+            style={{
+              padding: 'clamp(36px, 5vw, 52px) var(--space-page)',
+              borderRight: sectionBorder,
+            }}
+          >
+            <p
+              style={{
+                fontSize: '14px',
+                fontWeight: 300,
+                color: 'var(--color-subtle)',
+                lineHeight: 2,
+              }}
+            >
+              강연 기획은{' '}
+              <strong style={{ color: 'var(--color-ink)', fontWeight: 600 }}>단순한 섭외가 아닙니다.</strong><br />
+              기업의 목적을 이해하고, 그에 맞는 강사를 찾고,<br />
+              현장에서 실제로 작동하는 강연을 만드는 일입니다.<br /><br />
+              최선화닷컴은{' '}
+              <strong style={{ color: 'var(--color-ink)', fontWeight: 600 }}>그 과정 전체를 함께합니다.</strong><br />
+              강연 기획부터 강사 섭외, 현장 운영, 사후 관리까지 —<br />
+              한 팀이 처음부터 끝까지.
+            </p>
+          </div>
+          <div
+            style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)' }}
+          >
+            <ol style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {[
+                { step: '01', title: '강연 목적 및 대상 분석', desc: '기업의 니즈를 먼저 이해합니다' },
+                { step: '02', title: '검증된 강사 매칭 및 제안', desc: '직접 검증한 강사 풀에서 최적안 추출' },
+                { step: '03', title: '섭외 협의 및 계약 진행', desc: '커뮤니케이션 전담 처리' },
+                { step: '04', title: '현장 운영 지원', desc: '당일 현장까지 함께합니다' },
+                { step: '05', title: '사후 피드백 및 성과 분석', desc: '강연 후 데이터로 다음을 준비합니다' },
+              ].map(({ step, title, desc }, i, arr) => (
+                <li
+                  key={step}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '36px 1fr',
+                    gap: '16px',
+                    padding: '16px 0',
+                    borderBottom: i < arr.length - 1 ? sectionBorder : 'none',
+                    alignItems: 'flex-start',
+                  }}
+                >
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-english)',
+                      fontSize: '15px',
+                      color: 'var(--color-ochre)',
+                      paddingTop: '1px',
+                    }}
+                  >
+                    {step}
+                  </span>
+                  <div>
+                    <span
+                      style={{
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        letterSpacing: '-0.01em',
+                        display: 'block',
+                        lineHeight: 1.5,
+                      }}
+                    >
+                      {title}
+                    </span>
+                    <small
+                      style={{
+                        display: 'block',
+                        fontSize: '12px',
+                        fontWeight: 300,
+                        color: 'var(--color-muted)',
+                        marginTop: '2px',
+                      }}
+                    >
+                      {desc}
+                    </small>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
+      {/* 모바일 반응형 스타일 */}
+      <style>{`
+        @media (max-width: 768px) {
+          .inquiry-grid { grid-template-columns: 1fr !important; }
+          .about-grid { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </div>
   )
 }

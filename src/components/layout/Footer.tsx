@@ -1,71 +1,108 @@
 import Link from 'next/link'
 
-const FOOTER_LINKS = {
-  서비스: [
-    { href: '/speakers', label: '강사 소개' },
-    { href: '/lectures', label: '강연 커리큘럼' },
-    { href: '/inquiry/lecture', label: '강연기획 문의' },
-    { href: '/inquiry/register', label: '강사등록 문의' },
-  ],
-  고객지원: [
-    { href: '/support/faq', label: 'FAQ' },
-    { href: '/support/notice', label: '공지사항' },
-    { href: '/support/about', label: '회사소개' },
-  ],
-}
-
 export default function Footer() {
   return (
-    <footer className="bg-[#1a1a2e] text-gray-400">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* 브랜드 */}
-          <div className="md:col-span-2">
-            <Link href="/" className="text-white text-xl font-bold tracking-tight">
-              최선화닷컴
-            </Link>
-            <p className="mt-3 text-sm leading-relaxed text-gray-500">
-              강연 기획의 새로운 기준.<br />
-              검증된 강사와 기업을 연결하는 전문 플랫폼입니다.
-            </p>
-            <p className="mt-4 text-xs text-gray-600">
-              문의: contact@choisunhwa.com
-            </p>
-          </div>
-
-          {/* 링크 */}
-          {Object.entries(FOOTER_LINKS).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="text-sm font-semibold text-gray-300 mb-3">{category}</h3>
-              <ul className="space-y-2">
-                {links.map(({ href, label }) => (
-                  <li key={href}>
-                    <Link
-                      href={href}
-                      className="text-sm text-gray-500 hover:text-gray-300 transition-colors"
-                    >
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+    <footer
+      style={{
+        backgroundColor: 'var(--color-ink)',
+        padding: 'clamp(40px, 6vw, 60px) var(--space-page) clamp(32px, 4vw, 44px)',
+      }}
+    >
+      {/* 상단: 로고 + 링크 */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          alignItems: 'flex-end',
+          gap: '40px',
+          marginBottom: '48px',
+        }}
+      >
+        <div
+          style={{
+            fontFamily: 'var(--font-english)',
+            fontSize: 'clamp(36px, 6vw, 60px)',
+            letterSpacing: '0.02em',
+            lineHeight: 1,
+            color: '#2D2720',
+            userSelect: 'none',
+          }}
+        >
+          CHOISUNHWA<br />.COM
         </div>
 
-        <div className="mt-10 pt-6 border-t border-gray-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} 최선화닷컴. All rights reserved.
+        <div style={{ textAlign: 'right' }}>
+          <nav style={{ display: 'flex', gap: '20px', justifyContent: 'flex-end', marginBottom: '16px' }}>
+            {[
+              { href: '/speakers', label: '연사 라인업' },
+              { href: '/inquiry', label: '강연 의뢰하기' },
+              { href: '/support/about', label: '소개' },
+            ].map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                style={{
+                  fontFamily: 'var(--font-body)',
+                  fontSize: '11px',
+                  fontWeight: 500,
+                  letterSpacing: '0.08em',
+                  color: 'rgba(247,243,238,0.35)',
+                  transition: 'color 0.2s',
+                }}
+              >
+                {label}
+              </Link>
+            ))}
+          </nav>
+          <p
+            style={{
+              fontFamily: 'var(--font-body)',
+              fontSize: '11px',
+              fontWeight: 300,
+              color: 'rgba(247,243,238,0.25)',
+              lineHeight: 2,
+              letterSpacing: '0.04em',
+            }}
+          >
+            강연 기획의 새로운 기준<br />
+            © {new Date().getFullYear()} 최선화닷컴<br />
+            contact@choisunhwa.com
           </p>
-          <div className="flex gap-4 text-xs text-gray-600">
-            <Link href="/support/about" className="hover:text-gray-400 transition-colors">
-              이용약관
-            </Link>
-            <Link href="/support/about" className="hover:text-gray-400 transition-colors">
-              개인정보처리방침
-            </Link>
-          </div>
         </div>
+      </div>
+
+      {/* 하단: 구분선 + 법적 정보 */}
+      <div
+        style={{
+          borderTop: '1px solid rgba(212,207,200,0.12)',
+          paddingTop: '24px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '16px',
+          flexWrap: 'wrap',
+        }}
+      >
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '10px',
+            color: 'rgba(247,243,238,0.18)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          사업자 정보 | 이용약관 | 개인정보처리방침
+        </p>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '10px',
+            color: 'rgba(247,243,238,0.18)',
+            letterSpacing: '0.04em',
+          }}
+        >
+          Designed with care.
+        </p>
       </div>
     </footer>
   )
