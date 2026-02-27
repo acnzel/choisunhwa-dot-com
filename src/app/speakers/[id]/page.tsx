@@ -71,8 +71,17 @@ export default async function SpeakerDetailPage({ params }: Props) {
   // 저서 = news_links 배열
   const books = (speaker.news_links ?? []).filter(Boolean)
 
-  // 참고영상 = media_links
-  const mediaLinks = (speaker.media_links ?? []).filter(Boolean)
+  // 참고영상 = media_links (JSON "{title,url}" 또는 plain URL 둘 다 지원)
+  type MediaItem = { title: string; url: string }
+  const mediaLinks: MediaItem[] = (speaker.media_links ?? [])
+    .filter(Boolean)
+    .map((item) => {
+      try {
+        const parsed = JSON.parse(item)
+        if (parsed.url) return { title: parsed.title ?? parsed.url, url: parsed.url }
+      } catch { /* plain URL */ }
+      return { title: item, url: item }
+    })
 
   const hasContent = {
     bio: !!speaker.bio_full?.trim(),
@@ -213,20 +222,20 @@ export default async function SpeakerDetailPage({ params }: Props) {
             {hasContent.media && (
               <Section title="참고영상">
                 <div className="space-y-2">
-                  {mediaLinks.map((url, idx) => (
+                  {mediaLinks.map((item, idx) => (
                     <a
                       key={idx}
-                      href={url}
+                      href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-blue-600 hover:underline group"
+                      className="flex items-center gap-3 text-sm group"
                     >
                       <span className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
                         <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M8 5v14l11-7z"/>
                         </svg>
                       </span>
-                      <span className="group-hover:underline truncate">{url}</span>
+                      <span className="text-gray-700 group-hover:text-blue-600 group-hover:underline transition-colors">{item.title}</span>
                     </a>
                   ))}
                 </div>
