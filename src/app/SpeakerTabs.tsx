@@ -35,9 +35,9 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         /* 테이블 열 */
         .sp-row {
           display: grid;
-          grid-template-columns: 32px 1fr 180px 90px 24px;
+          grid-template-columns: 32px 1fr minmax(0, 160px) 80px 24px;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
           padding: 16px 0;
           border-bottom: 1px solid var(--color-border);
           text-decoration: none;
@@ -46,11 +46,11 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         }
         .sp-row:last-child { border-bottom: none; }
         .sp-row:hover { background: var(--color-surface); padding-left: 12px; padding-right: 12px; margin: 0 -12px; }
-        .sp-col-tags {}
+        .sp-col-tags { overflow: hidden; min-width: 0; }
         .sp-col-status {}
 
-        /* 모바일: 2열로 축소 */
-        @media (max-width: 640px) {
+        /* 태블릿/모바일: 태그·상태 숨김 */
+        @media (max-width: 768px) {
           .sp-row {
             grid-template-columns: 28px 1fr 28px;
           }

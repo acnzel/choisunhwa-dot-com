@@ -92,10 +92,11 @@ export default async function HomePage() {
 
         {/* ── HERO ── */}
         <section style={{
-          minHeight: 'calc(100vh - var(--nav-height) - 38px)',
-          display: 'grid',
-          gridTemplateRows: '1fr auto',
-          padding: '0 var(--space-page) clamp(40px,6vw,56px)',
+          minHeight: 'clamp(420px, 72vh, calc(100vh - var(--nav-height) - 38px))',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          padding: 'clamp(48px, 8vw, 96px) var(--space-page) clamp(40px,6vw,56px)',
           borderBottom: '1px solid var(--color-border)',
           position: 'relative',
           overflow: 'hidden',
@@ -110,7 +111,7 @@ export default async function HomePage() {
             lineHeight: 1, letterSpacing: '-0.02em', whiteSpace: 'nowrap',
           }}>SPEAK</div>
 
-          <div style={{ alignSelf: 'flex-end', position: 'relative', zIndex: 1, maxWidth: '860px', paddingTop: '100px' }}>
+          <div style={{ position: 'relative', zIndex: 1, maxWidth: '860px' }}>
             <p style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               fontSize: '11px', fontWeight: 500, letterSpacing: '0.14em',
@@ -146,7 +147,7 @@ export default async function HomePage() {
 
           <span aria-hidden style={{
             position: 'absolute', right: 'var(--space-page)',
-            bottom: 'clamp(40px,6vw,56px)',
+            bottom: 'clamp(24px, 4vw, 40px)',
             writingMode: 'vertical-rl', fontSize: '10px', letterSpacing: '0.16em',
             color: 'var(--color-muted)', textTransform: 'uppercase',
             display: 'flex', alignItems: 'center', gap: '10px',
