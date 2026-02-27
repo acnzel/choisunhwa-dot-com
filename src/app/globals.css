@@ -72,8 +72,23 @@ body {
   overflow-x: hidden;
 }
 
-a { color: inherit; text-decoration: none; }
+a { color: inherit; text-decoration: none; cursor: pointer; }
 img { display: block; max-width: 100%; }
+
+/* 클릭 가능한 모든 요소 — hand 커서 */
+a,
+button,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"],
+select,
+label { cursor: pointer; }
+
+/* disabled 상태는 not-allowed */
+button:disabled,
+input:disabled,
+select:disabled { cursor: not-allowed; opacity: 0.5; }
 
 /* 스크롤바 */
 ::-webkit-scrollbar { width: 6px; }
