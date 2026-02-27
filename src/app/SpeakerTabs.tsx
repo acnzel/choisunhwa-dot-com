@@ -35,10 +35,10 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         /* 테이블 열 */
         .sp-row {
           display: grid;
-          grid-template-columns: 32px 1fr minmax(0, 160px) 80px 24px;
+          grid-template-columns: 32px 1fr 24px;
           align-items: center;
-          gap: 12px;
-          padding: 16px 0;
+          gap: 16px;
+          padding: 18px 0;
           border-bottom: 1px solid var(--color-border);
           text-decoration: none;
           color: inherit;
@@ -46,17 +46,6 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         }
         .sp-row:last-child { border-bottom: none; }
         .sp-row:hover { background: var(--color-surface); padding-left: 12px; padding-right: 12px; margin: 0 -12px; }
-        .sp-col-tags { overflow: hidden; min-width: 0; }
-        .sp-col-status {}
-
-        /* 태블릿/모바일: 태그·상태 숨김 */
-        @media (max-width: 768px) {
-          .sp-row {
-            grid-template-columns: 28px 1fr 28px;
-          }
-          .sp-col-tags,
-          .sp-col-status { display: none; }
-        }
       `}</style>
 
       {/* 서브 탭 */}
@@ -110,7 +99,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         </div>
       )}
 
-      {/* 테이블 */}
+      {/* 리스트 */}
       <div style={{ padding: '0 var(--space-page)' }}>
         {filtered.length === 0 ? (
           <p style={{ padding: '40px 0', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)' }}>
@@ -120,44 +109,39 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           filtered.map((speaker, i) => (
             <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="sp-row">
               {/* 번호 */}
-              <span style={{ fontFamily: 'var(--font-english)', fontSize: '13px', color: 'var(--color-muted)' }}>
+              <span style={{ fontFamily: 'var(--font-english)', fontSize: '13px', color: 'var(--color-muted)', flexShrink: 0 }}>
                 {String(i + 1).padStart(2, '0')}
               </span>
 
-              {/* 이름 + 직함 */}
+              {/* 이름 + 직함 + 태그 (한 컬럼) */}
               <div style={{ minWidth: 0 }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {speaker.name}
                 </div>
-                <div style={{ fontSize: '11px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                <div style={{ fontSize: '11px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginBottom: speaker.fields.length > 0 ? '6px' : 0 }}>
                   {speaker.title}{speaker.company ? ` · ${speaker.company}` : ''}
                 </div>
+                {/* 태그: 이름 컬럼 안에, 줄바꿈 허용 */}
+                {speaker.fields.length > 0 && (
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                    {speaker.fields.slice(0, 3).map((f) => (
+                      <span key={f} style={{
+                        fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em',
+                        border: '1px solid var(--color-border)',
+                        padding: '2px 8px',
+                        color: 'var(--color-muted)',
+                        background: 'var(--color-surface)',
+                        whiteSpace: 'nowrap',
+                      }}>
+                        {fieldMap[f] ?? f}
+                      </span>
+                    ))}
+                  </div>
+                )}
               </div>
-
-              {/* 태그 (모바일 hidden) */}
-              <div className="sp-col-tags" style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                {speaker.fields.slice(0, 2).map((f) => (
-                  <span key={f} style={{
-                    fontSize: '10px', fontWeight: 600, letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    border: '1px solid var(--color-border)',
-                    padding: '2px 8px',
-                    color: 'var(--color-muted)',
-                    background: 'var(--color-surface)',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {fieldMap[f] ?? f}
-                  </span>
-                ))}
-              </div>
-
-              {/* 상태 (모바일 hidden) */}
-              <span className="sp-col-status" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-green)' }}>
-                섭외 가능
-              </span>
 
               {/* 화살표 */}
-              <span style={{ color: 'var(--color-muted)', fontSize: '14px', textAlign: 'right' }}>→</span>
+              <span style={{ color: 'var(--color-muted)', fontSize: '14px', flexShrink: 0 }}>→</span>
             </Link>
           ))
         )}
