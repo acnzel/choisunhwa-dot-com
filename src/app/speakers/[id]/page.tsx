@@ -80,7 +80,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
     education: education.length > 0,
     books: books.length > 0,
     media: mediaLinks.length > 0,
-    lectureHistories: (speaker.lecture_histories ?? []).length > 0,
+
     lectures: lectures.length > 0,
   }
 
@@ -228,22 +228,6 @@ export default async function SpeakerDetailPage({ params }: Props) {
                       </span>
                       <span className="group-hover:underline truncate">{url}</span>
                     </a>
-                  ))}
-                </div>
-              </Section>
-            )}
-
-            {/* 주요 강연 이력 */}
-            {hasContent.lectureHistories && (
-              <Section title="주요 출강 기업">
-                <div className="flex flex-wrap gap-2">
-                  {(speaker.lecture_histories as { org_name: string; logo_url?: string }[]).map((h, idx) => (
-                    <div key={idx} className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-100 text-sm text-gray-700">
-                      {h.logo_url && (
-                        <Image src={h.logo_url} alt={h.org_name} width={16} height={16} className="rounded" />
-                      )}
-                      {h.org_name}
-                    </div>
                   ))}
                 </div>
               </Section>
