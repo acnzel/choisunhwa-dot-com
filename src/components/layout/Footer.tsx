@@ -21,7 +21,7 @@ export default function Footer() {
         }
         .footer-logo {
           font-family: var(--font-english);
-          font-size: clamp(36px, 6vw, 60px);
+          font-size: clamp(24px, 4vw, 52px);
           letter-spacing: 0.02em;
           line-height: 1;
           color: #2D2720;
@@ -31,15 +31,16 @@ export default function Footer() {
         @media (max-width: 640px) {
           .footer-grid {
             grid-template-columns: 1fr;
-            gap: 28px;
+            gap: 24px;
           }
           .footer-right { text-align: left; }
           .footer-nav {
             justify-content: flex-start;
-            gap: 12px 16px;
+            gap: 10px 14px;
           }
           .footer-logo {
-            font-size: 40px;
+            font-size: clamp(18px, 5.5vw, 28px);
+            letter-spacing: 0.04em;
           }
         }
       `}</style>
