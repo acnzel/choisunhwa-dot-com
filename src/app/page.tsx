@@ -191,8 +191,8 @@ export default async function HomePage() {
               fontSize: 'clamp(40px, 6vw, 88px)',
               lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '28px',
             }}>
-              강연 한 번이
-              <span style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>조직을 바꿉니다.</span>
+              사람이 바뀌는 강연,
+              <span style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>여기서 시작됩니다.</span>
             </h1>
 
             {/* F-A: 서브카피 교체 */}
