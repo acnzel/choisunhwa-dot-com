@@ -29,14 +29,31 @@ async function getData() {
   }
 }
 
+// ── 신뢰 지표 (추후 DB/어드민 연동 예정) ──────────────────
+const TRUST_STATS = [
+  { number: '500건+', label: '누적 강연 기획' },
+  { number: '200곳+', label: '파트너 기업/기관' },
+  { number: '98%',   label: '고객 만족도' },
+]
+
+// ── 프로세스 4단계 (추후 DB/어드민 연동 예정) ──────────────
+const PROCESS_STEPS = [
+  { step: '01', icon: '📝', title: '의뢰 접수',      desc: '강연 목적, 대상, 예산을 간단히 알려주세요' },
+  { step: '02', icon: '☎️', title: '24시간 내 연락', desc: '담당자가 직접 연락해 요구사항을 확인합니다' },
+  { step: '03', icon: '🎯', title: '맞춤 강사 제안', desc: '조직에 딱 맞는 강사 2~3명을 추천드립니다' },
+  { step: '04', icon: '✅', title: '계약 & 진행',    desc: '일정, 장소, 내용 조율 후 강연이 시작됩니다' },
+]
+
 export default async function HomePage() {
   const { speakers, notices } = await getData()
-  const hero = notices[0] ?? null
-  const rest = notices.length > 1 ? notices.slice(1, 4) : []
+
+  // ── Insight 카드: 실제 데이터가 있는 것만 사용 ──
+  const hero   = notices[0] ?? null
+  const subs   = notices.slice(1, 4).filter(Boolean) as Notice[]
+  const showInsight = hero !== null || subs.length > 0
 
   return (
     <>
-      {/* ── CSS 호버 효과 (Server Component에서는 onMouse 불가 → global class 활용) ── */}
       <style>{`
         .btn-fill-green {
           display: inline-flex; align-items: center; gap: 8px;
@@ -59,35 +76,74 @@ export default async function HomePage() {
           transition: color 0.2s, gap 0.2s;
         }
         .see-all-link:hover { color: var(--color-ink); gap: 10px; }
-        .insight-hero-card {
-          background: var(--color-green);
-          transition: background 0.15s;
-        }
+        .insight-hero-card { background: var(--color-green); transition: background 0.15s; }
         .insight-hero-card:hover { background: #223630; }
         .insight-card-plain { transition: background 0.15s; }
         .insight-card-plain:hover { background: var(--color-surface); }
+
+        /* ── 신뢰 배너 ── */
+        .trust-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .trust-item {
+          padding: clamp(28px, 4vw, 44px) var(--space-page);
+          border-right: 1px solid var(--color-border);
+          text-align: center;
+        }
+        .trust-item:last-child { border-right: none; }
+
+        /* ── 프로세스 그리드 ── */
+        .process-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          border-left: 1px solid var(--color-border);
+        }
+        .process-item {
+          padding: clamp(24px, 3.5vw, 40px) clamp(20px, 2.5vw, 32px);
+          border-right: 1px solid var(--color-border);
+          border-bottom: 1px solid var(--color-border);
+          position: relative;
+        }
+        .process-arrow {
+          position: absolute; right: -10px; top: 50%;
+          transform: translateY(-50%);
+          font-size: 14px; color: var(--color-border);
+          z-index: 1;
+        }
+        .process-item:last-child .process-arrow { display: none; }
+
         /* ── 모바일 전반 ── */
         @media (max-width: 768px) {
-          /* 그리드 1열 전환 */
           .inquiry-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
           .about-grid   { grid-template-columns: 1fr !important; }
           .insight-grid { grid-template-columns: 1fr !important; }
           .insight-hero-card { grid-column: span 1 !important; min-height: 200px !important; }
-
-          /* Hero CTA 버튼 세로 배열 */
           .hero-actions { flex-direction: column !important; align-items: flex-start !important; gap: 16px !important; }
-
-          /* 섹션 헤더 한 줄 wrap 허용 */
-          .section-head-row { flex-wrap: wrap !important; gap: 8px !important; }
-
-          /* About left: 하단 보더로 구분 */
           .about-left-col { border-right: none !important; border-bottom: 1px solid var(--color-border) !important; }
-
-          /* 모바일 패딩 축소 */
           .inquiry-panel-l, .inquiry-panel-r, .about-panel-l, .about-panel-r {
-            padding-top: 28px !important;
-            padding-bottom: 28px !important;
+            padding-top: 28px !important; padding-bottom: 28px !important;
           }
+          /* 신뢰 배너: 모바일 세로 나열 */
+          .trust-grid {
+            grid-template-columns: 1fr;
+          }
+          .trust-item {
+            border-right: none;
+            border-bottom: 1px solid var(--color-border);
+            text-align: left;
+            display: flex; align-items: center; gap: 16px;
+          }
+          .trust-item:last-child { border-bottom: none; }
+          /* 프로세스: 모바일 타임라인 세로 */
+          .process-grid {
+            grid-template-columns: 1fr;
+          }
+          .process-item {
+            padding-left: var(--space-page);
+            padding-right: var(--space-page);
+          }
+          .process-arrow { display: none; }
         }
       `}</style>
 
@@ -96,7 +152,7 @@ export default async function HomePage() {
         {/* ── TICKER ── */}
         <HeroTicker speakerCount={speakers.length} />
 
-        {/* ── HERO ── */}
+        {/* ── HERO (F-A: 카피 교체) ── */}
         <section style={{
           minHeight: 'clamp(360px, 60vh, calc(100vh - var(--nav-height) - 38px))',
           display: 'flex',
@@ -107,14 +163,14 @@ export default async function HomePage() {
           position: 'relative',
           overflow: 'hidden',
         }}>
+          {/* SPEAK 워터마크 */}
           <div aria-hidden style={{
             position: 'absolute', top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
             fontFamily: 'var(--font-english)',
             fontSize: 'clamp(100px, 18vw, 260px)',
             color: 'var(--color-border)',
-            opacity: 0.55,
-            zIndex: 0,
+            opacity: 0.55, zIndex: 0,
             pointerEvents: 'none', userSelect: 'none',
             lineHeight: 1, letterSpacing: '-0.02em', whiteSpace: 'nowrap',
           }}>SPEAK</div>
@@ -129,22 +185,24 @@ export default async function HomePage() {
               강연 기획의 새로운 기준
             </p>
 
+            {/* F-A: 헤드라인 교체 */}
             <h1 style={{
               fontFamily: 'var(--font-display)', fontWeight: 900,
               fontSize: 'clamp(40px, 6vw, 88px)',
               lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '28px',
             }}>
-              올바른 강사와의
-              <span style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>정확한 연결.</span>
+              강연 한 번이
+              <span style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>조직을 바꿉니다.</span>
             </h1>
 
+            {/* F-A: 서브카피 교체 */}
             <p style={{
               fontSize: '14px', fontWeight: 300,
               color: 'var(--color-subtle)', lineHeight: 1.9,
-              maxWidth: '420px', marginBottom: '44px',
+              maxWidth: '440px', marginBottom: '44px',
+              whiteSpace: 'pre-line',
             }}>
-              최선화닷컴은 기업과 검증된 강사를 연결하는 강연 기획 플랫폼입니다.
-              강사 섭외부터 현장 운영, 사후 관리까지 — 한 팀이 끝까지 함께합니다.
+              {`최선화닷컴은 단순한 소개가 아닙니다.\n기획부터 현장까지, 서로 끌리는 강사와 기업을 연결합니다.`}
             </p>
 
             <div className="hero-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
@@ -163,6 +221,31 @@ export default async function HomePage() {
             Scroll
             <span style={{ width: '1px', height: '44px', background: 'var(--color-muted)', display: 'block' }} />
           </span>
+        </section>
+
+        {/* ── F-B: 신뢰 지표 배너 ── */}
+        <section style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
+          <div className="trust-grid">
+            {TRUST_STATS.map(({ number, label }, i) => (
+              <div key={i} className="trust-item">
+                <div style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 900,
+                  fontSize: 'clamp(36px, 4.5vw, 64px)',
+                  letterSpacing: '-0.03em', lineHeight: 1,
+                  color: i % 2 === 0 ? 'var(--color-green)' : 'var(--color-rust)',
+                  marginBottom: '8px',
+                }}>
+                  {number}
+                </div>
+                <div style={{
+                  fontFamily: 'var(--font-body)', fontSize: '12px', fontWeight: 400,
+                  color: 'var(--color-subtle)', letterSpacing: '0.04em',
+                }}>
+                  {label}
+                </div>
+              </div>
+            ))}
+          </div>
         </section>
 
         {/* ── SPEAKERS ── */}
@@ -186,63 +269,64 @@ export default async function HomePage() {
           <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} />
         </section>
 
-        {/* ── INSIGHT ── */}
-        <section style={{ borderBottom: '1px solid var(--color-border)' }} id="insight">
-          <div style={{
-            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-            padding: '28px var(--space-page) 22px',
-            borderBottom: '1px solid var(--color-border)',
-          }}>
-            <h2 style={{
-              fontFamily: 'var(--font-display)', fontWeight: 900,
-              fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
+        {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}
+        {showInsight && (
+          <section style={{ borderBottom: '1px solid var(--color-border)' }} id="insight">
+            <div style={{
+              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+              padding: '28px var(--space-page) 22px',
+              borderBottom: '1px solid var(--color-border)',
             }}>
-              인사이트{' '}
-              <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>Insight</span>
-            </h2>
-            <Link href="/support/notice" className="see-all-link">전체 보기 →</Link>
-          </div>
+              <h2 style={{
+                fontFamily: 'var(--font-display)', fontWeight: 900,
+                fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
+              }}>
+                인사이트{' '}
+                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>Insight</span>
+              </h2>
+              <Link href="/support/notice" className="see-all-link">전체 보기 →</Link>
+            </div>
 
-          <div className="insight-grid" style={{
-            display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
-            borderLeft: '1px solid var(--color-border)',
-          }}>
-            {/* 히어로 카드 */}
-            <Link
-              href={hero ? `/support/notice/${hero.id}` : '/support/notice'}
-              className="insight-hero-card"
-              style={{
-                gridColumn: 'span 2',
-                padding: 'clamp(24px, 3vw, 36px)',
-                borderRight: '1px solid var(--color-border)',
-                borderBottom: '1px solid var(--color-border)',
-                display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
-                minHeight: '280px',
-              }}
-            >
-              <div>
-                <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-ochre)', marginBottom: '12px' }}>
-                  {hero?.is_pinned ? '📌 공지' : '에디터 픽'}
-                </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 26px)', letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '10px', color: 'var(--color-bg)' }}>
-                  {hero?.title ?? '최선화닷컴 강연 기획의 새로운 기준'}
-                </div>
-                <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(247,243,238,0.65)', lineHeight: 1.75 }}>
-                  {hero?.content ? hero.content.substring(0, 80) + (hero.content.length > 80 ? '…' : '') : '검증된 강사와의 정확한 연결. 기업 강연의 처음부터 끝까지 함께합니다.'}
-                </p>
-              </div>
-              <div style={{ fontSize: '11px', color: 'rgba(247,243,238,0.45)', letterSpacing: '0.04em', marginTop: '16px' }}>
-                {hero ? new Date(hero.published_at).toLocaleDateString('ko-KR') : ''} · Editor&apos;s Pick
-              </div>
-            </Link>
-
-            {/* 나머지 카드 3개 */}
-            {(['현장 리포트', 'Off Stage', 'Coming Up'] as const).map((label, i) => {
-              const notice = rest[i] ?? null
-              return (
+            <div className="insight-grid" style={{
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
+              borderLeft: '1px solid var(--color-border)',
+            }}>
+              {/* 히어로 카드 (데이터 있을 때만) */}
+              {hero && (
                 <Link
-                  key={label}
-                  href={notice ? `/support/notice/${notice.id}` : '/support/notice'}
+                  href={`/support/notice/${hero.id}`}
+                  className="insight-hero-card"
+                  style={{
+                    gridColumn: 'span 2',
+                    padding: 'clamp(24px, 3vw, 36px)',
+                    borderRight: '1px solid var(--color-border)',
+                    borderBottom: '1px solid var(--color-border)',
+                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    minHeight: '280px',
+                  }}
+                >
+                  <div>
+                    <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-ochre)', marginBottom: '12px' }}>
+                      {hero.is_pinned ? '📌 공지' : '에디터 픽'}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 26px)', letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '10px', color: 'var(--color-bg)' }}>
+                      {hero.title}
+                    </div>
+                    <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(247,243,238,0.65)', lineHeight: 1.75 }}>
+                      {hero.content ? hero.content.substring(0, 80) + (hero.content.length > 80 ? '…' : '') : ''}
+                    </p>
+                  </div>
+                  <div style={{ fontSize: '11px', color: 'rgba(247,243,238,0.45)', letterSpacing: '0.04em', marginTop: '16px' }}>
+                    {new Date(hero.published_at).toLocaleDateString('ko-KR')} · Editor&apos;s Pick
+                  </div>
+                </Link>
+              )}
+
+              {/* 서브 카드: 실제 데이터만 렌더링 (F-D/E: 빈 카드 숨김) */}
+              {subs.map((notice) => (
+                <Link
+                  key={notice.id}
+                  href={`/support/notice/${notice.id}`}
                   className="insight-card-plain"
                   style={{
                     padding: 'clamp(20px, 2.5vw, 28px)',
@@ -251,16 +335,52 @@ export default async function HomePage() {
                     display: 'flex', flexDirection: 'column', gap: '10px',
                   }}
                 >
-                  <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>{label}</div>
+                  <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
+                    인사이트
+                  </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '16px', letterSpacing: '-0.02em', lineHeight: 1.45, color: 'var(--color-ink)' }}>
-                    {notice?.title ?? '업데이트 예정'}
+                    {notice.title}
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.04em', marginTop: 'auto' }}>
-                    {notice ? new Date(notice.published_at).toLocaleDateString('ko-KR') : '—'}
+                    {new Date(notice.published_at).toLocaleDateString('ko-KR')}
                   </div>
                 </Link>
-              )
-            })}
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── F-C: 프로세스 4단계 ── */}
+        <section style={{ borderBottom: '1px solid var(--color-border)' }} id="process">
+          <div style={{
+            display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+            padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)',
+          }}>
+            <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1 }}>
+              의뢰하면 이렇게 됩니다{' '}
+              <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>How it works</span>
+            </h2>
+          </div>
+
+          <div className="process-grid">
+            {PROCESS_STEPS.map(({ step, icon, title, desc }, i) => (
+              <div key={step} className="process-item">
+                {/* 단계 간 화살표 (PC) */}
+                {i < PROCESS_STEPS.length - 1 && (
+                  <span className="process-arrow">→</span>
+                )}
+                <div style={{ fontFamily: 'var(--font-english)', fontSize: '11px', fontWeight: 400, letterSpacing: '0.12em', color: 'var(--color-muted)', marginBottom: '12px' }}>
+                  STEP {step}
+                </div>
+                <div style={{ fontSize: '20px', marginBottom: '10px', lineHeight: 1 }}>{icon}</div>
+                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(15px, 1.8vw, 18px)', letterSpacing: '-0.02em', color: 'var(--color-ink)', marginBottom: '8px', lineHeight: 1.3 }}>
+                  {title}
+                </div>
+                <p style={{ fontSize: '12px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.75 }}>
+                  {desc}
+                </p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -293,7 +413,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* 우측 스텝 */}
+            {/* 우측 CTA */}
             <div className="inquiry-panel-r" style={{ padding: 'clamp(36px, 5vw, 48px) var(--space-page)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.9, marginBottom: '36px' }}>
@@ -301,26 +421,10 @@ export default async function HomePage() {
                   어떤 강연이 필요한지 간단히 알려주시면<br />
                   나머지는 최선화닷컴이 함께 설계합니다.
                 </p>
-                <ol style={{ listStyle: 'none', marginBottom: '40px' }}>
-                  {[
-                    '강연 목적과 대상을 알려주세요',
-                    '예산과 희망 일정을 공유해주세요',
-                    '24–48시간 내 맞춤 강사를 제안드립니다',
-                    '확정 후 전담 담당자가 끝까지 함께합니다',
-                  ].map((step, i) => (
-                    <li key={i} style={{
-                      display: 'grid', gridTemplateColumns: '32px 1fr', gap: '14px',
-                      padding: '14px 0',
-                      borderBottom: i < 3 ? '1px solid var(--color-border)' : 'none',
-                      fontSize: '13px', alignItems: 'center',
-                    }}>
-                      <span style={{ fontFamily: 'var(--font-english)', fontSize: '16px', color: 'var(--color-muted)' }}>
-                        {String(i + 1).padStart(2, '0')}
-                      </span>
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ol>
+                <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '24px', marginBottom: '40px' }}>
+                  <p style={{ fontSize: '12px', fontWeight: 500, color: 'var(--color-ink)', marginBottom: '6px' }}>강연 의뢰 연락처</p>
+                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)' }}>contact@choisunhwa.com</p>
+                </div>
               </div>
               <Link href="/inquiry/lecture" className="btn-fill-green" style={{ alignSelf: 'flex-start' }}>
                 프로젝트 시작하기 →
