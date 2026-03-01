@@ -109,10 +109,12 @@ export default async function HomePage() {
         }}>
           <div aria-hidden style={{
             position: 'absolute', top: '50%', left: '50%',
-            transform: 'translate(-42%, -50%)',
+            transform: 'translate(-50%, -50%)',
             fontFamily: 'var(--font-english)',
-            fontSize: 'clamp(120px, 22vw, 320px)',
+            fontSize: 'clamp(100px, 18vw, 260px)',
             color: 'var(--color-border)',
+            opacity: 0.55,
+            zIndex: 0,
             pointerEvents: 'none', userSelect: 'none',
             lineHeight: 1, letterSpacing: '-0.02em', whiteSpace: 'nowrap',
           }}>SPEAK</div>
