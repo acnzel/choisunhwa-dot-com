@@ -61,8 +61,12 @@ export default async function SpeakerDetailPage({ params }: Props) {
   if (!speaker) notFound()
 
   // 약력 / 학력 분리 ([학력] 접두어 기준)
-  type Career = { year: string; content: string }
-  const allCareers = (speaker.careers as Career[]) ?? []
+  // careers 배열은 plain string 또는 {year, content} 객체 두 형태 모두 허용
+  type Career = { year?: string; content: string }
+  const rawCareers = (speaker.careers as (string | Career)[]) ?? []
+  const allCareers: Career[] = rawCareers.map((c) =>
+    typeof c === 'string' ? { year: '', content: c } : { year: c.year ?? '', content: c.content ?? '' }
+  )
   const careers = allCareers.filter((c) => !c.content.startsWith('[학력]'))
   const education = allCareers
     .filter((c) => c.content.startsWith('[학력]'))
