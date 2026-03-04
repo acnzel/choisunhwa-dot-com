@@ -61,22 +61,18 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
   if (!speaker) notFound()
 
-  // 약력 / 학력 분리 ([학력] 접두어 기준)
-  // careers 배열은 plain string 또는 {year, content} 객체 두 형태 모두 허용
   type Career = { year?: string; content: string }
   const rawCareers = (speaker.careers as (string | Career)[]) ?? []
   const allCareers: Career[] = rawCareers.map((c) =>
     typeof c === 'string' ? { year: '', content: c } : { year: c.year ?? '', content: c.content ?? '' }
   )
-  const careers = allCareers.filter((c) => !c.content.startsWith('[학력]'))
+  const careers   = allCareers.filter((c) => !c.content.startsWith('[학력]'))
   const education = allCareers
     .filter((c) => c.content.startsWith('[학력]'))
     .map((c) => ({ ...c, content: c.content.replace(/^\[학력\]\s*/, '') }))
 
-  // 저서 = news_links 배열
   const books = (speaker.news_links ?? []).filter(Boolean)
 
-  // 참고영상 = media_links (JSON "{title,url}" 또는 plain URL 둘 다 지원)
   type MediaItem = { title: string; url: string }
   const mediaLinks: MediaItem[] = (speaker.media_links ?? [])
     .filter(Boolean)
@@ -89,238 +85,422 @@ export default async function SpeakerDetailPage({ params }: Props) {
     })
 
   const hasContent = {
-    bio: !!speaker.bio_full?.trim(),
-    careers: careers.length > 0,
+    bio:       !!speaker.bio_full?.trim(),
+    careers:   careers.length > 0,
     education: education.length > 0,
-    books: books.length > 0,
-    media: mediaLinks.length > 0,
-
-    lectures: lectures.length > 0,
+    books:     books.length > 0,
+    media:     mediaLinks.length > 0,
+    lectures:  lectures.length > 0,
   }
 
   return (
-    <div className="min-h-screen bg-[#fafafa]">
-      <ScrollToTop />
+    <>
+      <style>{`
+        /* ── 강사 상세 레이아웃 ── */
+        .sp-detail-grid {
+          display: grid;
+          grid-template-columns: 1fr 320px;
+          gap: 0;
+        }
+        @media (max-width: 860px) {
+          .sp-detail-grid {
+            grid-template-columns: 1fr;
+          }
+          .sp-detail-sidebar {
+            border-left: none !important;
+            border-top: 1px solid var(--color-border) !important;
+          }
+        }
+        /* 강연 카드 호버 */
+        .lec-card:hover {
+          background: var(--color-surface) !important;
+        }
+        /* 미디어 링크 */
+        .media-link:hover { color: var(--color-rust) !important; }
+      `}</style>
 
-      {/* ── 히어로 헤더 ────────────────────────────── */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14">
-          <div className="flex flex-col sm:flex-row gap-8 items-start">
+      <div style={{ minHeight: '100vh', paddingTop: 'var(--nav-height)', background: 'var(--color-bg)' }}>
+        <ScrollToTop />
+
+        {/* ── 히어로 헤더 ── */}
+        <header style={{ borderBottom: '1px solid var(--color-border)' }}>
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
+            gap: 'clamp(24px, 4vw, 56px)',
+            padding: 'clamp(28px, 5vw, 56px) var(--space-page)',
+            alignItems: 'flex-start',
+          }}>
 
             {/* 프로필 사진 */}
-            <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-2xl overflow-hidden bg-gray-100 flex-shrink-0 shadow-sm">
+            <div style={{
+              position: 'relative',
+              width: 'clamp(100px, 14vw, 180px)',
+              aspectRatio: '1',
+              background: 'var(--color-surface)',
+              border: '1px solid var(--color-border)',
+              flexShrink: 0,
+              overflow: 'hidden',
+            }}>
               {speaker.photo_url ? (
                 <Image
                   src={speaker.photo_url}
                   alt={speaker.name}
                   fill
-                  className="object-cover"
-                  sizes="144px"
+                  style={{ objectFit: 'cover' }}
+                  sizes="180px"
                   priority
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                  <svg className="w-14 h-14" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
+                <div style={{
+                  position: 'absolute', inset: 0, display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'var(--font-english)',
+                  fontSize: 'clamp(32px, 5vw, 64px)', color: 'var(--color-border)',
+                }}>
+                  {speaker.name.charAt(0)}
                 </div>
               )}
             </div>
 
             {/* 기본 정보 */}
-            <div className="flex-1 min-w-0">
+            <div>
               {/* 분야 태그 */}
               {speaker.fields.length > 0 && (
-                <div className="flex flex-wrap gap-1.5 mb-3">
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {speaker.fields.map((f) => (
-                    <span key={f} className="text-xs px-2.5 py-0.5 bg-blue-50 text-blue-700 rounded-full font-medium">
+                    <span key={f} style={{
+                      fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em',
+                      padding: '3px 10px',
+                      background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                      color: 'var(--color-subtle)', textTransform: 'uppercase',
+                    }}>
                       {FIELD_MAP[f] ?? f}
                     </span>
                   ))}
                 </div>
               )}
 
-              <h1 className="text-3xl sm:text-4xl font-bold text-[#1a1a2e] tracking-tight">{speaker.name}</h1>
-              <p className="text-gray-500 mt-1.5 text-sm">
+              {/* 이름 */}
+              <h1 style={{
+                fontFamily: 'var(--font-display)', fontWeight: 900,
+                fontSize: 'clamp(28px, 4.5vw, 64px)',
+                letterSpacing: '-0.03em', lineHeight: 1.05,
+                color: 'var(--color-ink)', marginBottom: '10px',
+              }}>
+                {speaker.name}
+              </h1>
+
+              {/* 직함 */}
+              <p style={{
+                fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 300,
+                color: 'var(--color-muted)', marginBottom: '16px', lineHeight: 1.5,
+              }}>
                 {[speaker.title, speaker.company].filter(Boolean).join(' · ')}
               </p>
 
+              {/* 한줄 소개 */}
               {speaker.bio_short && (
-                <p className="text-gray-600 mt-3 text-sm leading-relaxed max-w-xl">{speaker.bio_short}</p>
+                <p style={{
+                  fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 300,
+                  color: 'var(--color-subtle)', lineHeight: 1.8,
+                  maxWidth: '540px', marginBottom: '24px',
+                  borderLeft: '2px solid var(--color-ochre)',
+                  paddingLeft: '14px',
+                }}>
+                  {speaker.bio_short}
+                </p>
               )}
 
-              {/* CTA */}
-              <div className="flex flex-wrap gap-3 mt-5">
+              {/* CTA 버튼 */}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
                 <Link
                   href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1a1a2e] text-white text-sm font-semibold rounded-full hover:bg-[#16213e] transition-colors"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: '8px',
+                    fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em',
+                    color: 'var(--color-bg)', background: 'var(--color-green)',
+                    padding: '12px 24px',
+                    fontFamily: 'var(--font-body)',
+                  }}
                 >
-                  강사 섭외 문의
+                  강사 섭외 문의 →
                 </Link>
                 <ShareButton />
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </header>
 
-      {/* ── 본문 ────────────────────────────────────── */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* ── 본문 2열 그리드 ── */}
+        <div className="sp-detail-grid">
 
-          {/* 메인 콘텐츠 */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* ── 메인 콘텐츠 ── */}
+          <main style={{ borderRight: '1px solid var(--color-border)' }}>
 
             {/* 강사 소개 */}
             {hasContent.bio && (
-              <Section title="강사 소개">
-                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{speaker.bio_full}</p>
-              </Section>
+              <DetailSection title="강사 소개">
+                <p style={{
+                  fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 300,
+                  color: 'var(--color-subtle)', lineHeight: 2,
+                  whiteSpace: 'pre-line',
+                }}>
+                  {speaker.bio_full}
+                </p>
+              </DetailSection>
             )}
 
             {/* 약력 */}
             {hasContent.careers && (
-              <Section title="약력">
-                <ul className="space-y-3">
+              <DetailSection title="약력">
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {careers.map((career, idx) => (
-                    <li key={idx} className="flex gap-3 text-sm">
+                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
                       {career.year && (
-                        <span className="text-gray-400 font-medium whitespace-nowrap w-14 flex-shrink-0">{career.year}</span>
+                        <span style={{
+                          fontFamily: 'var(--font-english)', fontWeight: 700,
+                          fontSize: '11px', letterSpacing: '0.06em',
+                          color: 'var(--color-muted)', whiteSpace: 'nowrap',
+                          width: '52px', flexShrink: 0, paddingTop: '2px',
+                        }}>
+                          {career.year}
+                        </span>
                       )}
-                      <span className="text-gray-700 leading-relaxed">{career.content}</span>
+                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>
+                        {career.content}
+                      </span>
                     </li>
                   ))}
                 </ul>
-              </Section>
+              </DetailSection>
             )}
 
             {/* 학력 */}
             {hasContent.education && (
-              <Section title="학력">
-                <ul className="space-y-3">
+              <DetailSection title="학력">
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {education.map((edu, idx) => (
-                    <li key={idx} className="flex gap-3 text-sm">
+                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
                       {edu.year && (
-                        <span className="text-gray-400 font-medium whitespace-nowrap w-14 flex-shrink-0">{edu.year}</span>
+                        <span style={{
+                          fontFamily: 'var(--font-english)', fontWeight: 700,
+                          fontSize: '11px', letterSpacing: '0.06em',
+                          color: 'var(--color-muted)', whiteSpace: 'nowrap',
+                          width: '52px', flexShrink: 0, paddingTop: '2px',
+                        }}>
+                          {edu.year}
+                        </span>
                       )}
-                      <span className="text-gray-700 leading-relaxed">{edu.content}</span>
+                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{edu.content}</span>
                     </li>
                   ))}
                 </ul>
-              </Section>
+              </DetailSection>
             )}
 
             {/* 저서 */}
             {hasContent.books && (
-              <Section title="저서">
-                <ul className="space-y-2">
+              <DetailSection title="저서">
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {books.map((book, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="text-gray-300 mt-0.5 flex-shrink-0">📖</span>
-                      <span>{book}</span>
+                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
+                      <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
+                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{book}</span>
                     </li>
                   ))}
                 </ul>
-              </Section>
+              </DetailSection>
             )}
 
             {/* 참고영상 */}
             {hasContent.media && (
-              <Section title="참고영상">
-                <div className="space-y-2">
+              <DetailSection title="참고영상">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                   {mediaLinks.map((item, idx) => (
                     <a
                       key={idx}
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-3 text-sm group"
+                      className="media-link"
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        fontSize: '12px', color: 'var(--color-subtle)', textDecoration: 'none',
+                        transition: 'color 0.15s',
+                      }}
                     >
-                      <span className="w-6 h-6 rounded-full bg-red-500 flex items-center justify-center flex-shrink-0">
-                        <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M8 5v14l11-7z"/>
+                      <span style={{
+                        width: '28px', height: '28px', borderRadius: '50%',
+                        background: '#e53535',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        flexShrink: 0,
+                      }}>
+                        <svg width="10" height="10" viewBox="0 0 10 10" fill="white">
+                          <polygon points="2,1 9,5 2,9" />
                         </svg>
                       </span>
-                      <span className="text-gray-700 group-hover:text-blue-600 group-hover:underline transition-colors">{item.title}</span>
+                      {item.title}
                     </a>
                   ))}
                 </div>
-              </Section>
+              </DetailSection>
             )}
 
-            {/* 커리큘럼 */}
+            {/* 보유 커리큘럼 */}
             {hasContent.lectures && (
-              <div>
-                <h2 className="text-lg font-bold text-[#1a1a2e] mb-4">보유 커리큘럼</h2>
-                <div className="space-y-3">
+              <DetailSection title="보유 커리큘럼">
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
                   {lectures.map((lecture) => (
                     <Link
                       key={lecture.id}
                       href={`/lectures/${lecture.id}`}
-                      className="group block bg-white rounded-2xl p-5 border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+                      className="lec-card"
+                      style={{
+                        display: 'block', padding: '18px 0',
+                        borderBottom: '1px solid var(--color-border)',
+                        textDecoration: 'none', transition: 'background 0.15s',
+                      }}
                     >
-                      <div className="flex flex-wrap gap-1 mb-2">
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
                         {lecture.fields.slice(0, 2).map((f) => (
-                          <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
+                          <span key={f} style={{
+                            fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em',
+                            padding: '2px 8px', textTransform: 'uppercase',
+                            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                            color: 'var(--color-muted)',
+                          }}>
                             {FIELD_MAP[f] ?? f}
                           </span>
                         ))}
                       </div>
-                      <h3 className="font-semibold text-[#1a1a2e] group-hover:text-blue-800 transition-colors text-sm leading-snug">
+                      <h3 style={{
+                        fontFamily: 'var(--font-display)', fontWeight: 800,
+                        fontSize: 'clamp(14px, 1.8vw, 18px)', letterSpacing: '-0.02em',
+                        color: 'var(--color-ink)', lineHeight: 1.3, marginBottom: '6px',
+                      }}>
                         {lecture.title}
                       </h3>
                       {lecture.summary && (
-                        <p className="text-xs text-gray-500 mt-1.5 line-clamp-2">{lecture.summary}</p>
+                        <p style={{
+                          fontSize: '12px', color: 'var(--color-muted)', lineHeight: 1.7,
+                          display: '-webkit-box', WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                        }}>
+                          {lecture.summary}
+                        </p>
                       )}
                     </Link>
                   ))}
                 </div>
-              </div>
+              </DetailSection>
             )}
-          </div>
 
-          {/* ── 사이드바 ──────────────────────────── */}
-          <div className="space-y-4 lg:mt-0">
-            <div className="sticky top-20 space-y-4">
-              {/* 문의 카드 */}
-              <div className="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
-                <h3 className="font-semibold text-[#1a1a2e] text-sm mb-1">{speaker.name} 강사 섭외</h3>
-                <p className="text-xs text-gray-400 mb-4">문의 후 1~2 영업일 내 연락드립니다.</p>
+          </main>
+
+          {/* ── 사이드바 ── */}
+          <aside
+            className="sp-detail-sidebar"
+            style={{ borderLeft: '1px solid var(--color-border)' }}
+          >
+            <div style={{ position: 'sticky', top: 'calc(var(--nav-height) + 24px)' }}>
+
+              {/* 섭외 문의 카드 */}
+              <div style={{ padding: 'clamp(20px, 3vw, 32px)', borderBottom: '1px solid var(--color-border)' }}>
+                <p style={{
+                  fontFamily: 'var(--font-english)', fontWeight: 700,
+                  fontSize: '10px', letterSpacing: '0.12em', color: 'var(--color-muted)',
+                  textTransform: 'uppercase', marginBottom: '10px',
+                }}>
+                  REQUEST
+                </p>
+                <h3 style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 900,
+                  fontSize: 'clamp(16px, 2vw, 20px)', letterSpacing: '-0.02em',
+                  color: 'var(--color-ink)', marginBottom: '6px', lineHeight: 1.2,
+                }}>
+                  {speaker.name} 강사 섭외
+                </h3>
+                <p style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '20px', lineHeight: 1.6 }}>
+                  문의 후 1~2 영업일 내에<br />담당자가 연락드립니다.
+                </p>
                 <Link
                   href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
-                  className="block w-full text-center py-2.5 bg-[#1a1a2e] text-white text-sm font-semibold rounded-xl hover:bg-[#16213e] transition-colors"
+                  style={{
+                    display: 'block', textAlign: 'center',
+                    padding: '12px 0',
+                    background: 'var(--color-green)', color: 'var(--color-bg)',
+                    fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em',
+                    fontFamily: 'var(--font-body)',
+                    textDecoration: 'none',
+                  }}
                 >
-                  섭외 문의하기
+                  섭외 문의하기 →
                 </Link>
               </div>
 
               {/* 분야 */}
               {speaker.fields.length > 0 && (
-                <div className="bg-white rounded-2xl p-5 border border-gray-100">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">강연 분야</h3>
-                  <div className="flex flex-wrap gap-1.5">
+                <div style={{ padding: 'clamp(16px, 2.5vw, 24px)' }}>
+                  <p style={{
+                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em',
+                    textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '10px',
+                  }}>
+                    강연 분야
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
                     {speaker.fields.map((f) => (
-                      <span key={f} className="text-xs px-2.5 py-1 bg-gray-50 text-gray-600 rounded-full border border-gray-100">
+                      <span key={f} style={{
+                        fontSize: '10px', fontWeight: 600,
+                        padding: '4px 10px',
+                        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                        color: 'var(--color-subtle)',
+                      }}>
                         {FIELD_MAP[f] ?? f}
                       </span>
                     ))}
                   </div>
                 </div>
               )}
+
+              {/* 매칭으로 다른 강사 보기 */}
+              <div style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderTop: '1px solid var(--color-border)' }}>
+                <p style={{ fontSize: '11px', color: 'var(--color-muted)', lineHeight: 1.7, marginBottom: '12px' }}>
+                  다른 조건으로 강사를 찾고 싶으신가요?
+                </p>
+                <Link
+                  href="/matching?step=1"
+                  style={{
+                    fontSize: '11px', fontWeight: 600, color: 'var(--color-green)',
+                    textDecoration: 'underline', textUnderlineOffset: '3px',
+                    display: 'flex', alignItems: 'center', gap: '4px',
+                  }}
+                >
+                  강사 매칭 시작 →
+                </Link>
+              </div>
+
             </div>
-          </div>
+          </aside>
         </div>
+
       </div>
-    </div>
+    </>
   )
 }
 
-// ── 섹션 래퍼 컴포넌트 ─────────────────────────────────────
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+// ── 섹션 래퍼 ──────────────────────────────────────────────
+function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="bg-white rounded-2xl p-6 border border-gray-100">
-      <h2 className="text-base font-bold text-[#1a1a2e] mb-4 pb-3 border-b border-gray-50">{title}</h2>
+    <section style={{ borderBottom: '1px solid var(--color-border)', padding: 'clamp(24px, 4vw, 40px) var(--space-page)' }}>
+      <h2 style={{
+        fontFamily: 'var(--font-english)', fontWeight: 700,
+        fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase',
+        color: 'var(--color-muted)', marginBottom: '20px',
+      }}>
+        {title}
+      </h2>
       {children}
-    </div>
+    </section>
   )
 }
