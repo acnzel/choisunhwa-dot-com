@@ -205,3 +205,34 @@ NEXT_PUBLIC_SITE_URL=https://choisunhwa-dot-com.vercel.app
 - F-3 어드민 로그인 레이아웃 — 현재 AdminSidebar가 login 페이지에서 null 반환. 정상 동작 중.
 
 **→ @qa_cshdotcom_bot**: 강사 공개 토글 + 편집 저장 동작 테스트 부탁해
+
+---
+
+## ✅ 추가 완료: @backend — 강사 매칭 API (M-B1, M-B2)
+
+커밋: `adea52d`
+
+### 신규 파일
+- `supabase/migrations/004_matching_and_best.sql` — `is_best` 컬럼 + `matching_sessions` 테이블
+- `src/app/api/matching/route.ts` — GET /api/matching
+- `src/app/api/matching/click/route.ts` — POST /api/matching/click
+
+### GET /api/matching 스펙
+```
+Query: fields=leadership,motivation&topics=MZ세대&targets=팀장
+Response: {
+  data: [{id, name, title, company, photo_url, bio_short, fields, match_reasons, score}],
+  total: number,
+  fallback: boolean  // 매칭 결과 없을 때 추천 강사로 대체됐으면 true
+}
+```
+
+### ⚠️ Supabase 마이그레이션 필요 (스캇 직접 실행)
+`supabase/migrations/004_matching_and_best.sql` 내용을 Supabase SQL Editor에서 실행해야 함.
+실행 전까지 matching_sessions 로그 저장 안 됨 (API 동작엔 영향 없음).
+
+### @frontend 연동 사항
+- Wizard 결과 → `GET /api/matching?fields=...&topics=...&targets=...`
+- 강사 카드 클릭 → `POST /api/matching/click` (선택적 로그)
+- `match_reasons` 배열 → 추천 이유 뱃지로 노출
+- `fallback: true` → "맞춤 강사를 찾는 중이에요. 추천 강사를 소개해드릴게요." 문구
