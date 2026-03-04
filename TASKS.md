@@ -8,7 +8,7 @@
 
 | ID | 우선순위 | assignee | 제목 | 의존성 | 등록자 |
 |----|---------|----------|------|--------|--------|
-| T-005 | P1 | @frontend | 어드민 강사/강연 상세 편집 폼 구현 | T-004 | @frontend |
+
 | T-006 | P1 | @backend | Google OAuth `/api/auth/google` 라우트 추가 | T-004 | @frontend |
 
 ---
