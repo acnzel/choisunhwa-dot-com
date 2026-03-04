@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from 'react'
 import Link from 'next/link'
+
 import { upsertSpeaker } from '@/app/actions/admin'
 import { SPEAKER_FIELDS, FEE_RANGES } from '@/constants'
 
@@ -24,6 +25,7 @@ export default function NewSpeakerForm() {
         await upsertSpeaker(formData)
         return { error: '' }
       } catch (e) {
+        if (e !== null && typeof e === 'object' && 'digest' in (e as object)) throw e
         return { error: e instanceof Error ? e.message : '저장 실패' }
       }
     },

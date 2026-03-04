@@ -59,7 +59,7 @@ export default function LectureEditForm({ lecture, speakers }: Props) {
 
     try {
       const res = await fetch(`/api/admin/lectures/${lecture.id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })

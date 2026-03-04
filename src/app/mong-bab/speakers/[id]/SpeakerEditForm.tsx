@@ -3,6 +3,7 @@
 import { useActionState, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+
 import { upsertSpeaker, deleteSpeaker } from '@/app/actions/admin'
 import type { Speaker } from '@/types'
 import { SPEAKER_FIELDS, FEE_RANGES } from '@/constants'
@@ -71,6 +72,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
         await upsertSpeaker(formData)
         return { error: '' }
       } catch (e) {
+        if (e !== null && typeof e === 'object' && 'digest' in (e as object)) throw e   // redirect()는 다시 throw해야 동작
         return { error: e instanceof Error ? e.message : '저장 실패' }
       }
     },
