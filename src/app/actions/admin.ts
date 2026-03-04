@@ -158,6 +158,15 @@ export async function upsertLecture(formData: FormData) {
   redirect(`/mong-bab/lectures/${lectureId}?saved=1`)
 }
 
+export async function deleteLecture(lectureId: string) {
+  const supabase = createAdminClient()
+  const { error } = await supabase.from('lectures').delete().eq('id', lectureId)
+  if (error) return { ok: false, error: error.message }
+  revalidatePath('/mong-bab/lectures')
+  revalidatePath('/lectures')
+  return { ok: true }
+}
+
 // ─── 문의 상태 변경 ──────────────────────────────────────
 
 export async function updateInquiryStatus(inquiryId: string, status: string) {

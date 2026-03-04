@@ -69,7 +69,7 @@ export const LectureSchema = z.object({
   fields: z.array(z.string()).default([]),
   duration: z.enum(['1h', '2h', 'half_day', 'full_day']).default('2h'),
   target: z.string().max(200).default(''),
-  summary: z.string().max(100).default(''),
+  summary: z.string().max(2000).default(''),
   goals: z.array(z.string()).default([]),
   program: z
     .array(z.object({ time: z.string(), content: z.string() }))
