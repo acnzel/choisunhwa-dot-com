@@ -76,6 +76,7 @@ describe('Speaker 타입', () => {
       fields: ['리더십', '동기부여'],
       fee_range: '100_300',
       is_visible: true,
+      is_best: false,
       sort_order: 1,
       careers: [{ year: '2020', content: '강연 활동 시작' }],
       lecture_histories: [{ org_name: '삼성전자', logo_url: undefined }],
