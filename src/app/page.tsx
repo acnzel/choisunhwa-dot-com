@@ -215,8 +215,8 @@ export default async function HomePage() {
             </p>
 
             <div className="hero-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-              <Link href="/speakers" className="btn-fill-green">연사 라인업 보기 →</Link>
-              <Link href="/inquiry" className="btn-ghost-ink">강연 의뢰하기 →</Link>
+              <Link href="/matching?step=1" className="btn-fill-green">매칭 시작하기 →</Link>
+              <Link href="/speakers" className="btn-ghost-ink">연사 라인업 보기 →</Link>
             </div>
           </div>
 
