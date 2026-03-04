@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/server'
 import type { Speaker, Lecture } from '@/types'
 import { SPEAKER_FIELDS } from '@/constants'
 import ShareButton from './ShareButton'
+import ScrollToTop from './ScrollToTop'
 
 const FIELD_MAP: Record<string, string> = Object.fromEntries(
   SPEAKER_FIELDS.map((f) => [f.value, f.label])
@@ -99,6 +100,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-[#fafafa]">
+      <ScrollToTop />
 
       {/* ── 히어로 헤더 ────────────────────────────── */}
       <div className="bg-white border-b border-gray-100">
