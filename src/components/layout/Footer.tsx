@@ -64,6 +64,7 @@ export default function Footer() {
               {[
                 { href: '/speakers', label: '연사 라인업' },
                 { href: '/inquiry', label: '강연 의뢰하기' },
+                { href: '/inquiry/status', label: '문의 현황' },
                 { href: '/support/about', label: '소개' },
               ].map(({ href, label }) => (
                 <Link
