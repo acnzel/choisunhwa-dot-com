@@ -63,8 +63,7 @@
 html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;   /* 가로 스크롤 원천 차단 */
-  max-width: 100%;
+  /* overflow-x: hidden 은 html 레벨에 설정 시 Next.js scroll-to-top이 깨짐 → body로 이동 */
 }
 
 body {
@@ -74,9 +73,10 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: hidden;   /* html이 아닌 body에서만 — Next.js scroll-to-top 정상 동작 */
   width: 100%;
   max-width: 100%;
+  min-height: 100%;
 }
 
 /* a 기본 스타일 — @layer base에 넣어야 Tailwind utilities(text-white 등)가 우선됨 */
