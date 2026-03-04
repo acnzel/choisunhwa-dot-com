@@ -58,6 +58,8 @@
 | #12 | 고객지원 (FAQ/공지/회사소개) | `fe/support-pages` | ✅ 완료 | — |
 | #13 | Auth 페이지 (회원가입/로그인) | `fe/auth-pages` | ✅ 완료 | — |
 | #14 | 어드민 UI | `fe/admin-ui` | ✅ 완료 | — |
+| M-F1~5 | 강사 매칭 Wizard (4단계 UI + 결과 페이지 + 문의 연동) | `main` | ✅ 완료 | — |
+| BEST | BEST 강사 캐러셀 (is_best 컬럼 활성화) | `main` | ✅ 완료 | is_best 컬럼 생성 완료 |
 
 **핸드오프:**
 - #7 완료 → @backend_cshdotcom_bot 에게 "FE 컴포넌트 준비, API 연동 시작 가능" 알림
@@ -99,4 +101,4 @@
 
 ---
 
-_최종 업데이트: 2025-02-25 | 업데이트 담당: 작업 완료한 에이전트_
+_최종 업데이트: 2026-03-05 | 업데이트 담당: @frontend_cshdotcom_bot_
