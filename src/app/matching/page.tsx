@@ -138,6 +138,30 @@ function WizardContent() {
             grid-template-columns: 1fr 1fr;
           }
         }
+        /* PC: 버튼 인라인 (카드 아래) */
+        .wizard-nav {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-top: 32px;
+          padding-top: 24px;
+          border-top: 1px solid var(--color-border);
+        }
+        /* 모바일: sticky 하단 바 */
+        @media (max-width: 640px) {
+          .wizard-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            margin-top: 0;
+            padding: 16px var(--space-page);
+            background: var(--color-bg);
+            border-top: 1px solid var(--color-border);
+            z-index: 50;
+          }
+          .mobile-nav-spacer {
+            height: 72px !important;
+          }
+        }
       `}</style>
 
       <div style={{
@@ -251,50 +275,47 @@ function WizardContent() {
                 ))}
               </div>
             )}
+
+            {/* ── 버튼: 카드 바로 아래 (PC 인라인 / 모바일 fixed) ── */}
+            <div className="wizard-nav">
+              {step > 1 ? (
+                <button
+                  type="button"
+                  onClick={goPrev}
+                  style={{
+                    fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 500,
+                    color: 'var(--color-subtle)', background: 'none', border: 'none',
+                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
+                  }}
+                >
+                  ← 이전
+                </button>
+              ) : (
+                <div />
+              )}
+
+              <button
+                type="button"
+                onClick={goNext}
+                disabled={!canNext}
+                style={{
+                  fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 700,
+                  letterSpacing: '0.06em',
+                  color: 'var(--color-bg)',
+                  background: canNext ? 'var(--color-green)' : 'var(--color-border)',
+                  border: 'none', padding: '12px 36px',
+                  cursor: canNext ? 'pointer' : 'not-allowed',
+                  transition: 'background 0.2s',
+                }}
+              >
+                {step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* ── 하단 버튼 ── */}
-        <div style={{
-          borderTop: '1px solid var(--color-border)',
-          padding: '20px var(--space-page)',
-          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-          background: 'var(--color-bg)',
-          position: 'sticky', bottom: 0,
-        }}>
-          {step > 1 ? (
-            <button
-              type="button"
-              onClick={goPrev}
-              style={{
-                fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 500,
-                color: 'var(--color-subtle)', background: 'none', border: 'none',
-                cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-              }}
-            >
-              ← 이전
-            </button>
-          ) : (
-            <div />
-          )}
-
-          <button
-            type="button"
-            onClick={goNext}
-            disabled={!canNext}
-            style={{
-              fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 700,
-              letterSpacing: '0.06em',
-              color: 'var(--color-bg)',
-              background: canNext ? 'var(--color-green)' : 'var(--color-border)',
-              border: 'none', padding: '12px 28px',
-              cursor: canNext ? 'pointer' : 'not-allowed',
-              transition: 'background 0.2s',
-            }}
-          >
-            {step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'}
-          </button>
-        </div>
+        {/* 모바일 fixed bar 여백 확보 */}
+        <div style={{ height: '0' }} aria-hidden className="mobile-nav-spacer" />
       </div>
     </>
   )
