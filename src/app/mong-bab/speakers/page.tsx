@@ -4,6 +4,7 @@ import Image from 'next/image'
 import type { Speaker } from '@/types'
 import { SPEAKER_FIELDS } from '@/constants'
 import ToggleVisible from './ToggleVisible'
+import ToggleBest from './ToggleBest'
 import ClickableRow from '@/components/admin/ClickableRow'
 
 export const dynamic = 'force-dynamic'
@@ -44,6 +45,7 @@ export default async function AdminSpeakersPage() {
               <th className="text-left px-4 py-3 font-medium text-gray-500">강사</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500">분야</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">공개</th>
+              <th className="text-center px-4 py-3 font-medium text-gray-500 w-16">BEST</th>
               <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">순서</th>
               <th className="px-4 py-3 w-16" />
             </tr>
@@ -51,7 +53,7 @@ export default async function AdminSpeakersPage() {
           <tbody className="divide-y divide-gray-50">
             {speakers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="text-center py-12 text-gray-400">
+                <td colSpan={6} className="text-center py-12 text-gray-400">
                   등록된 강사가 없습니다.
                 </td>
               </tr>
@@ -86,6 +88,9 @@ export default async function AdminSpeakersPage() {
                   </td>
                   <td className="px-4 py-3">
                     <ToggleVisible speakerId={s.id} isVisible={s.is_visible} />
+                  </td>
+                  <td className="px-4 py-3 text-center">
+                    <ToggleBest speakerId={s.id} isBest={s.is_best ?? false} />
                   </td>
                   <td className="px-4 py-3 text-gray-500 text-center">{s.sort_order}</td>
                   <td className="px-4 py-3">

@@ -43,6 +43,7 @@ export interface Speaker {
   fields: string[]
   fee_range: FeeRange | null
   is_visible: boolean
+  is_best: boolean
   sort_order: number
   careers: SpeakerCareer[]
   lecture_histories: SpeakerLectureHistory[]

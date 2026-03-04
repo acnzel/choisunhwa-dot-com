@@ -4,12 +4,13 @@ import { SPEAKER_FIELDS } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
 import SpeakerTabs from './SpeakerTabs'
+import SpeakerCarousel from './SpeakerCarousel'
 
 const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
 
 async function getData() {
   const supabase = await createClient()
-  const [{ data: speakers }, { data: notices }] = await Promise.all([
+  const [{ data: speakers }, { data: notices }, { data: bestSpeakers }] = await Promise.all([
     supabase
       .from('speakers')
       .select('id, name, title, company, photo_url, fields, is_visible')
@@ -22,10 +23,18 @@ async function getData() {
       .eq('is_visible', true)
       .order('published_at', { ascending: false })
       .limit(4),
+    // is_best 컬럼은 스캇이 Supabase에서 SQL 실행 후 생김 → 실패 시 빈 배열 fallback
+    supabase
+      .from('speakers')
+      .select('id, name, title, company, photo_url, fields, is_visible')
+      .eq('is_best', true)
+      .eq('is_visible', true)
+      .order('sort_order', { ascending: true }),
   ])
   return {
     speakers: (speakers as Speaker[]) ?? [],
     notices: (notices as Notice[]) ?? [],
+    bestSpeakers: (bestSpeakers as Speaker[]) ?? [],
   }
 }
 
@@ -45,7 +54,7 @@ const PROCESS_STEPS = [
 ]
 
 export default async function HomePage() {
-  const { speakers, notices } = await getData()
+  const { speakers, notices, bestSpeakers } = await getData()
 
   // ── Insight 카드: 실제 데이터가 있는 것만 사용 ──
   const hero   = notices[0] ?? null
@@ -247,6 +256,31 @@ export default async function HomePage() {
             ))}
           </div>
         </section>
+
+        {/* ── BEST 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
+        {bestSpeakers.length > 0 && (
+          <section style={{ borderBottom: '1px solid var(--color-border)' }} id="best-speakers">
+            <div style={{
+              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
+              padding: '28px var(--space-page) 22px',
+              borderBottom: '1px solid var(--color-border)',
+            }}>
+              <h2 style={{
+                fontFamily: 'var(--font-display)', fontWeight: 900,
+                fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
+              }}>
+                BEST 강사{' '}
+                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
+                  Featured Speakers
+                </span>
+              </h2>
+              <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
+            </div>
+            <div style={{ padding: 'clamp(24px, 3vw, 36px) var(--space-page) 0' }}>
+              <SpeakerCarousel speakers={bestSpeakers} />
+            </div>
+          </section>
+        )}
 
         {/* ── SPEAKERS ── */}
         <section style={{ borderBottom: '1px solid var(--color-border)' }} id="speakers">
