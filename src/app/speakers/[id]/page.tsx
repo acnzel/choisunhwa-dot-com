@@ -226,8 +226,10 @@ export default async function SpeakerDetailPage({ params }: Props) {
               <DetailSection title="강사 소개">
                 <p style={{
                   fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 300,
-                  color: 'var(--color-subtle)', lineHeight: 2,
+                  color: 'var(--color-subtle)', lineHeight: 1.9,
                   whiteSpace: 'pre-line',
+                  wordBreak: 'keep-all',
+                  overflowWrap: 'break-word',
                 }}>
                   {bioText}
                 </p>
