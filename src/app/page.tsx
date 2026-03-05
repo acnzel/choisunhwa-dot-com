@@ -10,7 +10,7 @@ const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label
 
 async function getData() {
   const supabase = await createClient()
-  const [{ data: speakers }, { data: notices }, { data: bestSpeakers }] = await Promise.all([
+  const [{ data: speakers }, { data: notices }, { data: bestSpeakers }, { count: totalSpeakerCount }] = await Promise.all([
     supabase
       .from('speakers')
       .select('id, name, title, company, photo_url, fields, is_visible')
@@ -30,11 +30,17 @@ async function getData() {
       .eq('is_best', true)
       .eq('is_visible', true)
       .order('sort_order', { ascending: true }),
+    // 전체 등록 강사 수 (limit 없이 카운트만)
+    supabase
+      .from('speakers')
+      .select('id', { count: 'exact', head: true })
+      .eq('is_visible', true),
   ])
   return {
     speakers: (speakers as Speaker[]) ?? [],
     notices: (notices as Notice[]) ?? [],
     bestSpeakers: (bestSpeakers as Speaker[]) ?? [],
+    totalSpeakerCount: totalSpeakerCount ?? 0,
   }
 }
 
@@ -66,7 +72,7 @@ const PROCESS_ICONS = [
 ]
 
 export default async function HomePage() {
-  const { speakers, notices, bestSpeakers } = await getData()
+  const { speakers, notices, bestSpeakers, totalSpeakerCount } = await getData()
 
   // ── Insight 카드: 실제 데이터가 있는 것만 사용 ──
   const hero   = notices[0] ?? null
@@ -171,7 +177,7 @@ export default async function HomePage() {
       <div style={{ paddingTop: 'var(--nav-height)' }}>
 
         {/* ── TICKER ── */}
-        <HeroTicker speakerCount={speakers.length} />
+        <HeroTicker speakerCount={totalSpeakerCount} />
 
         {/* ── HERO (F-A: 카피 교체) ── */}
         <section style={{
