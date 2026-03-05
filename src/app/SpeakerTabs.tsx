@@ -62,11 +62,29 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           border-bottom: 1px solid var(--color-border);
           text-decoration: none;
           color: inherit;
-          transition: background 0.15s;
+          cursor: pointer;
+          transition: background 0.15s ease, transform 0.1s ease;
+          will-change: transform;
         }
         .sp-row:last-child { border-bottom: none; }
         .sp-row:hover {
           background: #f0ede6;
+        }
+        .sp-row:hover .sp-arrow {
+          transform: translateX(5px);
+          color: var(--color-ink);
+        }
+        .sp-row:active {
+          background: #e5e1d9;
+          transform: scale(0.995);
+        }
+        .sp-arrow {
+          display: inline-flex;
+          align-items: center;
+          justify-content: flex-end;
+          transition: transform 0.18s ease, color 0.15s;
+          color: var(--color-muted);
+          font-size: 16px;
         }
 
         /* 데스크탑: 별도 컬럼 태그 보임 / 인라인 태그 숨김 */
@@ -182,7 +200,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
               </span>
 
               {/* 05 화살표 */}
-              <span style={{ color: 'var(--color-muted)', fontSize: '14px', flexShrink: 0, textAlign: 'right' }}>→</span>
+              <span className="sp-arrow">→</span>
             </Link>
           ))
         )}
