@@ -39,7 +39,8 @@ export default async function AdminSpeakersPage() {
       </div>
 
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-        <table className="w-full text-sm">
+        <div className="overflow-x-auto">
+        <table className="w-full text-sm min-w-[600px]">
           <thead>
             <tr className="border-b border-gray-100 bg-gray-50">
               <th className="text-left px-4 py-3 font-medium text-gray-500">강사</th>
@@ -101,6 +102,7 @@ export default async function AdminSpeakersPage() {
             )}
           </tbody>
         </table>
+        </div>{/* overflow-x-auto */}
       </div>
     </div>
   )
