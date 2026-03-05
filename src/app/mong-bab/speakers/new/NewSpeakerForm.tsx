@@ -8,18 +8,21 @@ import { SPEAKER_FIELDS, FEE_RANGES } from '@/constants'
 
 type Career = { year: string; content: string }
 type LectureHistory = { org_name: string }
+type MediaLink = { title: string; url: string }
 
 const initialState = { error: '' }
 
 export default function NewSpeakerForm() {
   const [careers, setCareers] = useState<Career[]>([])
   const [histories, setHistories] = useState<LectureHistory[]>([])
+  const [mediaLinks, setMediaLinks] = useState<MediaLink[]>([])
   const [isVisible, setIsVisible] = useState(false)
 
   const [state, formAction, pending] = useActionState(
     async (_prev: typeof initialState, formData: FormData) => {
       formData.set('careers_json', JSON.stringify(careers))
       formData.set('lecture_histories_json', JSON.stringify(histories))
+      formData.set('media_links_json', JSON.stringify(mediaLinks))
       formData.set('is_visible', String(isVisible))
       try {
         await upsertSpeaker(formData)
@@ -172,14 +175,53 @@ export default function NewSpeakerForm() {
       {/* 미디어 */}
       <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
         <h2 className="text-base font-semibold text-[#1a1a2e]">미디어 & 언론</h2>
+
+        {/* 참고영상 */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">유튜브/영상 링크 (줄바꿈으로 구분)</label>
-          <textarea name="media_links" rows={3} placeholder="https://youtube.com/..."
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none" />
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-medium text-gray-600">참고영상 (유튜브)</label>
+            <button
+              type="button"
+              onClick={() => setMediaLinks([...mediaLinks, { title: '', url: '' }])}
+              className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              + 추가
+            </button>
+          </div>
+          <div className="space-y-2">
+            {mediaLinks.map((m, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="영상 제목"
+                  value={m.title}
+                  onChange={(e) => setMediaLinks(mediaLinks.map((x, idx) => idx === i ? { ...x, title: e.target.value } : x))}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+                />
+                <input
+                  type="url"
+                  placeholder="https://youtube.com/..."
+                  value={m.url}
+                  onChange={(e) => setMediaLinks(mediaLinks.map((x, idx) => idx === i ? { ...x, url: e.target.value } : x))}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setMediaLinks(mediaLinks.filter((_, idx) => idx !== i))}
+                  className="text-gray-300 hover:text-red-400 transition-colors px-1"
+                >✕</button>
+              </div>
+            ))}
+            {mediaLinks.length === 0 && (
+              <p className="text-xs text-gray-400 text-center py-2">참고영상이 없습니다.</p>
+            )}
+          </div>
         </div>
+
+        {/* 저서 */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">뉴스/언론 링크 (줄바꿈으로 구분)</label>
-          <textarea name="news_links" rows={2} placeholder="https://..."
+          <label className="block text-xs font-medium text-gray-600 mb-1">저서 (한 줄에 하나씩)</label>
+          <textarea name="news_links" rows={2} placeholder="책 제목 1&#10;책 제목 2&#10;..."
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none" />
         </div>
       </section>

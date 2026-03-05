@@ -52,8 +52,8 @@ export const SpeakerSchema = z.object({
   lecture_histories: z
     .array(z.object({ org_name: z.string(), logo_url: z.string().optional() }))
     .default([]),
-  media_links: z.array(z.string().url()).default([]),
-  news_links: z.array(z.string().url()).default([]),
+  media_links: z.array(z.object({ title: z.string(), url: z.string().url() })).default([]),
+  news_links: z.array(z.string()).default([]),
   photo_url: z.string().url().nullable().optional(),
   is_visible: z.boolean().default(false),
   sort_order: z.number().int().default(0),

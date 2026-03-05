@@ -32,6 +32,11 @@ export interface SpeakerLectureHistory {
   logo_url?: string
 }
 
+export interface SpeakerMediaLink {
+  title: string
+  url: string
+}
+
 export interface Speaker {
   id: string
   name: string
@@ -47,7 +52,7 @@ export interface Speaker {
   sort_order: number
   careers: SpeakerCareer[]
   lecture_histories: SpeakerLectureHistory[]
-  media_links: string[]
+  media_links: SpeakerMediaLink[]
   news_links: string[]
   created_at: string
 }

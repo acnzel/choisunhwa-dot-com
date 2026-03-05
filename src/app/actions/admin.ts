@@ -51,9 +51,11 @@ export async function upsertSpeaker(formData: FormData) {
   // 배열 파싱
   const fields = formData.getAll('fields') as string[]
 
-  // media_links — textarea에서 줄바꿈으로 구분
-  const mediaRaw = (formData.get('media_links') as string) || ''
-  const media_links = mediaRaw.split('\n').map(s => s.trim()).filter(Boolean)
+  // media_links — JSON 형태로 전달 ({title, url}[] )
+  let media_links: { title: string; url: string }[] = []
+  try {
+    media_links = JSON.parse((formData.get('media_links_json') as string) || '[]')
+  } catch { /* ignore */ }
 
   const newsRaw = (formData.get('news_links') as string) || ''
   const news_links = newsRaw.split('\n').map(s => s.trim()).filter(Boolean)

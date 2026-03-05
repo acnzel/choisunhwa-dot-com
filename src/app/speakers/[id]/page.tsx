@@ -73,16 +73,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
   const books = (speaker.news_links ?? []).filter(Boolean)
 
-  type MediaItem = { title: string; url: string }
-  const mediaLinks: MediaItem[] = (speaker.media_links ?? [])
-    .filter(Boolean)
-    .map((item) => {
-      try {
-        const parsed = JSON.parse(item)
-        if (parsed.url) return { title: parsed.title ?? parsed.url, url: parsed.url }
-      } catch { /* plain URL */ }
-      return { title: item, url: item }
-    })
+  const mediaLinks = (speaker.media_links ?? []).filter((m) => m.url)
 
   const bioText = speaker.bio_full?.trim() || speaker.bio_short?.trim() || ''
   const hasContent = {

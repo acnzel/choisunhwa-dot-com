@@ -15,6 +15,7 @@ interface Props {
 
 type Career = { year: string; content: string }
 type LectureHistory = { org_name: string; logo_url?: string }
+type MediaLink = { title: string; url: string }
 
 const initialState = { error: '' }
 
@@ -31,6 +32,9 @@ export default function SpeakerEditForm({ speaker }: Props) {
   )
   const [histories, setHistories] = useState<LectureHistory[]>(
     speaker.lecture_histories ?? []
+  )
+  const [mediaLinks, setMediaLinks] = useState<MediaLink[]>(
+    (speaker.media_links ?? []).map((m) => ({ title: m.title ?? '', url: m.url ?? '' }))
   )
   const [isVisible, setIsVisible] = useState(speaker.is_visible)
   const [deleting, setDeleting] = useState(false)
@@ -67,6 +71,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
       ]
       formData.set('careers_json', JSON.stringify(mergedCareers))
       formData.set('lecture_histories_json', JSON.stringify(histories))
+      formData.set('media_links_json', JSON.stringify(mediaLinks))
       formData.set('is_visible', String(isVisible))
       try {
         await upsertSpeaker(formData)
@@ -110,6 +115,13 @@ export default function SpeakerEditForm({ speaker }: Props) {
   function removeHistory(i: number) { setHistories(histories.filter((_, idx) => idx !== i)) }
   function updateHistory(i: number, field: keyof LectureHistory, value: string) {
     setHistories(histories.map((h, idx) => idx === i ? { ...h, [field]: value } : h))
+  }
+
+  // MediaLink 동적 추가/삭제
+  function addMediaLink() { setMediaLinks([...mediaLinks, { title: '', url: '' }]) }
+  function removeMediaLink(i: number) { setMediaLinks(mediaLinks.filter((_, idx) => idx !== i)) }
+  function updateMediaLink(i: number, field: keyof MediaLink, value: string) {
+    setMediaLinks(mediaLinks.map((m, idx) => idx === i ? { ...m, [field]: value } : m))
   }
 
   return (
@@ -416,16 +428,52 @@ export default function SpeakerEditForm({ speaker }: Props) {
       {/* 미디어 */}
       <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
         <h2 className="text-base font-semibold text-[#1a1a2e]">미디어 & 언론</h2>
+
+        {/* 참고영상 */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">참고영상 링크 (한 줄에 하나씩, 유튜브 URL)</label>
-          <textarea
-            name="media_links"
-            defaultValue={(speaker.media_links ?? []).join('\n')}
-            rows={3}
-            placeholder="https://youtube.com/..."
-            className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none"
-          />
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-medium text-gray-600">참고영상 (유튜브)</label>
+            <button
+              type="button"
+              onClick={addMediaLink}
+              className="text-xs px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              + 추가
+            </button>
+          </div>
+          <div className="space-y-2">
+            {mediaLinks.map((m, i) => (
+              <div key={i} className="flex gap-2">
+                <input
+                  type="text"
+                  placeholder="영상 제목"
+                  value={m.title}
+                  onChange={(e) => updateMediaLink(i, 'title', e.target.value)}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+                />
+                <input
+                  type="url"
+                  placeholder="https://youtube.com/..."
+                  value={m.url}
+                  onChange={(e) => updateMediaLink(i, 'url', e.target.value)}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+                />
+                <button
+                  type="button"
+                  onClick={() => removeMediaLink(i)}
+                  className="text-gray-300 hover:text-red-400 transition-colors px-1"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+            {mediaLinks.length === 0 && (
+              <p className="text-xs text-gray-400 text-center py-2">참고영상이 없습니다.</p>
+            )}
+          </div>
         </div>
+
+        {/* 저서 */}
         <div>
           <label className="block text-xs font-medium text-gray-600 mb-1">저서 (한 줄에 하나씩)</label>
           <textarea
