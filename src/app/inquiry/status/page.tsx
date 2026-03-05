@@ -4,7 +4,7 @@ import type { Inquiry } from '@/types'
 import Link from 'next/link'
 
 export const metadata: Metadata = {
-  title: '문의 현황 확인 | 최선화닷컴',
+  title: '문의 현황 확인',
   description: '이메일 주소로 접수하신 문의의 진행 현황을 확인하세요.',
 }
 

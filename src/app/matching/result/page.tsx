@@ -5,7 +5,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { WIZARD_FIELDS, WIZARD_TARGETS } from '@/constants/matching'
 
 export const metadata: Metadata = {
-  title: '매칭 결과 | 최선화닷컴',
+  title: '매칭 결과',
   description: '조건에 맞는 추천 강사 결과입니다.',
 }
 

@@ -8,7 +8,7 @@ import type { User } from '@supabase/supabase-js'
 
 const NAV_ITEMS = [
   { href: '/speakers', label: '연사 라인업' },
-  { href: '/lectures', label: '인사이트' },
+  { href: '/lectures', label: '강연 커리큘럼' },
   { href: '/inquiry', label: '강연 의뢰하기' },
   { href: '/support/about', label: '소개' },
 ]
