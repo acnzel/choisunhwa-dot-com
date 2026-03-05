@@ -6,58 +6,31 @@ import { createAdminClient } from '@/lib/supabase/admin'
  * 강사 매칭 추천 API
  *
  * Query params:
- *   fields  — 분야 (comma-separated): leadership,motivation,...
+ *   fields  — 분야 (comma-separated, DB 한글 값 그대로): 리더십,조직관리,...
  *   topics  — 강연 주제 키워드 (comma-separated)
- *   targets — 강연 대상 키워드 (comma-separated): executive,manager,junior,...
+ *   targets — 강연 대상 (comma-separated): 임원/경영진,팀장/중간관리자,...
  *
  * Response:
  *   { data: Speaker[], match_reasons: string[][], fallback: boolean }
  */
 
-// 대상 → 관련 분야 매핑
+// 대상 → 관련 분야 매핑 (DB 한글 값 기준)
 const TARGET_FIELD_MAP: Record<string, string[]> = {
-  executive:   ['leadership', 'finance', 'org_culture'],   // 임원/경영진
-  manager:     ['leadership', 'communication', 'hr'],       // 팀장/중간관리자
-  all_staff:   ['motivation', 'communication', 'org_culture'],
-  junior:      ['motivation', 'self_development', 'communication'], // 신입/주니어
-  sales_team:  ['sales', 'marketing', 'communication'],
-  public:      ['leadership', 'hr', 'self_development'],    // 공공기관/공무원
-  youth:       ['motivation', 'self_development', 'ai_tech'],
-  // 한국어 직접 입력도 지원
-  '임원':      ['leadership', 'finance', 'org_culture'],
-  '경영진':    ['leadership', 'finance'],
-  '팀장':      ['leadership', 'communication', 'hr'],
-  '중간관리자': ['leadership', 'communication'],
-  '신입':      ['motivation', 'self_development'],
-  '주니어':    ['motivation', 'self_development'],
-  '전체직원':  ['motivation', 'communication', 'org_culture'],
-  '영업팀':    ['sales', 'marketing'],
-  '마케팅팀':  ['marketing', 'communication'],
+  '임원/경영진':     ['리더십', '재테크', '조직관리'],
+  '팀장/중간관리자': ['리더십', '소통', 'HR'],
+  '전체직원':        ['동기부여', '소통', '조직관리'],
+  '신입/주니어':     ['동기부여', '자기계발', '소통'],
+  '영업/마케팅팀':   ['영업', '마케팅', '소통'],
+  '공공기관/공무원': ['리더십', 'HR', '자기계발'],
+  '학생/청년':       ['동기부여', '자기계발', 'AI'],
 }
 
 function getTargetFields(targets: string[]): string[] {
   const result = new Set<string>()
   targets.forEach((t) => {
-    const mapped = TARGET_FIELD_MAP[t] ?? []
-    mapped.forEach((f) => result.add(f))
+    ;(TARGET_FIELD_MAP[t] ?? []).forEach((f) => result.add(f))
   })
   return Array.from(result)
-}
-
-function fieldLabel(field: string): string {
-  const map: Record<string, string> = {
-    leadership:       '리더십',
-    motivation:       '동기부여',
-    marketing:        '마케팅',
-    org_culture:      '조직문화',
-    ai_tech:          'AI/기술',
-    communication:    '소통/커뮤니케이션',
-    sales:            '영업',
-    self_development: '자기계발/심리',
-    hr:               '인사/교육',
-    finance:          '재무/경영전략',
-  }
-  return map[field] ?? field
 }
 
 export async function GET(request: NextRequest) {
@@ -97,13 +70,13 @@ export async function GET(request: NextRequest) {
     let score = 0
     const reasons: string[] = []
     const spFields: string[] = Array.isArray(sp.fields) ? sp.fields : []
-    const spCareers: Array<{ content: string }> = Array.isArray(sp.careers) ? sp.careers : []
+    const spCareers: Array<string | { content?: string }> = Array.isArray(sp.careers) ? sp.careers : []
 
-    // ① 분야 매칭: query fields ∩ speaker fields → +3점/개
+    // ① 분야 매칭: query fields ∩ speaker fields → +3점/개 (한글 직접 비교)
     fields.forEach((f) => {
       if (spFields.includes(f)) {
         score += 3
-        reasons.push(`${fieldLabel(f)} 전문 강사`)
+        reasons.push(`${f} 전문 강사`)
       }
     })
 
@@ -111,7 +84,7 @@ export async function GET(request: NextRequest) {
     const bioText = [
       sp.bio_full ?? '',
       sp.bio_short ?? '',
-      ...spCareers.map((c) => c.content),
+      ...spCareers.map((c) => (typeof c === 'string' ? c : c?.content ?? '')),
     ].join(' ').toLowerCase()
 
     topics.forEach((topic) => {
@@ -125,7 +98,7 @@ export async function GET(request: NextRequest) {
     targetFields.forEach((tf) => {
       if (spFields.includes(tf)) {
         score += 1
-        reasons.push(`대상 맞춤: ${fieldLabel(tf)}`)
+        reasons.push(`대상 맞춤: ${tf}`)
       }
     })
 
@@ -158,10 +131,7 @@ export async function GET(request: NextRequest) {
     fields:    sp.fields,
   }))
 
-  // match_reasons: data와 같은 인덱스로 대응하는 string[] 배열
-  const match_reasons = finalList.map(({ reasons }) =>
-    [...new Set(reasons)] // 중복 제거
-  )
+  const match_reasons = finalList.map(({ reasons }) => [...new Set(reasons)])
 
   // ─── 매칭 세션 로그 저장 ─────────────────────────────
   supabase

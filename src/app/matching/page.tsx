@@ -81,7 +81,11 @@ function WizardContent() {
       // 결과 페이지로 — SSR 로딩 있으므로 navigating 상태 활성화
       setNavigating(true)
       const params = new URLSearchParams()
-      if (selectedFields.length) params.set('fields', selectedFields.join(','))
+      // wizard id → 실제 DB fields 값(한글)으로 확장
+      const dbFields = Array.from(new Set(
+        selectedFields.flatMap((id) => WIZARD_FIELDS.find((f) => f.id === id)?.dbFields ?? [])
+      ))
+      if (dbFields.length) params.set('fields', dbFields.join(','))
       if (selectedTopics.length) params.set('topics', selectedTopics.join(','))
       if (selectedTargets.length) params.set('targets', selectedTargets.join(','))
       router.push(`/matching/result?${params.toString()}`)
