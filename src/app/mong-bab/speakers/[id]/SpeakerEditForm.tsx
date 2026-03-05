@@ -442,34 +442,39 @@ export default function SpeakerEditForm({ speaker }: Props) {
               + 추가
             </button>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {mediaLinks.map((m, i) => (
-              <div key={i} className="flex gap-2">
+              <div key={i} className="border border-gray-200 rounded-xl p-3 space-y-2 bg-gray-50">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-xs text-gray-400 font-medium">#{i + 1}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeMediaLink(i)}
+                    className="text-xs text-gray-300 hover:text-red-400 transition-colors ml-auto"
+                  >
+                    삭제
+                  </button>
+                </div>
                 <input
                   type="text"
-                  placeholder="영상 제목"
+                  placeholder="영상 제목 (예: 리더십의 본질)"
                   value={m.title}
                   onChange={(e) => updateMediaLink(i, 'title', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] bg-white"
                 />
                 <input
                   type="url"
-                  placeholder="https://youtube.com/..."
+                  placeholder="YouTube URL (https://www.youtube.com/watch?v=...)"
                   value={m.url}
                   onChange={(e) => updateMediaLink(i, 'url', e.target.value)}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e]"
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] bg-white font-mono text-xs"
                 />
-                <button
-                  type="button"
-                  onClick={() => removeMediaLink(i)}
-                  className="text-gray-300 hover:text-red-400 transition-colors px-1"
-                >
-                  ✕
-                </button>
               </div>
             ))}
             {mediaLinks.length === 0 && (
-              <p className="text-xs text-gray-400 text-center py-2">참고영상이 없습니다.</p>
+              <p className="text-xs text-gray-400 text-center py-3 border border-dashed border-gray-200 rounded-xl">
+                참고영상이 없습니다. + 추가를 눌러 입력하세요.
+              </p>
             )}
           </div>
         </div>
