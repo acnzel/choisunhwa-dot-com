@@ -144,7 +144,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
               {/* 03 태그 (데스크탑 전용 컬럼) */}
               <div className="sp-col-tags">
-                {speaker.fields.slice(0, 2).map((f) => (
+                {speaker.fields.slice(0, 3).map((f) => (
                   <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
                     {fieldMap[f] ?? f}
                   </span>

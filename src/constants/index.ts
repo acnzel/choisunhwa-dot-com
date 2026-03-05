@@ -1,15 +1,60 @@
-// ─── 강사/강연 분야 ─────────────────────────────────────────
+// ─── 강사/강연 분야 (45개 풀 리스트) ───────────────────────
 export const SPEAKER_FIELDS = [
-  { value: 'leadership', label: '리더십' },
-  { value: 'motivation', label: '동기부여' },
-  { value: 'marketing', label: '마케팅' },
-  { value: 'org_culture', label: '조직문화' },
-  { value: 'ai_tech', label: 'AI/기술' },
-  { value: 'communication', label: '커뮤니케이션' },
-  { value: 'sales', label: '영업' },
-  { value: 'self_development', label: '자기계발' },
-  { value: 'hr', label: '인사/교육' },
-  { value: 'finance', label: '재무/경영' },
+  // 경제/경영
+  { value: 'economy',         label: '경제' },
+  { value: 'economic_outlook',label: '경제전망' },
+  { value: 'finance',         label: '재테크' },
+  { value: 'startup',         label: '창업' },
+  { value: 'startup_culture', label: '스타트업' },
+  // 리더십/조직
+  { value: 'leadership',      label: '리더십' },
+  { value: 'coaching',        label: '코칭' },
+  { value: 'empowerment',     label: '임파워먼트' },
+  { value: 'performance_mgmt',label: '성과관리' },
+  { value: 'org_culture',     label: '조직관리' },
+  // 소통/스킬
+  { value: 'communication',   label: '소통' },
+  { value: 'cs',              label: 'CS' },
+  { value: 'speech',          label: '스피치' },
+  { value: 'work_skills',     label: '업무스킬' },
+  // HR/교육
+  { value: 'hr',              label: 'HR' },
+  { value: 'education',       label: '교육' },
+  { value: 'child_education', label: '자녀교육' },
+  { value: 'employment',      label: '취업' },
+  { value: 'interview',       label: '면접' },
+  // 마케팅/영업
+  { value: 'marketing',       label: '마케팅' },
+  { value: 'sales',           label: '영업' },
+  // 동기/자기계발
+  { value: 'motivation',      label: '동기부여' },
+  { value: 'passion',         label: '열정' },
+  { value: 'self_development',label: '자기계발' },
+  { value: 'creativity',      label: '창의' },
+  // AI/기술
+  { value: 'ai',              label: 'AI' },
+  { value: 'it',              label: 'IT' },
+  { value: 'future',          label: '미래' },
+  { value: 'trend',           label: '트렌드' },
+  // 인문/예술/역사
+  { value: 'humanities',      label: '인문학' },
+  { value: 'literature',      label: '문학' },
+  { value: 'arts',            label: '예술' },
+  { value: 'history',         label: '역사' },
+  // 건강/심리
+  { value: 'health',          label: '건강' },
+  { value: 'psychology',      label: '심리' },
+  { value: 'stress',          label: '스트레스' },
+  { value: 'healing',         label: '힐링' },
+  { value: 'meditation',      label: '명상' },
+  { value: 'lifestyle',       label: '라이프' },
+  // 법/사회
+  { value: 'legal_required',  label: '법정필수' },
+  { value: 'law',             label: '법률' },
+  { value: 'politics',        label: '정치' },
+  { value: 'society',         label: '사회' },
+  // 기타 (구 ai_tech 하위호환)
+  { value: 'ai_tech',         label: 'AI/기술' },
 ] as const
 
 // ─── 강연료 범위 ─────────────────────────────────────────
