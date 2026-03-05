@@ -12,7 +12,7 @@
 | DB 스키마 + 기반 세팅 | @dev | ✅ 완료 | migrations 001~003, supabase 클라이언트, 타입, 미들웨어 |
 | 백엔드 API Routes | @backend | ✅ 완료 | public + admin API 전체, tsc 에러 0 |
 | **프론트엔드 페이지** | @frontend | ✅ 완료 | Phase 1 전체 완료, 빌드 통과, Vercel 배포 중 |
-| QA 테스트 | @qa | 🔴 블로커 | Vercel 배포 실패로 E2E 불가. 로컬 빌드 정상 확인. 배포 수정 후 즉시 재개 |
+| QA 전체 검수 | @qa | ✅ 완료 | 전 페이지 순회 완료. 버그 9건 발견. 상세 내용 이슈 트래커 참고 |
 
 ---
 
@@ -165,6 +165,55 @@ NEXT_PUBLIC_SITE_URL=https://choisunhwa-dot-com.vercel.app
 - [ ] 이미지 alt 텍스트
 
 **완료 후 → @dev_cshdotcom_bot 멘션 (최종 배포 확인)**
+
+---
+
+## 🐛 이슈 트래커 — QA 전체 검수 결과 (2026-02-27)
+
+### P1 — 수정 필요
+
+| ID | 담당 | 제목 | 상세 |
+|----|------|------|------|
+| BUG-A | @frontend | `/inquiry/status` 페이지 타이틀 중복 | `"문의 현황 확인 \| 최선화닷컴 \| 최선화닷컴"` — "최선화닷컴" 두 번 반복. metadata 수정 필요 |
+| BUG-B | @dev / 스캇 | 강사 프로필 사진에 강아지 사진 | 서은국 교수 프로필에 테스트용 강아지 사진 업로드됨. 실제 사진으로 교체 필요 |
+| BUG-C | @dev / 스캇 | 강연 커리큘럼 데이터 없음 | `/lectures` 페이지 "총 0개의 강연" 표시. 강연 데이터 입력 필요 |
+| BUG-D | @frontend | 메뉴명 "인사이트" ↔ 페이지명 "강연 커리큘럼" 불일치 | 네비게이션은 "인사이트"인데 실제 페이지 H1은 "강연 커리큘럼". UX 혼란 유발. 메뉴명 통일 필요 |
+| BUG-E | @frontend | 홈 통계 더미 데이터 하드코딩 | `500건+, 200곳+, 98%` 수치가 하드코딩. 실제 집계 수치 또는 의도된 값으로 명확히 할 것 |
+
+### P2 — 보완 권장
+
+| ID | 담당 | 제목 | 상세 |
+|----|------|------|------|
+| BUG-F | 스캇 | FAQ/공지사항 콘텐츠 없음 | `/support/faq`, `/support/notice` 빈 상태. 초기 콘텐츠 입력 필요 |
+| BUG-G | @frontend | 커스텀 404 페이지 없음 | 잘못된 URL 접근 시 영문 기본 404 "This page could not be found." 표시됨. 한국어 커스텀 404 필요 |
+| BUG-H | 스캇 | 회사소개 웹사이트 URL 미업데이트 | `/support/about` 에 웹사이트가 `choisunhwa-dot-com.vercel.app`으로 표시됨. 최종 도메인 확정 후 업데이트 필요 |
+
+### P3 — 확인 완료 / 진행 중
+
+| ID | 담당 | 제목 | 상세 |
+|----|------|------|------|
+| BUG-I | @frontend | 매칭 "강사 추천 받기" 로딩 피드백 없음 | step 3에서 버튼 클릭 시 로딩 상태 없음. 스캇이 @frontend에 이미 요청함 — 작업 중 |
+
+---
+
+### ✅ 정상 확인 항목 (전체 14개 라우트 HTTP 200)
+
+| 페이지 | 상태 | 비고 |
+|--------|------|------|
+| `/` 홈 | ✅ | 디자인 완성도 높음 |
+| `/speakers` 강사 목록 | ✅ | 필터/카드 정상 |
+| `/speakers/:id` 강사 상세 | ✅ | 경력/학력/유튜브 링크 정상 |
+| `/lectures` 강연 커리큘럼 | ⚠️ | 데이터 0건 (BUG-C) |
+| `/inquiry/lecture` 강연기획 문의 | ✅ | 폼 완전 구현 |
+| `/inquiry/register` 강사등록 문의 | ✅ | 폼 완전 구현 |
+| `/inquiry/status` 문의 현황 | ✅ | 타이틀 중복 외 정상 (BUG-A) |
+| `/support/faq` FAQ | ⚠️ | 빈 상태 (BUG-F) |
+| `/support/notice` 공지사항 | ⚠️ | 빈 상태 (BUG-F) |
+| `/support/about` 회사소개 | ✅ | URL 미업데이트 외 정상 |
+| `/auth/login` 로그인 | ✅ | Google OAuth 포함 |
+| `/auth/signup` 회원가입 | ✅ | 폼 완전 구현 |
+| `/matching` 매칭 위자드 | ✅ | 3단계 플로우 정상 |
+| `/mong-bab/login` 어드민 로그인 | ✅ | 정상 |
 
 ---
 
