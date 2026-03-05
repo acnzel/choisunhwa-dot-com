@@ -18,9 +18,44 @@ type LectureHistory = { org_name: string; logo_url?: string }
 
 const initialState = { error: '' }
 
+// DB에 구버전 문자열 배열로 저장된 경우 정규화
+function normalizeCareers(raw: unknown[]): Career[] {
+  return raw.map((item) => {
+    if (typeof item === 'string') return { year: '', content: item }
+    const c = item as Career
+    return { year: c.year ?? '', content: c.content ?? '' }
+  })
+}
+
+function normalizeHistories(raw: unknown[]): LectureHistory[] {
+  return raw.map((item) => {
+    if (typeof item === 'string') return { org_name: item }
+    const h = item as LectureHistory
+    return { org_name: h.org_name ?? '', logo_url: h.logo_url }
+  })
+}
+
+// media_links: "{\"title\":\"...\",\"url\":\"...\"}" 형태의 이중직렬화 처리
+function normalizeMediaLinks(raw: unknown[]): string[] {
+  return raw.map((item) => {
+    if (typeof item !== 'string') return String(item)
+    const trimmed = item.trim()
+    if (trimmed.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(trimmed) as { url?: string; title?: string }
+        return parsed.url ?? trimmed
+      } catch {
+        return trimmed
+      }
+    }
+    return trimmed
+  })
+}
+
 export default function SpeakerEditForm({ speaker }: Props) {
   const router = useRouter()
-  const allCareers = (speaker.careers as Career[]) ?? []
+  const rawCareers = (speaker.careers as unknown[]) ?? []
+  const allCareers = normalizeCareers(rawCareers)
   const [careers, setCareers] = useState<Career[]>(
     allCareers.filter((c) => !c.content.startsWith('[학력]'))
   )
@@ -30,7 +65,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
       .map((c) => ({ ...c, content: c.content.replace(/^\[학력\]\s*/, '') }))
   )
   const [histories, setHistories] = useState<LectureHistory[]>(
-    (speaker.lecture_histories as LectureHistory[]) ?? []
+    normalizeHistories((speaker.lecture_histories as unknown[]) ?? [])
   )
   const [isVisible, setIsVisible] = useState(speaker.is_visible)
   const [deleting, setDeleting] = useState(false)
@@ -420,7 +455,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
           <label className="block text-xs font-medium text-gray-600 mb-1">참고영상 링크 (한 줄에 하나씩, 유튜브 URL)</label>
           <textarea
             name="media_links"
-            defaultValue={(speaker.media_links ?? []).join('\n')}
+            defaultValue={normalizeMediaLinks((speaker.media_links as unknown[]) ?? []).join('\n')}
             rows={3}
             placeholder="https://youtube.com/..."
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none"
