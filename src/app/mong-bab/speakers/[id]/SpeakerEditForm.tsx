@@ -7,6 +7,7 @@ import Link from 'next/link'
 import { upsertSpeaker, deleteSpeaker } from '@/app/actions/admin'
 import type { Speaker } from '@/types'
 import { SPEAKER_FIELDS, FEE_RANGES } from '@/constants'
+import { parseMediaLinks } from '@/lib/utils/speaker'
 import { useRouter } from 'next/navigation'
 
 interface Props {
@@ -34,7 +35,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
     speaker.lecture_histories ?? []
   )
   const [mediaLinks, setMediaLinks] = useState<MediaLink[]>(
-    (speaker.media_links ?? []).map((m) => ({ title: m.title ?? '', url: m.url ?? '' }))
+    parseMediaLinks(speaker.media_links as unknown[])
   )
   const [isVisible, setIsVisible] = useState(speaker.is_visible)
   const [deleting, setDeleting] = useState(false)

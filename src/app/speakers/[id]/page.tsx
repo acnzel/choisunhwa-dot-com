@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import type { Speaker, Lecture } from '@/types'
 import { SPEAKER_FIELDS } from '@/constants'
+import { normalizeSpeaker } from '@/lib/utils/speaker'
 import ShareButton from './ShareButton'
 import ScrollToTop from './ScrollToTop'
 
@@ -24,7 +25,8 @@ async function getSpeaker(id: string): Promise<Speaker | null> {
     .eq('id', id)
     .eq('is_visible', true)
     .single()
-  return (data as Speaker) ?? null
+  if (!data) return null
+  return normalizeSpeaker(data as Speaker)
 }
 
 async function getSpeakerLectures(speakerId: string): Promise<Lecture[]> {

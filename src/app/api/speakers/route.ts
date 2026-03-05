@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { PAGINATION } from '@/constants'
+import { normalizeSpeaker } from '@/lib/utils/speaker'
 
 /**
  * GET /api/speakers
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.json({
-    data,
+    data: (data ?? []).map((s) => normalizeSpeaker(s as Parameters<typeof normalizeSpeaker>[0])),
     meta: {
       page,
       limit,

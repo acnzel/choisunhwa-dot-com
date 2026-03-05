@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Speaker } from '@/types'
+import { normalizeSpeaker } from '@/lib/utils/speaker'
 import SpeakerEditForm from './SpeakerEditForm'
 
 interface Props {
@@ -12,7 +13,8 @@ interface Props {
 async function getSpeaker(id: string): Promise<Speaker | null> {
   const supabase = createAdminClient()
   const { data } = await supabase.from('speakers').select('*').eq('id', id).single()
-  return (data as Speaker) ?? null
+  if (!data) return null
+  return normalizeSpeaker(data as Speaker)
 }
 
 export default async function AdminSpeakerDetailPage({ params, searchParams }: Props) {

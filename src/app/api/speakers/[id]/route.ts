@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { normalizeSpeaker } from '@/lib/utils/speaker'
 
 /**
  * GET /api/speakers/:id
@@ -40,7 +41,7 @@ export async function GET(
 
   return NextResponse.json({
     data: {
-      ...speaker,
+      ...normalizeSpeaker(speaker as Parameters<typeof normalizeSpeaker>[0]),
       lectures: lectures ?? [],
       reviews: reviews ?? [],
     },
