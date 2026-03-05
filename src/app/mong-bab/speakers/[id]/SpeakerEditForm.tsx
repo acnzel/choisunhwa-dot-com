@@ -255,7 +255,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
                 type="checkbox"
                 name="fields"
                 value={value}
-                defaultChecked={speaker.fields.includes(value)}
+                defaultChecked={(speaker.fields ?? []).includes(value)}
                 className="accent-[#1a1a2e]"
               />
               <span className="text-sm text-gray-700">{label}</span>
@@ -420,7 +420,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
           <label className="block text-xs font-medium text-gray-600 mb-1">참고영상 링크 (한 줄에 하나씩, 유튜브 URL)</label>
           <textarea
             name="media_links"
-            defaultValue={speaker.media_links.join('\n')}
+            defaultValue={(speaker.media_links ?? []).join('\n')}
             rows={3}
             placeholder="https://youtube.com/..."
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none"
@@ -430,7 +430,7 @@ export default function SpeakerEditForm({ speaker }: Props) {
           <label className="block text-xs font-medium text-gray-600 mb-1">저서 (한 줄에 하나씩)</label>
           <textarea
             name="news_links"
-            defaultValue={speaker.news_links.join('\n')}
+            defaultValue={(speaker.news_links ?? []).join('\n')}
             rows={3}
             placeholder="책 제목 1&#10;책 제목 2&#10;..."
             className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#1a1a2e] resize-none"
