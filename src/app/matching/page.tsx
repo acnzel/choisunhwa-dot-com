@@ -54,6 +54,7 @@ function WizardContent() {
   const [selectedFields, setSelectedFields] = useState<WizardFieldId[]>([])
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
   const [selectedTargets, setSelectedTargets] = useState<string[]>([])
+  const [navigating, setNavigating] = useState(false)
 
   // step이 바뀔 때 다음 단계 선택값 초기화
   const prevStep = step
@@ -71,7 +72,8 @@ function WizardContent() {
     if (step < TOTAL_STEPS) {
       router.push(`/matching?step=${step + 1}`)
     } else {
-      // 결과 페이지로
+      // 결과 페이지로 — SSR 로딩 있으므로 navigating 상태 활성화
+      setNavigating(true)
       const params = new URLSearchParams()
       if (selectedFields.length) params.set('fields', selectedFields.join(','))
       if (selectedTopics.length) params.set('topics', selectedTopics.join(','))
@@ -162,7 +164,62 @@ function WizardContent() {
             height: 72px !important;
           }
         }
+        /* 버튼 스피너 */
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+        .btn-spinner {
+          display: inline-block;
+          width: 14px; height: 14px;
+          border: 2px solid rgba(255,255,255,0.35);
+          border-top-color: #fff;
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+          flex-shrink: 0;
+        }
+        /* 결과 로딩 오버레이 */
+        .matching-loading-overlay {
+          position: fixed; inset: 0;
+          background: rgba(247,243,238,0.88);
+          backdrop-filter: blur(4px);
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          gap: 20px; z-index: 100;
+        }
+        @keyframes pulse-dot {
+          0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+          40% { transform: scale(1); opacity: 1; }
+        }
+        .loading-dots {
+          display: flex; gap: 8px;
+        }
+        .loading-dots span {
+          width: 10px; height: 10px; border-radius: 50%;
+          background: var(--color-green);
+          animation: pulse-dot 1.2s ease-in-out infinite;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
       `}</style>
+
+      {/* ── 결과 로딩 오버레이 ── */}
+      {navigating && (
+        <div className="matching-loading-overlay">
+          <div className="loading-dots">
+            <span /><span /><span />
+          </div>
+          <p style={{
+            fontFamily: 'var(--font-display)', fontWeight: 900,
+            fontSize: 'clamp(16px, 2.5vw, 22px)', letterSpacing: '-0.02em',
+            color: 'var(--color-ink)',
+          }}>
+            조건에 맞는 강사를 찾고 있습니다…
+          </p>
+          <p style={{ fontSize: '12px', color: 'var(--color-muted)' }}>
+            잠시만 기다려주세요
+          </p>
+        </div>
+      )}
 
       <div style={{
         minHeight: '100vh', paddingTop: 'var(--nav-height)',
@@ -297,18 +354,22 @@ function WizardContent() {
               <button
                 type="button"
                 onClick={goNext}
-                disabled={!canNext}
+                disabled={!canNext || navigating}
                 style={{
                   fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 700,
                   letterSpacing: '0.06em',
                   color: 'var(--color-bg)',
-                  background: canNext ? 'var(--color-green)' : 'var(--color-border)',
+                  background: canNext && !navigating ? 'var(--color-green)' : 'var(--color-border)',
                   border: 'none', padding: '12px 36px',
-                  cursor: canNext ? 'pointer' : 'not-allowed',
+                  cursor: canNext && !navigating ? 'pointer' : 'not-allowed',
                   transition: 'background 0.2s',
+                  display: 'inline-flex', alignItems: 'center', gap: '10px',
                 }}
               >
-                {step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'}
+                {navigating && step === TOTAL_STEPS
+                  ? <><span className="btn-spinner" />검색 중…</>
+                  : step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'
+                }
               </button>
             </div>
           </div>

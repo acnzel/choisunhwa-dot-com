@@ -84,8 +84,9 @@ export default async function SpeakerDetailPage({ params }: Props) {
       return { title: item, url: item }
     })
 
+  const bioText = speaker.bio_full?.trim() || speaker.bio_short?.trim() || ''
   const hasContent = {
-    bio:       !!speaker.bio_full?.trim(),
+    bio:       !!bioText,
     careers:   careers.length > 0,
     education: education.length > 0,
     books:     books.length > 0,
@@ -191,26 +192,15 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 {speaker.name}
               </h1>
 
-              {/* 직함 */}
+              {/* 직함 + 소속 — 크고 진하게, 하나만 표시 */}
               <p style={{
-                fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 300,
-                color: 'var(--color-muted)', marginBottom: '16px', lineHeight: 1.5,
+                fontFamily: 'var(--font-body)', fontSize: 'clamp(15px, 1.8vw, 18px)',
+                fontWeight: 500, color: 'var(--color-ink)',
+                marginBottom: '24px', lineHeight: 1.5,
+                letterSpacing: '-0.01em',
               }}>
                 {[speaker.title, speaker.company].filter(Boolean).join(' · ')}
               </p>
-
-              {/* 한줄 소개 */}
-              {speaker.bio_short && (
-                <p style={{
-                  fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 300,
-                  color: 'var(--color-subtle)', lineHeight: 1.8,
-                  maxWidth: '540px', marginBottom: '24px',
-                  borderLeft: '2px solid var(--color-ochre)',
-                  paddingLeft: '14px',
-                }}>
-                  {speaker.bio_short}
-                </p>
-              )}
 
               {/* CTA 버튼 */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
@@ -246,7 +236,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
                   color: 'var(--color-subtle)', lineHeight: 2,
                   whiteSpace: 'pre-line',
                 }}>
-                  {speaker.bio_full}
+                  {bioText}
                 </p>
               </DetailSection>
             )}
