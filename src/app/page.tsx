@@ -47,10 +47,22 @@ const TRUST_STATS = [
 
 // ── 프로세스 4단계 (추후 DB/어드민 연동 예정) ──────────────
 const PROCESS_STEPS = [
-  { step: '01', icon: '📝', title: '의뢰 접수',      desc: '강연 목적, 대상, 예산을 간단히 알려주세요' },
-  { step: '02', icon: '☎️', title: '24시간 내 연락', desc: '담당자가 직접 연락해 요구사항을 확인합니다' },
-  { step: '03', icon: '🎯', title: '맞춤 강사 제안', desc: '조직에 딱 맞는 강사 2~3명을 추천드립니다' },
-  { step: '04', icon: '✅', title: '계약 & 진행',    desc: '일정, 장소, 내용 조율 후 강연이 시작됩니다' },
+  { step: '01', title: '의뢰 접수',      desc: '강연 목적, 대상, 예산을 간단히 알려주세요' },
+  { step: '02', title: '24시간 내 연락', desc: '담당자가 직접 연락해 요구사항을 확인합니다' },
+  { step: '03', title: '맞춤 강사 제안', desc: '조직에 딱 맞는 강사 2~3명을 추천드립니다' },
+  { step: '04', title: '계약 & 진행',    desc: '일정, 장소, 내용 조율 후 강연이 시작됩니다' },
+]
+
+// ── 프로세스 SVG 아이콘 (Lucide 스타일, 32px / stroke 1.5 / #4a5e3a) ──
+const PROCESS_ICONS = [
+  // file-text
+  <svg key="file-text" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4a5e3a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>,
+  // phone-call
+  <svg key="phone-call" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4a5e3a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15.05 5A5 5 0 0 1 19 8.95M15.05 1A9 9 0 0 1 23 8.94m-1 7.98v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13.6a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.44 3h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10.6a16 16 0 0 0 6 6l.83-.83a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.44 17.92z"/></svg>,
+  // users
+  <svg key="users" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4a5e3a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  // check-circle
+  <svg key="check-circle" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4a5e3a" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
 ]
 
 export default async function HomePage() {
@@ -241,7 +253,7 @@ export default async function HomePage() {
                   fontFamily: 'var(--font-display)', fontWeight: 900,
                   fontSize: 'clamp(36px, 4.5vw, 64px)',
                   letterSpacing: '-0.03em', lineHeight: 1,
-                  color: i % 2 === 0 ? 'var(--color-green)' : 'var(--color-rust)',
+                  color: i === 2 ? '#c4724a' : 'var(--color-ink)',
                   marginBottom: '8px',
                 }}>
                   {number}
@@ -397,16 +409,26 @@ export default async function HomePage() {
           </div>
 
           <div className="process-grid">
-            {PROCESS_STEPS.map(({ step, icon, title, desc }, i) => (
+            {PROCESS_STEPS.map(({ step, title, desc }, i) => (
               <div key={step} className="process-item">
                 {/* 단계 간 화살표 (PC) */}
                 {i < PROCESS_STEPS.length - 1 && (
                   <span className="process-arrow">→</span>
                 )}
-                <div style={{ fontFamily: 'var(--font-english)', fontSize: '11px', fontWeight: 400, letterSpacing: '0.12em', color: 'var(--color-muted)', marginBottom: '12px' }}>
-                  STEP {step}
+                {/* 아이콘 + 숫자 뱃지 */}
+                <div style={{ position: 'relative', display: 'inline-flex', marginBottom: '14px' }}>
+                  {PROCESS_ICONS[i]}
+                  <span style={{
+                    position: 'absolute', top: '-6px', right: '-8px',
+                    width: '18px', height: '18px', borderRadius: '50%',
+                    background: 'var(--color-ink)', color: 'var(--color-bg)',
+                    fontSize: '9px', fontWeight: 700, fontFamily: 'var(--font-english)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    letterSpacing: '0.02em',
+                  }}>
+                    {i + 1}
+                  </span>
                 </div>
-                <div style={{ fontSize: '20px', marginBottom: '10px', lineHeight: 1 }}>{icon}</div>
                 <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(15px, 1.8vw, 18px)', letterSpacing: '-0.02em', color: 'var(--color-ink)', marginBottom: '8px', lineHeight: 1.3 }}>
                   {title}
                 </div>

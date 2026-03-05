@@ -11,6 +11,22 @@ type LectureWithSpeaker = Lecture & { speaker: Pick<Speaker, 'id' | 'name' | 'ti
 const FIELD_MAP: Record<string, string> = Object.fromEntries(
   SPEAKER_FIELDS.map((f) => [f.value, f.label])
 )
+// 한국어 레이블 → enum 값 역방향 맵 (DB 데이터 혼용 대응)
+const LABEL_TO_VALUE: Record<string, string> = {
+  ...Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.label, f.value])),
+  // 구버전 한국어 별칭 추가 매핑
+  '행복': 'psychology', '심리': 'psychology', '힐링': 'healing',
+  '조직문화': 'org_culture', '조직관리': 'org_culture',
+  '일하는 방식': 'work_skills', '업무스킬': 'work_skills',
+  '리더십': 'leadership', '동기부여': 'motivation',
+  '소통': 'communication', '커뮤니케이션': 'communication',
+  'HR': 'hr', 'HRD': 'hr', '인사관리': 'hr',
+  '경영전략': 'finance', '재무': 'finance',
+  'AI': 'ai', 'IT': 'it', '인문학': 'humanities',
+}
+function normalizeField(f: string): string {
+  return LABEL_TO_VALUE[f] ?? f
+}
 const DURATION_MAP: Record<string, string> = Object.fromEntries(
   LECTURE_DURATIONS.map((d) => [d.value, d.label])
 )
@@ -23,9 +39,18 @@ export default function LectureList({ lectures }: Props) {
   const [search, setSearch] = useState('')
   const [selectedField, setSelectedField] = useState('all')
 
+  // 실제 강연 데이터에 있는 분야만 필터 버튼에 표시
+  const activeFields = useMemo(() => {
+    const fieldSet = new Set<string>()
+    lectures.forEach((l) => l.fields.forEach((f) => fieldSet.add(normalizeField(f))))
+    return SPEAKER_FIELDS.filter((f) => fieldSet.has(f.value))
+  }, [lectures])
+
   const filtered = useMemo(() => {
     return lectures.filter((l) => {
-      const matchField = selectedField === 'all' || l.fields.includes(selectedField)
+      // DB 필드가 한국어 레이블 또는 영어 enum 값 둘 다 허용
+      const normalizedFields = l.fields.map(normalizeField)
+      const matchField = selectedField === 'all' || normalizedFields.includes(selectedField)
       const q = search.toLowerCase()
       const matchSearch =
         !q ||
@@ -64,7 +89,7 @@ export default function LectureList({ lectures }: Props) {
           >
             전체
           </button>
-          {SPEAKER_FIELDS.map(({ value, label }) => (
+          {activeFields.map(({ value, label }) => (
             <button
               key={value}
               onClick={() => setSelectedField(value)}
@@ -123,7 +148,7 @@ export default function LectureList({ lectures }: Props) {
                 <div className="flex flex-wrap gap-1 mb-2">
                   {lecture.fields.slice(0, 2).map((f) => (
                     <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
-                      {FIELD_MAP[f] ?? f}
+                      {FIELD_MAP[normalizeField(f)] ?? f}
                     </span>
                   ))}
                 </div>

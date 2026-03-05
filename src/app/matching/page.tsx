@@ -20,11 +20,11 @@ function SelectCard({
       style={{
         display: 'flex', flexDirection: 'column', alignItems: 'flex-start',
         gap: '8px', padding: '16px 20px',
-        border: selected ? '2px solid var(--color-green)' : '1px solid var(--color-border)',
-        background: selected ? 'rgba(43,66,56,0.06)' : 'var(--color-bg)',
+        border: selected ? '2px solid #2d3a25' : '1px solid #d0cdc6',
+        background: selected ? '#eef1ea' : '#fff',
         cursor: disabled && !selected ? 'not-allowed' : 'pointer',
         opacity: disabled && !selected ? 0.45 : 1,
-        transition: 'border 0.15s, background 0.15s',
+        transition: 'all 0.15s ease',
         textAlign: 'left', position: 'relative',
       }}
     >
@@ -32,13 +32,19 @@ function SelectCard({
         <span style={{
           position: 'absolute', top: '10px', right: '12px',
           width: '18px', height: '18px', borderRadius: '50%',
-          background: 'var(--color-green)',
+          background: '#2d3a25',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           fontSize: '10px', color: '#fff',
         }}>✓</span>
       )}
       {icon && <span style={{ fontSize: '22px', lineHeight: 1 }}>{icon}</span>}
-      <span style={{ fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.4 }}>
+      <span style={{
+        fontFamily: 'var(--font-body)', fontSize: '13px',
+        fontWeight: selected ? 700 : 600,
+        color: selected ? '#2d3a25' : 'var(--color-ink)',
+        lineHeight: 1.4,
+        transition: 'font-weight 0.15s',
+      }}>
         {label}
       </span>
     </button>
@@ -267,7 +273,7 @@ function WizardContent() {
 
         {/* ── 메인 콘텐츠 ── */}
         <div style={{
-          flex: 1, padding: 'clamp(32px, 5vw, 56px) var(--space-page)',
+          flex: 1, padding: 'clamp(28px, 4vw, 44px) var(--space-page) 48px',
           maxWidth: '760px', width: '100%', margin: '0 auto',
         }}>
           <div className="wizard-slide" key={step}>
@@ -362,12 +368,14 @@ function WizardContent() {
                   background: canNext && !navigating ? 'var(--color-green)' : 'var(--color-border)',
                   border: 'none', padding: '12px 36px',
                   cursor: canNext && !navigating ? 'pointer' : 'not-allowed',
-                  transition: 'background 0.2s',
+                  transition: 'background 0.2s, opacity 0.2s',
                   display: 'inline-flex', alignItems: 'center', gap: '10px',
+                  pointerEvents: navigating ? 'none' : 'auto',
+                  opacity: navigating ? 0.7 : 1,
                 }}
               >
                 {navigating && step === TOTAL_STEPS
-                  ? <><span className="btn-spinner" />검색 중…</>
+                  ? <><span className="btn-spinner" />분석 중…</>
                   : step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'
                 }
               </button>

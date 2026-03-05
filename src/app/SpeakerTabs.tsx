@@ -11,6 +11,27 @@ interface Props {
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
 
+// 분야별 컬러 도트/보더 매핑
+const FIELD_COLORS: Record<string, string> = {
+  leadership:       '#2c3e6b', // 네이비
+  org_culture:      '#4a5e3a', // 올리브 그린
+  motivation:       '#c4724a', // 테라코타
+  self_development: '#c4724a',
+  marketing:        '#c49a2a', // 머스타드
+  sales:            '#c49a2a',
+  communication:    '#4a5e3a',
+  ai_tech:          '#2c3e6b',
+  hr:               '#c49a2a',
+  finance:          '#2c3e6b',
+}
+
+function getFieldColor(fields: string[]): string {
+  for (const f of fields) {
+    if (FIELD_COLORS[f]) return FIELD_COLORS[f]
+  }
+  return 'var(--color-border)'
+}
+
 export default function SpeakerTabs({ speakers, fieldMap }: Props) {
   const [activeTab, setActiveTab] = useState(0)
   const [filterField, setFilterField] = useState<string | null>(null)
@@ -45,8 +66,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         }
         .sp-row:last-child { border-bottom: none; }
         .sp-row:hover {
-          background: var(--color-surface);
-          padding-left: 12px; padding-right: 12px; margin: 0 -12px;
+          background: #f0ede6;
         }
 
         /* 데스크탑: 별도 컬럼 태그 보임 / 인라인 태그 숨김 */
@@ -115,7 +135,12 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           </p>
         ) : (
           filtered.map((speaker, i) => (
-            <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="sp-row">
+            <Link
+              key={speaker.id}
+              href={`/speakers/${speaker.id}`}
+              className="sp-row"
+              style={{ boxShadow: `inset 3px 0 0 ${getFieldColor(speaker.fields ?? [])}` }}
+            >
 
               {/* 01 번호 */}
               <span style={{ fontFamily: 'var(--font-english)', fontSize: '13px', color: 'var(--color-muted)', flexShrink: 0 }}>
