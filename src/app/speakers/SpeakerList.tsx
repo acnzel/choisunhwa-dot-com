@@ -4,11 +4,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useMemo } from 'react'
 import type { Speaker } from '@/types'
-import { SPEAKER_FIELDS } from '@/constants'
-
-const FIELD_MAP: Record<string, string> = Object.fromEntries(
-  SPEAKER_FIELDS.map((f) => [f.value, f.label])
-)
 
 interface Props {
   speakers: Speaker[]
@@ -18,15 +13,22 @@ export default function SpeakerList({ speakers }: Props) {
   const [search, setSearch] = useState('')
   const [selectedField, setSelectedField] = useState<string>('all')
 
+  // DB에 실제로 존재하는 분야만 필터 버튼에 노출
+  const availableFields = useMemo(
+    () => Array.from(new Set(speakers.flatMap((s) => s.fields ?? []))).sort(),
+    [speakers]
+  )
+
   const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase()
     return speakers.filter((s) => {
-      const matchField = selectedField === 'all' || s.fields.includes(selectedField)
-      const q = search.toLowerCase()
+      const matchField = selectedField === 'all' || (s.fields ?? []).includes(selectedField)
       const matchSearch =
         !q ||
-        s.name.toLowerCase().includes(q) ||
-        s.bio_short.toLowerCase().includes(q) ||
-        s.company.toLowerCase().includes(q)
+        (s.name ?? '').toLowerCase().includes(q) ||
+        (s.bio_short ?? '').toLowerCase().includes(q) ||
+        (s.company ?? '').toLowerCase().includes(q) ||
+        (s.title ?? '').toLowerCase().includes(q)
       return matchField && matchSearch
     })
   }, [speakers, search, selectedField])
@@ -34,9 +36,9 @@ export default function SpeakerList({ speakers }: Props) {
   return (
     <div>
       {/* 필터 & 검색 */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-8">
-        {/* 검색 */}
-        <div className="relative flex-1 max-w-sm">
+      <div className="flex flex-col gap-3 mb-8">
+        {/* 검색창 */}
+        <div className="relative max-w-sm">
           <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -50,7 +52,7 @@ export default function SpeakerList({ speakers }: Props) {
           />
         </div>
 
-        {/* 분야 필터 */}
+        {/* 분야 필터 — DB에 실제 존재하는 분야만 표시 */}
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setSelectedField('all')}
@@ -62,17 +64,17 @@ export default function SpeakerList({ speakers }: Props) {
           >
             전체
           </button>
-          {SPEAKER_FIELDS.map(({ value, label }) => (
+          {availableFields.map((field) => (
             <button
-              key={value}
-              onClick={() => setSelectedField(value)}
+              key={field}
+              onClick={() => setSelectedField(field)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                selectedField === value
+                selectedField === field
                   ? 'bg-[#1a1a2e] text-white'
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
               }`}
             >
-              {label}
+              {field}
             </button>
           ))}
         </div>
@@ -120,9 +122,9 @@ export default function SpeakerList({ speakers }: Props) {
               </Link>
               <div className="p-4 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {speaker.fields.slice(0, 3).map((f) => (
+                  {(speaker.fields ?? []).slice(0, 3).map((f) => (
                     <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
-                      {FIELD_MAP[f] ?? f}
+                      {f}
                     </span>
                   ))}
                 </div>

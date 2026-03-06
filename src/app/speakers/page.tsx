@@ -3,6 +3,8 @@ import { createClient } from '@/lib/supabase/server'
 import type { Speaker } from '@/types'
 import SpeakerList from './SpeakerList'
 
+export const dynamic = 'force-dynamic'
+
 export const metadata: Metadata = {
   title: '강사 소개',
   description: '최선화닷컴의 검증된 전문 강사들을 만나보세요.',
