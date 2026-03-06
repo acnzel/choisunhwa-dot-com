@@ -52,10 +52,10 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
       <style>{`
         .sub-tab-btn { background: none; border: none; font-family: var(--font-body); }
 
-        /* 데스크탑 5열: 번호 / 이름+역할 / 태그 / 상태 / 화살표 */
+        /* 데스크탑 5열: 번호+도트 / 이름+역할 / 태그 / 상태 / 화살표 */
         .sp-row {
           display: grid;
-          grid-template-columns: 32px 1fr 200px 72px 24px;
+          grid-template-columns: 44px 1fr 200px 72px 24px;
           align-items: center;
           gap: 16px;
           padding: 18px 0;
@@ -95,7 +95,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         /* 768px 이하: 3열로 축소, 별도 컬럼 숨기고 인라인 태그 보임 */
         @media (max-width: 768px) {
           .sp-row {
-            grid-template-columns: 28px 1fr 24px;
+            grid-template-columns: 40px 1fr 24px;
             gap: 12px;
           }
           .sp-col-tags, .sp-col-status { display: none; }
@@ -157,12 +157,18 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
               key={speaker.id}
               href={`/speakers/${speaker.id}`}
               className="sp-row"
-              style={{ boxShadow: `inset 3px 0 0 ${getFieldColor(speaker.fields ?? [])}` }}
             >
 
-              {/* 01 번호 */}
-              <span style={{ fontFamily: 'var(--font-english)', fontSize: '13px', color: 'var(--color-muted)', flexShrink: 0 }}>
-                {String(i + 1).padStart(2, '0')}
+              {/* 01 번호 + 분야 도트 */}
+              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
+                <span style={{
+                  width: '7px', height: '7px', borderRadius: '50%',
+                  background: getFieldColor(speaker.fields ?? []),
+                  display: 'inline-block', flexShrink: 0,
+                }} />
+                <span style={{ fontFamily: 'var(--font-english)', fontSize: '11px', color: 'var(--color-muted)' }}>
+                  {String(i + 1).padStart(2, '0')}
+                </span>
               </span>
 
               {/* 02 이름 + 역할 + (모바일용 인라인 태그) */}
