@@ -142,7 +142,13 @@ export async function upsertLecture(formData: FormData) {
     program = JSON.parse((formData.get('program_json') as string) || '[]')
   } catch { /* ignore */ }
 
-  const payload = { speaker_id, title, thumbnail_url, duration, target, summary, is_visible, fields, goals, effects, program }
+  // article_type + body → content_json
+  const article_type = (formData.get('article_type') as string) || 'lecture'
+  const body = (formData.get('body') as string) || ''
+  const content_json: Record<string, unknown> = { article_type }
+  if (body) content_json.body = body
+
+  const payload = { speaker_id: article_type === 'lecture' ? speaker_id : (speaker_id || null), title, thumbnail_url, duration, target, summary, is_visible, fields, goals, effects, program, content_json }
 
   let lectureId = id
 

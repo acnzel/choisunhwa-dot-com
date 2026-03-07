@@ -14,13 +14,23 @@ export default function NewLectureForm({ speakers }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const ARTICLE_TYPES = [
+    { value: 'lecture',      label: '강연 커리큘럼' },
+    { value: 'editor_pick',  label: '에디터 픽' },
+    { value: 'field_report', label: '현장 리포트' },
+    { value: 'behind',       label: '비하인드' },
+    { value: 'monthly',      label: '이달의 강연' },
+  ]
+
   const [form, setForm] = useState({
+    article_type: 'lecture',
     speaker_id: '',
     title: '',
     fields: [] as string[],
     duration: '2h',
     target: '',
     summary: '',
+    body: '',
     goals: '',
     effects: '',
     is_visible: false,
@@ -37,14 +47,17 @@ export default function NewLectureForm({ speakers }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!form.speaker_id) { setError('강사를 선택해주세요'); return }
-    if (!form.title.trim()) { setError('강연명을 입력해주세요'); return }
+    if (form.article_type === 'lecture' && !form.speaker_id) { setError('강연 커리큘럼은 강사를 선택해주세요'); return }
+    if (!form.title.trim()) { setError('제목을 입력해주세요'); return }
 
     setLoading(true)
     setError(null)
 
+    const content_json: Record<string, unknown> = { article_type: form.article_type }
+    if (form.body.trim()) content_json.body = form.body.trim()
+
     const payload = {
-      speaker_id: form.speaker_id,
+      speaker_id: form.speaker_id || null,
       title: form.title.trim(),
       fields: form.fields,
       duration: form.duration,
@@ -53,6 +66,7 @@ export default function NewLectureForm({ speakers }: Props) {
       goals: form.goals.split('\n').map((g) => g.trim()).filter(Boolean),
       effects: form.effects.split('\n').map((e) => e.trim()).filter(Boolean),
       is_visible: form.is_visible,
+      content_json,
     }
 
     try {
@@ -77,22 +91,40 @@ export default function NewLectureForm({ speakers }: Props) {
     }
   }
 
+  const isLecture = form.article_type === 'lecture'
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 bg-white rounded-2xl p-6 border border-gray-100">
-      {/* 강사 선택 */}
+      {/* 콘텐츠 타입 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">강사 *</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">콘텐츠 타입 *</label>
         <select
-          value={form.speaker_id}
-          onChange={(e) => setForm((p) => ({ ...p, speaker_id: e.target.value }))}
+          value={form.article_type}
+          onChange={(e) => setForm((p) => ({ ...p, article_type: e.target.value }))}
           className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20"
         >
-          <option value="">강사를 선택하세요</option>
-          {speakers.map((s) => (
-            <option key={s.id} value={s.id}>{s.name}</option>
+          {ARTICLE_TYPES.map((t) => (
+            <option key={t.value} value={t.value}>{t.label}</option>
           ))}
         </select>
       </div>
+
+      {/* 강사 선택 (강연 커리큘럼만) */}
+      {isLecture && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">강사 *</label>
+          <select
+            value={form.speaker_id}
+            onChange={(e) => setForm((p) => ({ ...p, speaker_id: e.target.value }))}
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20"
+          >
+            <option value="">강사를 선택하세요</option>
+            {speakers.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {/* 강연명 */}
       <div>
@@ -153,41 +185,57 @@ export default function NewLectureForm({ speakers }: Props) {
         />
       </div>
 
-      {/* 강연 요약 */}
+      {/* 요약 */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">강연 요약</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1.5">{isLecture ? '강연 요약' : '리드 문구 (선택)'}</label>
         <textarea
           value={form.summary}
           onChange={(e) => setForm((p) => ({ ...p, summary: e.target.value }))}
           rows={3}
-          placeholder="강연 내용을 간략히 설명해주세요"
+          placeholder={isLecture ? '강연 내용을 간략히 설명해주세요' : '목록에서 표시될 짧은 소개 (선택사항)'}
           className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 resize-none"
         />
       </div>
 
-      {/* 학습 목표 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">학습 목표 (줄바꿈으로 구분)</label>
-        <textarea
-          value={form.goals}
-          onChange={(e) => setForm((p) => ({ ...p, goals: e.target.value }))}
-          rows={3}
-          placeholder="목표 1&#10;목표 2&#10;목표 3"
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 resize-none"
-        />
-      </div>
+      {/* 본문 (에디토리얼 타입만) */}
+      {!isLecture && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">본문 *</label>
+          <textarea
+            value={form.body}
+            onChange={(e) => setForm((p) => ({ ...p, body: e.target.value }))}
+            rows={12}
+            placeholder="매거진 본문을 입력하세요"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 resize-y"
+          />
+        </div>
+      )}
 
-      {/* 기대 효과 */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1.5">기대 효과 (줄바꿈으로 구분)</label>
-        <textarea
-          value={form.effects}
-          onChange={(e) => setForm((p) => ({ ...p, effects: e.target.value }))}
-          rows={3}
-          placeholder="효과 1&#10;효과 2&#10;효과 3"
-          className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 resize-none"
-        />
-      </div>
+      {/* 학습 목표 / 기대 효과 (강연 커리큘럼만) */}
+      {isLecture && (
+        <>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">학습 목표 (줄바꿈으로 구분)</label>
+            <textarea
+              value={form.goals}
+              onChange={(e) => setForm((p) => ({ ...p, goals: e.target.value }))}
+              rows={3}
+              placeholder="목표 1&#10;목표 2&#10;목표 3"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 resize-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">기대 효과 (줄바꿈으로 구분)</label>
+            <textarea
+              value={form.effects}
+              onChange={(e) => setForm((p) => ({ ...p, effects: e.target.value }))}
+              rows={3}
+              placeholder="효과 1&#10;효과 2&#10;효과 3"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1a1a2e]/20 resize-none"
+            />
+          </div>
+        </>
+      )}
 
       {/* 공개 여부 */}
       <div className="flex items-center gap-3">

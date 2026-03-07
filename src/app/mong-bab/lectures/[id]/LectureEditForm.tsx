@@ -15,8 +15,22 @@ interface Props {
 type ProgramItem = { time: string; content: string }
 const initialState = { error: '' }
 
+const ARTICLE_TYPES = [
+  { value: 'lecture',      label: '강연 커리큘럼' },
+  { value: 'editor_pick',  label: '에디터 픽' },
+  { value: 'field_report', label: '현장 리포트' },
+  { value: 'behind',       label: '비하인드' },
+  { value: 'monthly',      label: '이달의 강연' },
+]
+
 export default function LectureEditForm({ lecture, speakers }: Props) {
   const router = useRouter()
+
+  const contentJson = (lecture.content_json ?? {}) as Record<string, unknown>
+  const [articleType, setArticleType] = useState<string>(
+    (contentJson.article_type as string) ?? 'lecture'
+  )
+  const [body, setBody] = useState<string>((contentJson.body as string) ?? '')
 
   const [isVisible, setIsVisible] = useState(lecture.is_visible)
   const [fields, setFields]   = useState<string[]>(lecture.fields ?? [])
@@ -98,27 +112,47 @@ export default function LectureEditForm({ lecture, speakers }: Props) {
     )
   }
 
+  const isLecture = articleType === 'lecture'
+
   return (
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="id" value={lecture.id} />
+      <input type="hidden" name="article_type" value={articleType} />
+      <input type="hidden" name="body" value={body} />
 
       {/* ── 기본 정보 ── */}
       <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
         <h2 className="text-base font-semibold text-[#1a1a2e]">기본 정보</h2>
 
-        {/* 강사 선택 */}
+        {/* 콘텐츠 타입 */}
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">강사 *</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">콘텐츠 타입 *</label>
           <select
-            name="speaker_id"
-            defaultValue={lecture.speaker_id}
+            value={articleType}
+            onChange={(e) => setArticleType(e.target.value)}
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] bg-white"
           >
-            {speakers.map((s) => (
-              <option key={s.id} value={s.id}>{s.name}</option>
+            {ARTICLE_TYPES.map((t) => (
+              <option key={t.value} value={t.value}>{t.label}</option>
             ))}
           </select>
         </div>
+
+        {/* 강사 선택 (강연 커리큘럼만) */}
+        {isLecture && (
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">강사 *</label>
+            <select
+              name="speaker_id"
+              defaultValue={lecture.speaker_id}
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] bg-white"
+            >
+              {speakers.map((s) => (
+                <option key={s.id} value={s.id}>{s.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
 
         {/* 강연명 */}
         <div>
@@ -228,44 +262,63 @@ export default function LectureEditForm({ lecture, speakers }: Props) {
 
       {/* ── 강연 내용 ── */}
       <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
-        <h2 className="text-base font-semibold text-[#1a1a2e]">강연 내용</h2>
+        <h2 className="text-base font-semibold text-[#1a1a2e]">{isLecture ? '강연 내용' : '콘텐츠 내용'}</h2>
 
         <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">강연 요약</label>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            {isLecture ? '강연 요약' : '리드 문구 (선택)'}
+          </label>
           <textarea
             name="summary"
             defaultValue={lecture.summary}
-            rows={5}
-            placeholder="강연의 핵심 내용을 요약해주세요"
+            rows={isLecture ? 5 : 3}
+            placeholder={isLecture ? '강연의 핵심 내용을 요약해주세요' : '목록에서 표시될 짧은 소개 (선택사항)'}
             className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] resize-none"
           />
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">학습 목표 <span className="text-gray-400">(줄바꿈으로 구분)</span></label>
-          <textarea
-            value={goals}
-            onChange={(e) => setGoals(e.target.value)}
-            rows={3}
-            placeholder={'목표 1\n목표 2\n목표 3'}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] resize-none"
-          />
-        </div>
+        {/* 본문 (에디토리얼 타입만) */}
+        {!isLecture && (
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">본문</label>
+            <textarea
+              value={body}
+              onChange={(e) => setBody(e.target.value)}
+              rows={14}
+              placeholder="매거진 본문을 입력하세요"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] resize-y"
+            />
+          </div>
+        )}
 
-        <div>
-          <label className="block text-xs font-medium text-gray-600 mb-1">기대 효과 <span className="text-gray-400">(줄바꿈으로 구분)</span></label>
-          <textarea
-            value={effects}
-            onChange={(e) => setEffects(e.target.value)}
-            rows={3}
-            placeholder={'효과 1\n효과 2\n효과 3'}
-            className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] resize-none"
-          />
-        </div>
+        {isLecture && (
+          <>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">학습 목표 <span className="text-gray-400">(줄바꿈으로 구분)</span></label>
+              <textarea
+                value={goals}
+                onChange={(e) => setGoals(e.target.value)}
+                rows={3}
+                placeholder={'목표 1\n목표 2\n목표 3'}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] resize-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-600 mb-1">기대 효과 <span className="text-gray-400">(줄바꿈으로 구분)</span></label>
+              <textarea
+                value={effects}
+                onChange={(e) => setEffects(e.target.value)}
+                rows={3}
+                placeholder={'효과 1\n효과 2\n효과 3'}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#1a1a2e] resize-none"
+              />
+            </div>
+          </>
+        )}
       </section>
 
-      {/* ── 강연 커리큘럼 ── */}
-      <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
+      {/* ── 강연 커리큘럼 (강연 커리큘럼 타입만) ── */}
+      {isLecture && <section className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-base font-semibold text-[#1a1a2e]">강연 커리큘럼 <span className="text-xs text-gray-400 font-normal">(선택)</span></h2>
           <button
@@ -302,7 +355,7 @@ export default function LectureEditForm({ lecture, speakers }: Props) {
             >×</button>
           </div>
         ))}
-      </section>
+      </section>}
 
       {/* ── 에러 / 버튼 ── */}
       {state.error && (
