@@ -4,6 +4,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useMemo } from 'react'
 import type { Speaker } from '@/types'
+import { SPEAKER_FIELDS } from '@/constants'
+
+const FIELD_MAP: Record<string, string> = Object.fromEntries(
+  SPEAKER_FIELDS.map((f) => [f.value, f.label])
+)
 
 interface Props {
   speakers: Speaker[]
@@ -12,12 +17,6 @@ interface Props {
 export default function SpeakerList({ speakers }: Props) {
   const [search, setSearch] = useState('')
   const [selectedField, setSelectedField] = useState<string>('all')
-
-  // DB에 실제로 존재하는 분야만 필터 버튼에 노출
-  const availableFields = useMemo(
-    () => Array.from(new Set(speakers.flatMap((s) => s.fields ?? []))).sort(),
-    [speakers]
-  )
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -52,7 +51,7 @@ export default function SpeakerList({ speakers }: Props) {
           />
         </div>
 
-        {/* 분야 필터 — DB에 실제 존재하는 분야만 표시 */}
+        {/* 분야 필터 — 사전 정의된 SPEAKER_FIELDS 카테고리 표시 */}
         <div className="flex gap-2 flex-wrap">
           <button
             onClick={() => setSelectedField('all')}
@@ -64,17 +63,17 @@ export default function SpeakerList({ speakers }: Props) {
           >
             전체
           </button>
-          {availableFields.map((field) => (
+          {SPEAKER_FIELDS.map(({ value, label }) => (
             <button
-              key={field}
-              onClick={() => setSelectedField(field)}
+              key={value}
+              onClick={() => setSelectedField(value)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                selectedField === field
+                selectedField === value
                   ? 'bg-[#1a1a2e] text-white'
                   : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
               }`}
             >
-              {field}
+              {label}
             </button>
           ))}
         </div>
@@ -122,9 +121,9 @@ export default function SpeakerList({ speakers }: Props) {
               </Link>
               <div className="p-4 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {(speaker.fields ?? []).slice(0, 3).map((f) => (
+                  {(speaker.fields ?? []).filter(f => FIELD_MAP[f]).slice(0, 3).map((f) => (
                     <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
-                      {f}
+                      {FIELD_MAP[f]}
                     </span>
                   ))}
                 </div>

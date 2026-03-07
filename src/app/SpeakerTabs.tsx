@@ -44,7 +44,8 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
     return speakers
   })()
 
-  const allFields = Array.from(new Set(speakers.flatMap((s) => s.fields)))
+  // 필터 버튼은 fieldMap에 정의된 카테고리만 (raw 강연분야 키워드 제외)
+  const allFields = Array.from(new Set(speakers.flatMap((s) => s.fields))).filter(f => fieldMap[f])
   const border = '1px solid var(--color-border)'
 
   return (
@@ -182,9 +183,9 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                 {/* 모바일에서만 보이는 인라인 태그 */}
                 {speaker.fields.length > 0 && (
                   <div className="sp-inline-tags">
-                    {speaker.fields.slice(0, 3).map((f) => (
+                    {speaker.fields.filter(f => fieldMap[f]).slice(0, 3).map((f) => (
                       <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
-                        {fieldMap[f] ?? f}
+                        {fieldMap[f]}
                       </span>
                     ))}
                   </div>
@@ -193,9 +194,9 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
               {/* 03 태그 (데스크탑 전용 컬럼) */}
               <div className="sp-col-tags">
-                {speaker.fields.slice(0, 3).map((f) => (
+                {speaker.fields.filter(f => fieldMap[f]).slice(0, 3).map((f) => (
                   <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
-                    {fieldMap[f] ?? f}
+                    {fieldMap[f]}
                   </span>
                 ))}
               </div>
