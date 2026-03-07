@@ -178,7 +178,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                   {speaker.name}
                 </div>
                 <div style={{ fontSize: '11px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {speaker.title}{speaker.company ? ` · ${speaker.company}` : ''}
+                  {[speaker.title, speaker.company].filter(Boolean).join(' · ')}
                 </div>
                 {/* 모바일에서만 보이는 인라인 태그 */}
                 {speaker.fields.length > 0 && (

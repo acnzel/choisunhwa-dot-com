@@ -132,7 +132,10 @@ export default function SpeakerList({ speakers }: Props) {
                     {speaker.name}
                   </h2>
                 </Link>
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">{speaker.bio_short}</p>
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">
+                  {speaker.bio_short ||
+                    [speaker.company, speaker.title].filter(Boolean).join(' ')}
+                </p>
                 <Link
                   href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
                   className="mt-4 w-full text-center text-xs font-medium py-2 border border-gray-200 rounded-full text-gray-600 hover:bg-[#1a1a2e] hover:text-white hover:border-[#1a1a2e] transition-colors"
