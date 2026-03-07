@@ -56,14 +56,17 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         /* ── 카드 그리드 ── */
         .sp-card-grid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(4, 1fr);
           gap: 1px;
           background: var(--color-border);
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
+          .sp-card-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 680px) {
           .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
         }
-        @media (max-width: 520px) {
+        @media (max-width: 400px) {
           .sp-card-grid { grid-template-columns: 1fr; }
         }
 
@@ -92,7 +95,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         .sp-card-photo {
           position: relative;
           width: 100%;
-          aspect-ratio: 4 / 3;
+          aspect-ratio: 16 / 9;
           background: var(--color-surface);
           overflow: hidden;
         }
@@ -109,11 +112,11 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
         /* 정보 영역 */
         .sp-card-body {
-          padding: 16px 20px 20px;
+          padding: 12px 16px 16px;
           flex: 1;
           display: flex;
           flex-direction: column;
-          gap: 6px;
+          gap: 5px;
         }
 
         /* hover 오버레이 */
@@ -218,7 +221,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                         fill
                         className="sp-card-img"
                         style={{ objectFit: 'cover' }}
-                        sizes="(max-width: 520px) 100vw, (max-width: 900px) 50vw, 33vw"
+                        sizes="(max-width: 400px) 100vw, (max-width: 680px) 50vw, (max-width: 1024px) 33vw, 25vw"
                       />
                     ) : (
                       <div className="sp-card-placeholder">
@@ -254,7 +257,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                     {/* 이름 */}
                     <div style={{
                       fontFamily: 'var(--font-display)', fontWeight: 900,
-                      fontSize: 'clamp(16px, 2vw, 20px)',
+                      fontSize: 'clamp(14px, 1.5vw, 17px)',
                       letterSpacing: '-0.02em', lineHeight: 1.15,
                       color: 'var(--color-ink)',
                     }}>
