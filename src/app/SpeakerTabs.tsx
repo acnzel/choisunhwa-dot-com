@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import type { Speaker } from '@/types'
 
 interface Props {
@@ -11,13 +12,13 @@ interface Props {
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
 
-// 분야별 컬러 도트/보더 매핑
+// 분야별 상단 컬러바 매핑
 const FIELD_COLORS: Record<string, string> = {
-  leadership:       '#2c3e6b', // 네이비
-  org_culture:      '#4a5e3a', // 올리브 그린
-  motivation:       '#c4724a', // 테라코타
+  leadership:       '#2c3e6b',
+  org_culture:      '#4a5e3a',
+  motivation:       '#c4724a',
   self_development: '#c4724a',
-  marketing:        '#c49a2a', // 머스타드
+  marketing:        '#c49a2a',
   sales:            '#c49a2a',
   communication:    '#4a5e3a',
   ai_tech:          '#2c3e6b',
@@ -29,7 +30,7 @@ function getFieldColor(fields: string[]): string {
   for (const f of fields) {
     if (FIELD_COLORS[f]) return FIELD_COLORS[f]
   }
-  return 'var(--color-border)'
+  return '#2B4238' // --color-green 기본
 }
 
 export default function SpeakerTabs({ speakers, fieldMap }: Props) {
@@ -38,69 +39,112 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
   const filtered = (() => {
     if (activeTab === 1 && filterField) {
-      return speakers.filter((s) => s.fields.includes(filterField))
+      return speakers.filter((s) => (s.fields ?? []).includes(filterField))
     }
-    if (activeTab === 2) return speakers.slice(0, 2)
+    if (activeTab === 2) return speakers.slice(0, 6)
     return speakers
   })()
 
-  // 필터 버튼은 fieldMap에 정의된 카테고리만 (raw 강연분야 키워드 제외)
-  const allFields = Array.from(new Set(speakers.flatMap((s) => s.fields))).filter(f => fieldMap[f])
+  const allFields = Array.from(new Set(speakers.flatMap((s) => s.fields ?? []))).filter(f => fieldMap[f])
   const border = '1px solid var(--color-border)'
 
   return (
     <>
       <style>{`
-        .sub-tab-btn { background: none; border: none; font-family: var(--font-body); }
+        .sub-tab-btn { background: none; border: none; font-family: var(--font-body); cursor: pointer; }
 
-        /* 데스크탑 5열: 번호+도트 / 이름+역할 / 태그 / 상태 / 화살표 */
-        .sp-row {
+        /* ── 카드 그리드 ── */
+        .sp-card-grid {
           display: grid;
-          grid-template-columns: 44px 1fr 200px 72px 24px;
-          align-items: center;
-          gap: 16px;
-          padding: 18px 0;
-          border-bottom: 1px solid var(--color-border);
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1px;
+          background: var(--color-border);
+        }
+        @media (max-width: 900px) {
+          .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 520px) {
+          .sp-card-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ── 개별 카드 ── */
+        .sp-card {
+          display: flex;
+          flex-direction: column;
           text-decoration: none;
           color: inherit;
-          cursor: pointer;
-          transition: background 0.15s ease, transform 0.1s ease;
-          will-change: transform;
+          background: var(--color-bg);
+          position: relative;
+          overflow: hidden;
+          transition: background 0.15s ease;
         }
-        .sp-row:last-child { border-bottom: none; }
-        .sp-row:hover {
-          background: #f0ede6;
+        .sp-card:hover { background: #f5f1ea; }
+        .sp-card:active { background: #ede9e1; }
+
+        /* 상단 컬러바 */
+        .sp-card-bar {
+          height: 3px;
+          width: 100%;
+          flex-shrink: 0;
         }
-        .sp-row:hover .sp-arrow {
-          transform: translateX(5px);
-          color: var(--color-ink);
+
+        /* 사진 영역 */
+        .sp-card-photo {
+          position: relative;
+          width: 100%;
+          aspect-ratio: 4 / 3;
+          background: var(--color-surface);
+          overflow: hidden;
         }
-        .sp-row:active {
-          background: #e5e1d9;
-          transform: scale(0.995);
+        .sp-card:hover .sp-card-img {
+          transform: scale(1.04);
         }
-        .sp-arrow {
-          display: inline-flex;
-          align-items: center;
-          justify-content: flex-end;
-          transition: transform 0.18s ease, color 0.15s;
+        .sp-card-img {
+          transition: transform 0.4s ease;
+        }
+        .sp-card-placeholder {
+          position: absolute; inset: 0;
+          display: flex; align-items: center; justify-content: center;
+        }
+
+        /* 정보 영역 */
+        .sp-card-body {
+          padding: 16px 20px 20px;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+
+        /* hover 오버레이 */
+        .sp-card-hover-overlay {
+          position: absolute;
+          bottom: 0; left: 0; right: 0;
+          padding: 14px 20px;
+          background: var(--color-ink);
+          color: var(--color-bg);
+          font-family: var(--font-body);
+          font-size: 12px; font-weight: 600;
+          letter-spacing: 0.06em;
+          display: flex; align-items: center; justify-content: space-between;
+          transform: translateY(100%);
+          transition: transform 0.22s ease;
+        }
+        .sp-card:hover .sp-card-hover-overlay {
+          transform: translateY(0);
+        }
+
+        /* 인덱스 뱃지 */
+        .sp-card-index {
+          position: absolute;
+          top: 12px; right: 12px;
+          font-family: var(--font-english);
+          font-size: 10px; font-weight: 400;
           color: var(--color-muted);
-          font-size: 16px;
-        }
-
-        /* 데스크탑: 별도 컬럼 태그 보임 / 인라인 태그 숨김 */
-        .sp-col-tags   { display: flex; flex-wrap: wrap; gap: 4px; overflow: hidden; min-width: 0; }
-        .sp-col-status { display: block; }
-        .sp-inline-tags { display: none; }
-
-        /* 768px 이하: 3열로 축소, 별도 컬럼 숨기고 인라인 태그 보임 */
-        @media (max-width: 768px) {
-          .sp-row {
-            grid-template-columns: 40px 1fr 24px;
-            gap: 12px;
-          }
-          .sp-col-tags, .sp-col-status { display: none; }
-          .sp-inline-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+          background: rgba(247,243,238,0.85);
+          padding: 2px 6px;
+          letter-spacing: 0.08em;
+          backdrop-filter: blur(2px);
         }
       `}</style>
 
@@ -117,7 +161,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
               color: activeTab === i ? 'var(--color-ink)' : 'var(--color-muted)',
               padding: '12px 0', marginRight: '24px', flexShrink: 0,
               borderBottom: activeTab === i ? '2px solid var(--color-ink)' : '2px solid transparent',
-              cursor: 'pointer', transition: 'color 0.2s',
+              transition: 'color 0.2s',
             }}
           >
             {tab}
@@ -138,6 +182,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                 background: filterField === value ? 'var(--color-ink)' : 'var(--color-surface)',
                 color: filterField === value ? 'var(--color-bg)' : 'var(--color-muted)',
                 transition: 'background 0.15s', fontFamily: 'var(--font-body)',
+                cursor: 'pointer',
               }}
             >
               {label}
@@ -146,70 +191,96 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         </div>
       )}
 
-      {/* 리스트 */}
-      <div style={{ padding: '0 var(--space-page)' }}>
+      {/* 카드 그리드 */}
+      <div style={{ borderTop: border }}>
         {filtered.length === 0 ? (
-          <p style={{ padding: '40px 0', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)' }}>
+          <p style={{ padding: '40px var(--space-page)', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)' }}>
             해당 분야 강사가 없습니다.
           </p>
         ) : (
-          filtered.map((speaker, i) => (
-            <Link
-              key={speaker.id}
-              href={`/speakers/${speaker.id}`}
-              className="sp-row"
-            >
+          <div className="sp-card-grid">
+            {filtered.map((speaker, i) => {
+              const accentColor = getFieldColor(speaker.fields ?? [])
+              const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 3)
+              const subText = speaker.bio_short || [speaker.company, speaker.title].filter(Boolean).join(' · ')
 
-              {/* 01 번호 + 분야 도트 */}
-              <span style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', flexShrink: 0 }}>
-                <span style={{
-                  width: '7px', height: '7px', borderRadius: '50%',
-                  background: getFieldColor(speaker.fields ?? []),
-                  display: 'inline-block', flexShrink: 0,
-                }} />
-                <span style={{ fontFamily: 'var(--font-english)', fontSize: '11px', color: 'var(--color-muted)' }}>
-                  {String(i + 1).padStart(2, '0')}
-                </span>
-              </span>
+              return (
+                <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="sp-card">
+                  {/* 분야 컬러바 */}
+                  <div className="sp-card-bar" style={{ background: accentColor }} />
 
-              {/* 02 이름 + 역할 + (모바일용 인라인 태그) */}
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: 800, letterSpacing: '-0.02em', marginBottom: '2px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {speaker.name}
-                </div>
-                <div style={{ fontSize: '11px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {[speaker.title, speaker.company].filter(Boolean).join(' · ')}
-                </div>
-                {/* 모바일에서만 보이는 인라인 태그 */}
-                {speaker.fields.length > 0 && (
-                  <div className="sp-inline-tags">
-                    {speaker.fields.filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 3).map((f) => (
-                      <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
-                        {fieldMap[f]}
-                      </span>
-                    ))}
+                  {/* 사진 */}
+                  <div className="sp-card-photo">
+                    {speaker.photo_url ? (
+                      <Image
+                        src={speaker.photo_url}
+                        alt={speaker.name}
+                        fill
+                        className="sp-card-img"
+                        style={{ objectFit: 'cover' }}
+                        sizes="(max-width: 520px) 100vw, (max-width: 900px) 50vw, 33vw"
+                      />
+                    ) : (
+                      <div className="sp-card-placeholder">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--color-border)" strokeWidth="1">
+                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                          <circle cx="12" cy="7" r="4" />
+                        </svg>
+                      </div>
+                    )}
+                    {/* 인덱스 */}
+                    <span className="sp-card-index">{String(i + 1).padStart(2, '0')}</span>
                   </div>
-                )}
-              </div>
 
-              {/* 03 태그 (데스크탑 전용 컬럼) */}
-              <div className="sp-col-tags">
-                {speaker.fields.filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 3).map((f) => (
-                  <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
-                    {fieldMap[f]}
-                  </span>
-                ))}
-              </div>
+                  {/* 카드 정보 */}
+                  <div className="sp-card-body">
+                    {/* 태그 */}
+                    {visibleFields.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {visibleFields.map((f) => (
+                          <span key={f} style={{
+                            fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em',
+                            textTransform: 'uppercase', padding: '2px 6px',
+                            border: `1px solid ${accentColor}40`,
+                            color: accentColor,
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {fieldMap[f]}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
-              {/* 04 상태 (데스크탑 전용) */}
-              <span className="sp-col-status" style={{ fontSize: '11px', fontWeight: 600, color: 'var(--color-green)', whiteSpace: 'nowrap' }}>
-                섭외 가능
-              </span>
+                    {/* 이름 */}
+                    <div style={{
+                      fontFamily: 'var(--font-display)', fontWeight: 900,
+                      fontSize: 'clamp(16px, 2vw, 20px)',
+                      letterSpacing: '-0.02em', lineHeight: 1.15,
+                      color: 'var(--color-ink)',
+                    }}>
+                      {speaker.name}
+                    </div>
 
-              {/* 05 화살표 */}
-              <span className="sp-arrow">→</span>
-            </Link>
-          ))
+                    {/* 소속/소개 */}
+                    <div style={{
+                      fontSize: '11px', fontWeight: 300,
+                      color: 'var(--color-subtle)', lineHeight: 1.55,
+                      display: '-webkit-box', WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                    }}>
+                      {subText}
+                    </div>
+                  </div>
+
+                  {/* hover 오버레이 */}
+                  <div className="sp-card-hover-overlay">
+                    <span>섭외 가능</span>
+                    <span>→</span>
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
         )}
       </div>
     </>

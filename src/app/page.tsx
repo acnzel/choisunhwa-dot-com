@@ -4,6 +4,7 @@ import { SPEAKER_FIELDS } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
 import SpeakerTabs from './SpeakerTabs'
+import TrustStats from './TrustStats'
 import SpeakerCarousel from './SpeakerCarousel'
 
 const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
@@ -108,6 +109,17 @@ export default async function HomePage() {
         .insight-card-plain { transition: background 0.15s; }
         .insight-card-plain:hover { background: var(--color-surface); }
 
+        /* ── 히어로 애니메이션 ── */
+        @keyframes heroSlideIn {
+          from { opacity: 0; transform: translateY(20px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .hero-eyebrow { animation: heroSlideIn 0.6s ease forwards; opacity: 0; animation-delay: 0.05s; }
+        .hero-line-1  { animation: heroSlideIn 0.7s ease forwards; opacity: 0; animation-delay: 0.2s; }
+        .hero-line-2  { animation: heroSlideIn 0.7s ease forwards; opacity: 0; animation-delay: 0.4s; }
+        .hero-sub     { animation: heroSlideIn 0.6s ease forwards; opacity: 0; animation-delay: 0.65s; }
+        .hero-cta     { animation: heroSlideIn 0.5s ease forwards; opacity: 0; animation-delay: 0.85s; }
+
         /* ── 신뢰 배너 ── */
         .trust-grid {
           display: grid;
@@ -120,25 +132,35 @@ export default async function HomePage() {
         }
         .trust-item:last-child { border-right: none; }
 
-        /* ── 프로세스 그리드 ── */
+        /* ── 프로세스 타임라인 (세로) ── */
         .process-grid {
-          display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          border-left: 1px solid var(--color-border);
+          display: flex;
+          flex-direction: column;
+          padding: clamp(32px, 4vw, 56px) var(--space-page);
+          max-width: 680px;
         }
         .process-item {
-          padding: clamp(24px, 3.5vw, 40px) clamp(20px, 2.5vw, 32px);
-          border-right: 1px solid var(--color-border);
-          border-bottom: 1px solid var(--color-border);
-          position: relative;
+          display: grid;
+          grid-template-columns: 52px 1fr;
+          gap: 20px;
+          padding-bottom: 40px;
         }
-        .process-arrow {
-          position: absolute; right: -10px; top: 50%;
-          transform: translateY(-50%);
-          font-size: 14px; color: var(--color-border);
-          z-index: 1;
+        .process-item:last-child { padding-bottom: 0; }
+        .process-item-left {
+          display: flex; flex-direction: column; align-items: center;
         }
-        .process-item:last-child .process-arrow { display: none; }
+        .process-step-circle {
+          width: 40px; height: 40px; border-radius: 50%;
+          background: var(--color-ink); color: var(--color-bg);
+          display: flex; align-items: center; justify-content: center;
+          font-family: var(--font-english); font-size: 13px; font-weight: 700;
+          flex-shrink: 0; letter-spacing: 0.02em;
+        }
+        .process-connector {
+          width: 1px; flex: 1; background: var(--color-border);
+          margin-top: 10px;
+        }
+        .process-item:last-child .process-connector { display: none; }
 
         /* ── 모바일 전반 ── */
         @media (max-width: 768px) {
@@ -162,15 +184,8 @@ export default async function HomePage() {
             display: flex; align-items: center; gap: 16px;
           }
           .trust-item:last-child { border-bottom: none; }
-          /* 프로세스: 모바일 타임라인 세로 */
-          .process-grid {
-            grid-template-columns: 1fr;
-          }
-          .process-item {
-            padding-left: var(--space-page);
-            padding-right: var(--space-page);
-          }
-          .process-arrow { display: none; }
+          /* 프로세스: 모바일 그대로 (이미 세로) */
+          .process-grid { max-width: 100%; }
         }
       `}</style>
 
@@ -203,7 +218,7 @@ export default async function HomePage() {
           }}>SPEAK</div>
 
           <div style={{ position: 'relative', zIndex: 1, maxWidth: '860px' }}>
-            <p style={{
+            <p className="hero-eyebrow" style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               fontSize: '11px', fontWeight: 500, letterSpacing: '0.14em',
               color: 'var(--color-muted)', marginBottom: '20px', textTransform: 'uppercase',
@@ -218,12 +233,12 @@ export default async function HomePage() {
               fontSize: 'clamp(40px, 6vw, 88px)',
               lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '28px',
             }}>
-              사람이 바뀌는 강연,
-              <span style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>여기서 시작됩니다.</span>
+              <span className="hero-line-1" style={{ display: 'block' }}>사람이 바뀌는 강연,</span>
+              <span className="hero-line-2" style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>여기서 시작됩니다.</span>
             </h1>
 
             {/* F-A: 서브카피 교체 */}
-            <p style={{
+            <p className="hero-sub" style={{
               fontSize: '14px', fontWeight: 300,
               color: 'var(--color-subtle)', lineHeight: 1.9,
               maxWidth: '440px', marginBottom: '44px',
@@ -232,7 +247,7 @@ export default async function HomePage() {
               {`최선화닷컴은 단순한 소개가 아닙니다.\n기획부터 현장까지, 서로 끌리는 강사와 기업을 연결합니다.`}
             </p>
 
-            <div className="hero-actions" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+            <div className="hero-actions hero-cta" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
               <Link href="/matching?step=1" className="btn-fill-green">매칭 시작하기 →</Link>
               <Link href="/speakers" className="btn-ghost-ink">연사 라인업 보기 →</Link>
             </div>
@@ -250,29 +265,9 @@ export default async function HomePage() {
           </span>
         </section>
 
-        {/* ── F-B: 신뢰 지표 배너 ── */}
+        {/* ── F-B: 신뢰 지표 배너 (카운트업) ── */}
         <section style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
-          <div className="trust-grid">
-            {TRUST_STATS.map(({ number, label }, i) => (
-              <div key={i} className="trust-item">
-                <div style={{
-                  fontFamily: 'var(--font-display)', fontWeight: 900,
-                  fontSize: 'clamp(36px, 4.5vw, 64px)',
-                  letterSpacing: '-0.03em', lineHeight: 1,
-                  color: i === 2 ? '#c4724a' : 'var(--color-ink)',
-                  marginBottom: '8px',
-                }}>
-                  {number}
-                </div>
-                <div style={{
-                  fontFamily: 'var(--font-body)', fontSize: '12px', fontWeight: 400,
-                  color: 'var(--color-subtle)', letterSpacing: '0.04em',
-                }}>
-                  {label}
-                </div>
-              </div>
-            ))}
-          </div>
+          <TrustStats stats={TRUST_STATS.map((s, i) => ({ ...s, highlight: i === 2 }))} />
         </section>
 
         {/* ── BEST 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
@@ -417,30 +412,21 @@ export default async function HomePage() {
           <div className="process-grid">
             {PROCESS_STEPS.map(({ step, title, desc }, i) => (
               <div key={step} className="process-item">
-                {/* 단계 간 화살표 (PC) */}
-                {i < PROCESS_STEPS.length - 1 && (
-                  <span className="process-arrow">→</span>
-                )}
-                {/* 아이콘 + 숫자 뱃지 */}
-                <div style={{ position: 'relative', display: 'inline-flex', marginBottom: '14px' }}>
-                  {PROCESS_ICONS[i]}
-                  <span style={{
-                    position: 'absolute', top: '-6px', right: '-8px',
-                    width: '18px', height: '18px', borderRadius: '50%',
-                    background: 'var(--color-ink)', color: 'var(--color-bg)',
-                    fontSize: '9px', fontWeight: 700, fontFamily: 'var(--font-english)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    letterSpacing: '0.02em',
-                  }}>
-                    {i + 1}
-                  </span>
+                {/* 왼쪽: 번호 원 + 연결선 */}
+                <div className="process-item-left">
+                  <div className="process-step-circle">{String(i + 1).padStart(2, '0')}</div>
+                  <div className="process-connector" />
                 </div>
-                <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(15px, 1.8vw, 18px)', letterSpacing: '-0.02em', color: 'var(--color-ink)', marginBottom: '8px', lineHeight: 1.3 }}>
-                  {title}
+                {/* 오른쪽: 아이콘 + 텍스트 */}
+                <div style={{ paddingTop: '6px', paddingBottom: '4px' }}>
+                  <div style={{ marginBottom: '12px' }}>{PROCESS_ICONS[i]}</div>
+                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(16px, 1.8vw, 20px)', letterSpacing: '-0.02em', color: 'var(--color-ink)', marginBottom: '8px', lineHeight: 1.2 }}>
+                    {title}
+                  </div>
+                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.8 }}>
+                    {desc}
+                  </p>
                 </div>
-                <p style={{ fontSize: '12px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.75 }}>
-                  {desc}
-                </p>
               </div>
             ))}
           </div>
