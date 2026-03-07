@@ -475,7 +475,7 @@ export default async function HomePage() {
                 </div>
               </div>
               <Link href="/inquiry/lecture" className="btn-fill-green" style={{ alignSelf: 'flex-start' }}>
-                프로젝트 시작하기 →
+                문의하기 →
               </Link>
             </div>
           </div>
