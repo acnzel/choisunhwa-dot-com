@@ -104,12 +104,7 @@ export default async function LectureDetailPage({ params }: Props) {
               )}
             </div>
             <div>
-              <Link
-                href={`/inquiry/lecture?lecture=${encodeURIComponent(lecture.title)}&speaker=${encodeURIComponent(lecture.speaker?.name ?? '')}`}
-                className="block w-full text-center py-3 bg-[#1a1a2e] text-white text-sm font-semibold rounded-xl hover:bg-[#16213e] transition-colors"
-              >
-                이 강연 문의하기
-              </Link>
+              {/* 문의 버튼은 사이드바에만 표시 */}
             </div>
           </div>
         </div>
