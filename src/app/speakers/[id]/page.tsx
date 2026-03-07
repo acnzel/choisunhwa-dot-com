@@ -75,16 +75,22 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
   const books = (speaker.news_links ?? []).filter(Boolean)
 
+  // 강연주제: lecture_histories를 재활용 (각 항목의 org_name이 강연주제 한 줄)
+  const lectureTopics = (speaker.lecture_histories ?? [])
+    .map((h) => (typeof h === 'string' ? h : h.org_name))
+    .filter(Boolean)
+
   const mediaLinks = (speaker.media_links ?? []).filter((m) => m.url)
 
   const bioText = speaker.bio_full?.trim() || speaker.bio_short?.trim() || ''
   const hasContent = {
-    bio:       !!bioText,
-    careers:   careers.length > 0,
-    education: education.length > 0,
-    books:     books.length > 0,
-    media:     mediaLinks.length > 0,
-    lectures:  lectures.length > 0,
+    bio:           !!bioText,
+    careers:       careers.length > 0,
+    education:     education.length > 0,
+    lectureTopics: lectureTopics.length > 0,
+    books:         books.length > 0,
+    media:         mediaLinks.length > 0,
+    lectures:      lectures.length > 0,
   }
 
   return (
@@ -281,6 +287,20 @@ export default async function SpeakerDetailPage({ params }: Props) {
                         </span>
                       )}
                       <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{edu.content}</span>
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+            )}
+
+            {/* 강연 주제 */}
+            {hasContent.lectureTopics && (
+              <DetailSection title="강연 주제">
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {lectureTopics.map((topic, idx) => (
+                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
+                      <span style={{ color: 'var(--color-green)', flexShrink: 0, lineHeight: 1.8 }}>›</span>
+                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{topic}</span>
                     </li>
                   ))}
                 </ul>
