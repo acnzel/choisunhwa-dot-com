@@ -183,7 +183,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                 {/* 모바일에서만 보이는 인라인 태그 */}
                 {speaker.fields.length > 0 && (
                   <div className="sp-inline-tags">
-                    {speaker.fields.filter(f => fieldMap[f]).slice(0, 3).map((f) => (
+                    {speaker.fields.filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 3).map((f) => (
                       <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
                         {fieldMap[f]}
                       </span>
@@ -194,7 +194,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
               {/* 03 태그 (데스크탑 전용 컬럼) */}
               <div className="sp-col-tags">
-                {speaker.fields.filter(f => fieldMap[f]).slice(0, 3).map((f) => (
+                {speaker.fields.filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 3).map((f) => (
                   <span key={f} style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em', border, padding: '2px 8px', color: 'var(--color-muted)', background: 'var(--color-surface)', whiteSpace: 'nowrap' }}>
                     {fieldMap[f]}
                   </span>

@@ -121,7 +121,7 @@ export default function SpeakerList({ speakers }: Props) {
               </Link>
               <div className="p-4 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {(speaker.fields ?? []).filter(f => FIELD_MAP[f]).slice(0, 3).map((f) => (
+                  {(speaker.fields ?? []).filter(f => !f.startsWith('~') && FIELD_MAP[f]).slice(0, 3).map((f) => (
                     <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
                       {FIELD_MAP[f]}
                     </span>

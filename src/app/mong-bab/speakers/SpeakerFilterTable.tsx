@@ -181,9 +181,9 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap gap-1">
-                        {s.fields.slice(0, 2).map((f) => (
+                        {s.fields.filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 2).map((f) => (
                           <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-600 rounded-full">
-                            {fieldMap[f] ?? f}
+                            {fieldMap[f]}
                           </span>
                         ))}
                       </div>

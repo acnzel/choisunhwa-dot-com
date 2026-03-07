@@ -159,19 +159,22 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
             {/* 기본 정보 */}
             <div>
-              {/* 분야 태그 */}
-              {speaker.fields.length > 0 && (
+              {/* 분야 태그 — 엑셀 강연분야(~접두어) 원본 표시 */}
+              {speaker.fields.some(f => f.startsWith('~')) && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
-                  {speaker.fields.map((f) => (
-                    <span key={f} style={{
-                      fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em',
-                      padding: '3px 10px',
-                      background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                      color: 'var(--color-subtle)', textTransform: 'uppercase',
-                    }}>
-                      {FIELD_MAP[f] ?? f}
-                    </span>
-                  ))}
+                  {speaker.fields
+                    .filter(f => f.startsWith('~'))
+                    .map(f => f.slice(1))
+                    .map((topic) => (
+                      <span key={topic} style={{
+                        fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em',
+                        padding: '3px 10px',
+                        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                        color: 'var(--color-subtle)',
+                      }}>
+                        {topic}
+                      </span>
+                    ))}
                 </div>
               )}
 
@@ -424,8 +427,8 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 </Link>
               </div>
 
-              {/* 분야 */}
-              {speaker.fields.length > 0 && (
+              {/* 분야 — 카테고리(SPEAKER_FIELDS) 표시, 강연분야 raw값 제외 */}
+              {speaker.fields.some(f => !f.startsWith('~') && FIELD_MAP[f]) && (
                 <div style={{ padding: 'clamp(16px, 2.5vw, 24px)' }}>
                   <p style={{
                     fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em',
@@ -434,16 +437,18 @@ export default async function SpeakerDetailPage({ params }: Props) {
                     강연 분야
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {speaker.fields.map((f) => (
-                      <span key={f} style={{
-                        fontSize: '10px', fontWeight: 600,
-                        padding: '4px 10px',
-                        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                        color: 'var(--color-subtle)',
-                      }}>
-                        {FIELD_MAP[f] ?? f}
-                      </span>
-                    ))}
+                    {speaker.fields
+                      .filter(f => !f.startsWith('~') && FIELD_MAP[f])
+                      .map((f) => (
+                        <span key={f} style={{
+                          fontSize: '10px', fontWeight: 600,
+                          padding: '4px 10px',
+                          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                          color: 'var(--color-subtle)',
+                        }}>
+                          {FIELD_MAP[f]}
+                        </span>
+                      ))}
                   </div>
                 </div>
               )}
