@@ -8,9 +8,9 @@ import type { User } from '@supabase/supabase-js'
 
 const NAV_ITEMS = [
   { href: '/speakers', label: '연사 라인업' },
-  { href: '/lectures', label: '강연 커리큘럼' },
-  { href: '/inquiry', label: '강연 의뢰하기' },
-  { href: '/support/about', label: '소개' },
+  { href: '/lectures', label: '강연 매거진' },
+  { href: '/matching?step=1', label: '강사 매칭 신청' },
+  { href: '/support/about', label: '최선화닷컴 이야기' },
 ]
 
 export default function Header() {
