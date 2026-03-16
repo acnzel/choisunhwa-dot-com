@@ -132,8 +132,9 @@ export default function LectureList({ lectures }: Props) {
           </p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'var(--color-border)' }}
-          className="lecture-grid"
+        <div
+          className="lecture-grid stagger-grid"
+          style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1px', background: 'var(--color-border)' }}
         >
           <style>{`
             @media (max-width: 900px) { .lecture-grid { grid-template-columns: repeat(2, 1fr) !important; } }

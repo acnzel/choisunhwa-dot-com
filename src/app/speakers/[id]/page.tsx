@@ -8,6 +8,7 @@ import { SPEAKER_FIELDS } from '@/constants'
 import { normalizeSpeaker } from '@/lib/utils/speaker'
 import ShareButton from './ShareButton'
 import ScrollToTop from './ScrollToTop'
+import RevealOnScroll from '@/components/RevealOnScroll'
 
 const FIELD_MAP: Record<string, string> = Object.fromEntries(
   SPEAKER_FIELDS.map((f) => [f.value, f.label])
@@ -96,6 +97,9 @@ export default async function SpeakerDetailPage({ params }: Props) {
   return (
     <>
       <style>{`
+        /* 브레드크럼 */
+        .breadcrumb-link { transition: color 0.15s; }
+        .breadcrumb-link:hover { color: var(--color-ink) !important; }
         /* ── 강사 상세 레이아웃 ── */
         .sp-detail-grid {
           display: grid;
@@ -119,8 +123,23 @@ export default async function SpeakerDetailPage({ params }: Props) {
         .media-link:hover { color: var(--color-rust) !important; }
       `}</style>
 
-      <div style={{ minHeight: '100vh', paddingTop: 'var(--nav-height)', background: 'var(--color-bg)' }}>
+      <div className="page-max-wrap" style={{ minHeight: '100dvh', paddingTop: 'var(--nav-height)', background: 'var(--color-bg)' }}>
         <ScrollToTop />
+        <RevealOnScroll />
+
+        {/* ── 뒤로가기 브레드크럼 ── */}
+        <div style={{
+          padding: '12px var(--space-page)',
+          borderBottom: '1px solid var(--color-border)',
+          display: 'flex', alignItems: 'center', gap: '8px',
+          fontSize: '11px', color: 'var(--color-muted)',
+        }}>
+          <Link href="/speakers" className="breadcrumb-link" style={{ color: 'var(--color-muted)' }}>
+            ← 연사 라인업
+          </Link>
+          <span>·</span>
+          <span>{speaker.name}</span>
+        </div>
 
         {/* ── 히어로 헤더 ── */}
         <header style={{ borderBottom: '1px solid var(--color-border)' }}>
@@ -132,11 +151,11 @@ export default async function SpeakerDetailPage({ params }: Props) {
             alignItems: 'flex-start',
           }}>
 
-            {/* 프로필 사진 */}
+            {/* 프로필 사진 — 3:4 포트레이트 */}
             <div style={{
               position: 'relative',
-              width: 'clamp(100px, 14vw, 180px)',
-              aspectRatio: '1',
+              width: 'clamp(96px, 13vw, 200px)',
+              aspectRatio: '3 / 4',
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
               flexShrink: 0,
@@ -500,9 +519,20 @@ export default async function SpeakerDetailPage({ params }: Props) {
 }
 
 // ── 섹션 래퍼 ──────────────────────────────────────────────
-function DetailSection({ title, children }: { title: string; children: React.ReactNode }) {
+function DetailSection({
+  title,
+  children,
+  className = 'reveal',
+}: {
+  title: string
+  children: React.ReactNode
+  className?: string
+}) {
   return (
-    <section style={{ borderBottom: '1px solid var(--color-border)', padding: 'clamp(24px, 4vw, 40px) var(--space-page)' }}>
+    <section
+      className={className}
+      style={{ borderBottom: '1px solid var(--color-border)', padding: 'clamp(24px, 4vw, 40px) var(--space-page)' }}
+    >
       <h2 style={{
         fontFamily: 'var(--font-english)', fontWeight: 700,
         fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase',
