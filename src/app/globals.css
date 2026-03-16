@@ -116,3 +116,88 @@ select:disabled { cursor: not-allowed; opacity: 0.5; }
 .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
 .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+
+/* ── taste-skill upgrades ──────────────────────────────── */
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-delay-1 { transition-delay: 0.08s; }
+.reveal-delay-2 { transition-delay: 0.16s; }
+.reveal-delay-3 { transition-delay: 0.24s; }
+.reveal-delay-4 { transition-delay: 0.32s; }
+
+/* text-wrap balance — orphan prevention on headlines */
+h1, h2, h3, h4 { text-wrap: balance; }
+
+/* Button active/pressed feedback */
+.btn-fill-green:active  { transform: scale(0.97) translateY(1px); }
+.btn-ghost-ink:active   { opacity: 0.6; }
+.see-all-link:active    { opacity: 0.6; }
+
+/* Card hover lift with colored shadow */
+.card-lift {
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px -8px rgba(28, 23, 18, 0.12);
+}
+
+/* Insight card hover lift */
+.insight-card-plain {
+  transition: background 0.15s, transform 0.22s ease !important;
+}
+.insight-card-plain:hover {
+  background: var(--color-surface) !important;
+  transform: translateY(-3px);
+}
+
+/* Grain overlay — subtle noise texture on hero */
+.grain {
+  position: relative;
+}
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n' x='0' y='0'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  opacity: 0.032;
+  pointer-events: none;
+  z-index: 2;
+  mix-blend-mode: multiply;
+}
+
+/* Process horizontal grid */
+.process-horizontal {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  padding: clamp(36px, 5vw, 64px) var(--space-page);
+  gap: 0;
+}
+.process-h-item {
+  padding: 0 clamp(20px, 2.5vw, 36px);
+  border-right: 1px solid var(--color-border);
+}
+.process-h-item:first-child { padding-left: 0; }
+.process-h-item:last-child  { border-right: none; padding-right: 0; }
+
+@media (max-width: 768px) {
+  .process-horizontal {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .process-h-item {
+    padding: 24px 0 !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .process-h-item:nth-child(odd) { padding-right: clamp(12px, 4vw, 24px) !important; }
+  .process-h-item:nth-child(3),
+  .process-h-item:nth-child(4) { border-bottom: none; }
+}

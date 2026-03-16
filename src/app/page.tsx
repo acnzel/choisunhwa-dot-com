@@ -6,6 +6,7 @@ import HeroTicker from './HeroTicker'
 import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import SpeakerCarousel from './SpeakerCarousel'
+import RevealOnScroll from '@/components/RevealOnScroll'
 
 const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
 
@@ -132,36 +133,6 @@ export default async function HomePage() {
         }
         .trust-item:last-child { border-right: none; }
 
-        /* ── 프로세스 타임라인 (세로) ── */
-        .process-grid {
-          display: flex;
-          flex-direction: column;
-          padding: clamp(32px, 4vw, 56px) var(--space-page);
-          max-width: 680px;
-        }
-        .process-item {
-          display: grid;
-          grid-template-columns: 52px 1fr;
-          gap: 20px;
-          padding-bottom: 40px;
-        }
-        .process-item:last-child { padding-bottom: 0; }
-        .process-item-left {
-          display: flex; flex-direction: column; align-items: center;
-        }
-        .process-step-circle {
-          width: 40px; height: 40px; border-radius: 50%;
-          background: var(--color-ink); color: var(--color-bg);
-          display: flex; align-items: center; justify-content: center;
-          font-family: var(--font-english); font-size: 13px; font-weight: 700;
-          flex-shrink: 0; letter-spacing: 0.02em;
-        }
-        .process-connector {
-          width: 1px; flex: 1; background: var(--color-border);
-          margin-top: 10px;
-        }
-        .process-item:last-child .process-connector { display: none; }
-
         /* ── 모바일 전반 ── */
         @media (max-width: 768px) {
           .inquiry-grid { grid-template-columns: 1fr !important; min-height: auto !important; }
@@ -190,13 +161,14 @@ export default async function HomePage() {
       `}</style>
 
       <div style={{ paddingTop: 'var(--nav-height)' }}>
+        <RevealOnScroll />
 
         {/* ── TICKER ── */}
         <HeroTicker speakerCount={totalSpeakerCount} />
 
-        {/* ── HERO (F-A: 카피 교체) ── */}
-        <section style={{
-          minHeight: 'clamp(360px, 60vh, calc(100vh - var(--nav-height) - 38px))',
+        {/* ── HERO ── */}
+        <section className="grain" style={{
+          minHeight: 'clamp(360px, 60dvh, calc(100dvh - var(--nav-height) - 38px))',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -266,13 +238,13 @@ export default async function HomePage() {
         </section>
 
         {/* ── F-B: 신뢰 지표 배너 (카운트업) ── */}
-        <section style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
+        <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
           <TrustStats stats={TRUST_STATS.map((s, i) => ({ ...s, highlight: i === 2 }))} />
         </section>
 
         {/* ── BEST 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
         {bestSpeakers.length > 0 && (
-          <section style={{ borderBottom: '1px solid var(--color-border)' }} id="best-speakers">
+          <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="best-speakers">
             <div style={{
               display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
               padding: '28px var(--space-page) 22px',
@@ -296,7 +268,7 @@ export default async function HomePage() {
         )}
 
         {/* ── SPEAKERS ── */}
-        <section style={{ borderBottom: '1px solid var(--color-border)' }} id="speakers">
+        <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="speakers">
           <div style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             padding: '28px var(--space-page) 22px',
@@ -318,7 +290,7 @@ export default async function HomePage() {
 
         {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}
         {showInsight && (
-          <section style={{ borderBottom: '1px solid var(--color-border)' }} id="insight">
+          <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="insight">
             <div style={{
               display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
               padding: '28px var(--space-page) 22px',
@@ -398,7 +370,7 @@ export default async function HomePage() {
         )}
 
         {/* ── F-C: 프로세스 4단계 ── */}
-        <section style={{ borderBottom: '1px solid var(--color-border)' }} id="process">
+        <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="process">
           <div style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)',
@@ -409,31 +381,42 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          <div className="process-grid">
+          {/* 가로 4열 레이아웃 */}
+          <div className="process-horizontal">
             {PROCESS_STEPS.map(({ step, title, desc }, i) => (
-              <div key={step} className="process-item">
-                {/* 왼쪽: 번호 원 + 연결선 */}
-                <div className="process-item-left">
-                  <div className="process-step-circle">{String(i + 1).padStart(2, '0')}</div>
-                  <div className="process-connector" />
+              <div key={step} className={`process-h-item reveal reveal-delay-${i + 1}`}>
+                {/* 아이콘 */}
+                <div style={{ marginBottom: '20px' }}>{PROCESS_ICONS[i]}</div>
+                {/* 스텝 번호 — 크게, 서체 강조 */}
+                <div style={{
+                  fontFamily: 'var(--font-english)',
+                  fontSize: 'clamp(40px, 4vw, 56px)',
+                  color: 'var(--color-border)',
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em',
+                  marginBottom: '14px',
+                  userSelect: 'none',
+                }}>
+                  {step}
                 </div>
-                {/* 오른쪽: 아이콘 + 텍스트 */}
-                <div style={{ paddingTop: '6px', paddingBottom: '4px' }}>
-                  <div style={{ marginBottom: '12px' }}>{PROCESS_ICONS[i]}</div>
-                  <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(16px, 1.8vw, 20px)', letterSpacing: '-0.02em', color: 'var(--color-ink)', marginBottom: '8px', lineHeight: 1.2 }}>
-                    {title}
-                  </div>
-                  <p style={{ fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.8 }}>
-                    {desc}
-                  </p>
+                <div style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 800,
+                  fontSize: 'clamp(15px, 1.6vw, 18px)',
+                  letterSpacing: '-0.02em', color: 'var(--color-ink)',
+                  marginBottom: '10px', lineHeight: 1.25,
+                }}>
+                  {title}
                 </div>
+                <p style={{ fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.85 }}>
+                  {desc}
+                </p>
               </div>
             ))}
           </div>
         </section>
 
         {/* ── INQUIRY ── */}
-        <section style={{ borderBottom: '1px solid var(--color-border)' }} id="inquiry">
+        <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="inquiry">
           <div style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)',
@@ -482,7 +465,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── ABOUT ── */}
-        <section style={{ borderBottom: '1px solid var(--color-border)' }} id="about">
+        <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="about">
           <div style={{ padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1 }}>
               최선화닷컴 이야기{' '}
