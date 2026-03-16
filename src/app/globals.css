@@ -213,20 +213,100 @@ select:disabled { cursor: not-allowed; opacity: 0.5; }
   .process-h-item:last-child  { padding-right: 0 !important; }
 }
 
-/* ── taste-skill upgrades ──────────────────────────────── */
+/* ── taste-skill: scroll interaction system ─────────────── */
 
-/* Scroll reveal */
+/* ─ 공통 transition 베이스 ─
+   spring curve: 살짝 튀는 물리감 (overshoot ~5%) */
+:root {
+  --ease-spring: cubic-bezier(0.34, 1.18, 0.64, 1);
+  --ease-out:    cubic-bezier(0.22, 1, 0.36, 1);
+  --reveal-dur:  0.65s;
+}
+
+/* 1. 기본 fadeUp */
 .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(32px);
+  transition: opacity var(--reveal-dur) var(--ease-out),
+              transform var(--reveal-dur) var(--ease-spring);
 }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* 2. 왼쪽에서 진입 */
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity var(--reveal-dur) var(--ease-out),
+              transform var(--reveal-dur) var(--ease-spring);
+}
+.reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+/* 3. 오른쪽에서 진입 */
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity var(--reveal-dur) var(--ease-out),
+              transform var(--reveal-dur) var(--ease-spring);
+}
+.reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+/* 4. 스케일 + 살짝 위로 */
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.93) translateY(14px);
+  transition: opacity 0.6s var(--ease-out),
+              transform 0.6s var(--ease-spring);
+}
+.reveal-scale.visible { opacity: 1; transform: scale(1) translateY(0); }
+
+/* 5. 스태거 컨테이너 — 자식들이 순차 진입 */
+.reveal-stagger > * {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.5s var(--ease-out),
+              transform 0.5s var(--ease-spring);
+}
+.reveal-stagger > *.stagger-in {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 6. 딜레이 유틸 */
 .reveal-delay-1 { transition-delay: 0.08s; }
 .reveal-delay-2 { transition-delay: 0.16s; }
 .reveal-delay-3 { transition-delay: 0.24s; }
 .reveal-delay-4 { transition-delay: 0.32s; }
+
+/* ─ 강사 카드 그리드 스태거 ─ */
+.sp-card-grid.stagger-grid > .sp-card {
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: opacity 0.45s var(--ease-out),
+              transform 0.45s var(--ease-spring);
+}
+.sp-card-grid.stagger-grid.visible > .sp-card {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(1) { transition-delay: 0.00s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(2) { transition-delay: 0.06s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(3) { transition-delay: 0.12s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(4) { transition-delay: 0.18s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(5) { transition-delay: 0.24s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(6) { transition-delay: 0.30s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(7) { transition-delay: 0.36s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(8) { transition-delay: 0.42s; }
+
+/* ─ 접근성: prefers-reduced-motion ─ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, .reveal-left, .reveal-right, .reveal-scale,
+  .reveal-stagger > *,
+  .sp-card-grid.stagger-grid > .sp-card {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
 
 /* text-wrap balance — orphan prevention on headlines */
 h1, h2, h3, h4 { text-wrap: balance; }

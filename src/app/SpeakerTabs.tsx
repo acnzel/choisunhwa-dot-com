@@ -201,7 +201,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
             해당 분야 강사가 없습니다.
           </p>
         ) : (
-          <div className="sp-card-grid">
+          <div className="sp-card-grid stagger-grid">
             {filtered.map((speaker, i) => {
               const accentColor = getFieldColor(speaker.fields ?? [])
               const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 3)

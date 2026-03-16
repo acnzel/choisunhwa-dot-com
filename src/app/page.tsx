@@ -177,8 +177,8 @@ export default async function HomePage() {
           position: 'relative',
           overflow: 'hidden',
         }}>
-          {/* SPEAK 워터마크 */}
-          <div aria-hidden style={{
+          {/* SPEAK 워터마크 — parallax (RevealOnScroll이 scroll 이벤트 처리) */}
+          <div aria-hidden data-parallax="speak" style={{
             position: 'absolute', top: '50%', left: '50%',
             transform: 'translate(-50%, -50%)',
             fontFamily: 'var(--font-english)',
@@ -359,7 +359,7 @@ export default async function HomePage() {
               {hero && (
                 <Link
                   href={`/support/notice/${hero.id}`}
-                  className="insight-hero-card"
+                  className="insight-hero-card reveal-scale"
                   style={{
                     gridColumn: 'span 2',
                     padding: 'clamp(24px, 3vw, 36px)',
@@ -426,10 +426,10 @@ export default async function HomePage() {
             </h2>
           </div>
 
-          {/* 가로 4열 레이아웃 */}
-          <div className="process-horizontal">
+          {/* 가로 4열 레이아웃 — reveal-stagger로 순차 진입 */}
+          <div className="process-horizontal reveal-stagger">
             {PROCESS_STEPS.map(({ step, title, desc }, i) => (
-              <div key={step} className={`process-h-item reveal reveal-delay-${i + 1}`}>
+              <div key={step} className="process-h-item">
                 {/* 아이콘 */}
                 <div style={{ marginBottom: '20px' }}>{PROCESS_ICONS[i]}</div>
                 {/* 스텝 번호 — 크게, 서체 강조 */}
@@ -473,8 +473,8 @@ export default async function HomePage() {
           </div>
 
           <div className="inquiry-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', minHeight: '480px' }}>
-            {/* 좌측 다크 */}
-            <div className="inquiry-panel-l" style={{
+            {/* 좌측 다크 — 왼쪽에서 진입 */}
+            <div className="inquiry-panel-l reveal-left" style={{
               background: 'var(--color-ink)',
               padding: 'clamp(40px, 6vw, 60px) var(--space-page)',
               display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
@@ -489,8 +489,8 @@ export default async function HomePage() {
               </p>
             </div>
 
-            {/* 우측 CTA */}
-            <div className="inquiry-panel-r" style={{ padding: 'clamp(36px, 5vw, 48px) var(--space-page)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+            {/* 우측 CTA — 오른쪽에서 진입 */}
+            <div className="inquiry-panel-r reveal-right" style={{ padding: 'clamp(36px, 5vw, 48px) var(--space-page)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div>
                 <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 1.9, marginBottom: '36px' }}>
                   복잡하게 생각하지 않아도 됩니다.<br />
@@ -519,7 +519,7 @@ export default async function HomePage() {
           </div>
 
           <div className="about-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
-            <div className="about-left-col about-panel-l" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)', borderRight: '1px solid var(--color-border)' }}>
+            <div className="about-left-col about-panel-l reveal-left" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)', borderRight: '1px solid var(--color-border)' }}>
               <p style={{ fontSize: '14px', fontWeight: 300, color: 'var(--color-subtle)', lineHeight: 2 }}>
                 강연 기획은 <strong style={{ color: 'var(--color-ink)', fontWeight: 600 }}>단순한 섭외가 아닙니다.</strong><br />
                 기업의 목적을 이해하고, 그에 맞는 강사를 찾고,<br />
@@ -529,7 +529,7 @@ export default async function HomePage() {
                 한 팀이 처음부터 끝까지.
               </p>
             </div>
-            <div className="about-panel-r" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)' }}>
+            <div className="about-panel-r reveal-right" style={{ padding: 'clamp(36px, 5vw, 52px) var(--space-page)' }}>
               <ol style={{ listStyle: 'none' }}>
                 {[
                   { step: '01', title: '강연 목적 및 대상 분석', desc: '기업의 니즈를 먼저 이해합니다' },
