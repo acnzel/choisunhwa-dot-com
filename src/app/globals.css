@@ -117,6 +117,102 @@ select:disabled { cursor: not-allowed; opacity: 0.5; }
 .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .line-clamp-3 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
 
+/* ── PC / Desktop layout upgrades ────────────────────── */
+
+/* Magazine-style max-width wrapper with side borders */
+.page-max-wrap {
+  max-width: 1520px;
+  margin: 0 auto;
+  border-left: 1px solid var(--color-border);
+  border-right: 1px solid var(--color-border);
+  position: relative;
+}
+
+/* Hero 2-column (desktop only) */
+.hero-right-panel { display: none; }
+
+@media (min-width: 1024px) {
+  .hero-2col {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: clamp(48px, 5vw, 80px);
+    align-items: center;
+  }
+  .hero-right-panel { display: block; }
+
+  .hero-speaker-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+    transition: border-color 0.22s ease,
+                transform 0.22s cubic-bezier(0.22,1,0.36,1),
+                box-shadow 0.22s ease;
+  }
+  .hero-speaker-card:hover {
+    border-color: var(--color-muted);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 40px -12px rgba(28, 23, 18, 0.14);
+  }
+  .hero-speaker-photo {
+    aspect-ratio: 3 / 4;
+    position: relative;
+    background: var(--color-border);
+    overflow: hidden;
+  }
+  .hero-speaker-photo img {
+    transition: transform 0.4s ease;
+  }
+  .hero-speaker-card:hover .hero-speaker-photo img {
+    transform: scale(1.04);
+  }
+  .hero-speaker-info {
+    padding: 14px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
+/* Speaker card portrait ratio on desktop */
+@media (min-width: 769px) {
+  .sp-card-photo { aspect-ratio: 3 / 4 !important; }
+}
+
+/* Speaker card grid — 더 넓은 화면에서 5열 */
+@media (min-width: 1400px) {
+  .sp-card-grid { grid-template-columns: repeat(5, 1fr) !important; }
+}
+
+/* Carousel: 데스크탑에서 카드 크기 업 */
+@media (min-width: 769px) {
+  .carousel-card  { width: 240px !important; }
+  .carousel-photo { width: 240px !important; height: 210px !important; }
+  .carousel-track { gap: 28px !important; }
+}
+
+/* Section headers: 데스크탑 수직 여백 확대 */
+@media (min-width: 1024px) {
+  .section-hd { padding-top: 36px !important; padding-bottom: 30px !important; }
+}
+
+/* Trust stats: 데스크탑 패딩 확대 */
+@media (min-width: 1024px) {
+  .trust-item { padding-top: 56px !important; padding-bottom: 56px !important; }
+}
+
+/* Process horizontal: 데스크탑 아이템 간격 */
+@media (min-width: 1024px) {
+  .process-horizontal { padding-top: 56px !important; padding-bottom: 56px !important; }
+  .process-h-item { padding-left: clamp(28px, 3vw, 48px) !important; padding-right: clamp(28px, 3vw, 48px) !important; }
+  .process-h-item:first-child { padding-left: 0 !important; }
+  .process-h-item:last-child  { padding-right: 0 !important; }
+}
+
 /* ── taste-skill upgrades ──────────────────────────────── */
 
 /* Scroll reveal */

@@ -160,7 +160,7 @@ export default async function HomePage() {
         }
       `}</style>
 
-      <div style={{ paddingTop: 'var(--nav-height)' }}>
+      <div className="page-max-wrap" style={{ paddingTop: 'var(--nav-height)' }}>
         <RevealOnScroll />
 
         {/* ── TICKER ── */}
@@ -189,39 +189,84 @@ export default async function HomePage() {
             lineHeight: 1, letterSpacing: '-0.02em', whiteSpace: 'nowrap',
           }}>SPEAK</div>
 
-          <div style={{ position: 'relative', zIndex: 1, maxWidth: '860px' }}>
-            <p className="hero-eyebrow" style={{
-              display: 'flex', alignItems: 'center', gap: '10px',
-              fontSize: '11px', fontWeight: 500, letterSpacing: '0.14em',
-              color: 'var(--color-muted)', marginBottom: '20px', textTransform: 'uppercase',
-            }}>
-              <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--color-muted)' }} />
-              강연 기획의 새로운 기준
-            </p>
+          {/* ── 2열 그리드: 데스크탑에서 좌(카피) + 우(피처드 강사) ── */}
+          <div className="hero-2col" style={{ position: 'relative', zIndex: 1 }}>
+            {/* 좌: 카피 */}
+            <div>
+              <p className="hero-eyebrow" style={{
+                display: 'flex', alignItems: 'center', gap: '10px',
+                fontSize: '11px', fontWeight: 500, letterSpacing: '0.14em',
+                color: 'var(--color-muted)', marginBottom: '20px', textTransform: 'uppercase',
+              }}>
+                <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--color-muted)' }} />
+                강연 기획의 새로운 기준
+              </p>
 
-            {/* F-A: 헤드라인 교체 */}
-            <h1 style={{
-              fontFamily: 'var(--font-display)', fontWeight: 900,
-              fontSize: 'clamp(40px, 6vw, 88px)',
-              lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '28px',
-            }}>
-              <span className="hero-line-1" style={{ display: 'block' }}>사람이 바뀌는 강연,</span>
-              <span className="hero-line-2" style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>여기서 시작됩니다.</span>
-            </h1>
+              <h1 style={{
+                fontFamily: 'var(--font-display)', fontWeight: 900,
+                fontSize: 'clamp(40px, 6vw, 88px)',
+                lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '28px',
+              }}>
+                <span className="hero-line-1" style={{ display: 'block' }}>사람이 바뀌는 강연,</span>
+                <span className="hero-line-2" style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>여기서 시작됩니다.</span>
+              </h1>
 
-            {/* F-A: 서브카피 교체 */}
-            <p className="hero-sub" style={{
-              fontSize: '14px', fontWeight: 300,
-              color: 'var(--color-subtle)', lineHeight: 1.9,
-              maxWidth: '440px', marginBottom: '44px',
-              whiteSpace: 'pre-line',
-            }}>
-              {`최선화닷컴은 단순한 소개가 아닙니다.\n기획부터 현장까지, 서로 끌리는 강사와 기업을 연결합니다.`}
-            </p>
+              <p className="hero-sub" style={{
+                fontSize: '14px', fontWeight: 300,
+                color: 'var(--color-subtle)', lineHeight: 1.9,
+                maxWidth: '440px', marginBottom: '44px',
+                whiteSpace: 'pre-line',
+              }}>
+                {`최선화닷컴은 단순한 소개가 아닙니다.\n기획부터 현장까지, 서로 끌리는 강사와 기업을 연결합니다.`}
+              </p>
 
-            <div className="hero-actions hero-cta" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-              <Link href="/matching?step=1" className="btn-fill-green">매칭 시작하기 →</Link>
-              <Link href="/speakers" className="btn-ghost-ink">연사 라인업 보기 →</Link>
+              <div className="hero-actions hero-cta" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
+                <Link href="/matching?step=1" className="btn-fill-green">매칭 시작하기 →</Link>
+                <Link href="/speakers" className="btn-ghost-ink">연사 라인업 보기 →</Link>
+              </div>
+            </div>
+
+            {/* 우: 피처드 강사 카드 — 데스크탑에서만 노출 */}
+            <div className="hero-right-panel">
+              {(() => {
+                const featured = bestSpeakers[0] ?? speakers[0]
+                if (!featured) return null
+                return (
+                  <Link href={`/speakers/${featured.id}`} className="hero-speaker-card">
+                    {/* 사진 */}
+                    <div className="hero-speaker-photo">
+                      {featured.photo_url ? (
+                        <img
+                          src={featured.photo_url}
+                          alt={featured.name}
+                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
+                        />
+                      ) : (
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontFamily: 'var(--font-english)', fontSize: '72px',
+                          color: 'var(--color-border)',
+                        }}>
+                          {featured.name.charAt(0)}
+                        </div>
+                      )}
+                    </div>
+                    {/* 정보 */}
+                    <div className="hero-speaker-info">
+                      <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
+                        Featured Speaker
+                      </span>
+                      <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '18px', letterSpacing: '-0.02em', color: 'var(--color-ink)', lineHeight: 1.2 }}>
+                        {featured.name}
+                      </span>
+                      <span style={{ fontSize: '11px', fontWeight: 300, color: 'var(--color-subtle)' }}>
+                        {[featured.company, featured.title].filter(Boolean).join(' · ')}
+                      </span>
+                    </div>
+                  </Link>
+                )
+              })()}
             </div>
           </div>
 
@@ -245,7 +290,7 @@ export default async function HomePage() {
         {/* ── BEST 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
         {bestSpeakers.length > 0 && (
           <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="best-speakers">
-            <div style={{
+            <div className="section-hd" style={{
               display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
               padding: '28px var(--space-page) 22px',
               borderBottom: '1px solid var(--color-border)',
@@ -269,7 +314,7 @@ export default async function HomePage() {
 
         {/* ── SPEAKERS ── */}
         <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="speakers">
-          <div style={{
+          <div className="section-hd" style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             padding: '28px var(--space-page) 22px',
             borderBottom: '1px solid var(--color-border)',
@@ -291,7 +336,7 @@ export default async function HomePage() {
         {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}
         {showInsight && (
           <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="insight">
-            <div style={{
+            <div className="section-hd" style={{
               display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
               padding: '28px var(--space-page) 22px',
               borderBottom: '1px solid var(--color-border)',
@@ -371,7 +416,7 @@ export default async function HomePage() {
 
         {/* ── F-C: 프로세스 4단계 ── */}
         <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="process">
-          <div style={{
+          <div className="section-hd" style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)',
           }}>
@@ -417,7 +462,7 @@ export default async function HomePage() {
 
         {/* ── INQUIRY ── */}
         <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="inquiry">
-          <div style={{
+          <div className="section-hd" style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
             padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)',
           }}>
@@ -466,7 +511,7 @@ export default async function HomePage() {
 
         {/* ── ABOUT ── */}
         <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="about">
-          <div style={{ padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)' }}>
+          <div className="section-hd" style={{ padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)' }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1 }}>
               최선화닷컴 이야기{' '}
               <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>About</span>
