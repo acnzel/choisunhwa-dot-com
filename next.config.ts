@@ -14,6 +14,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async redirects() {
+    return [
+      // 강연 매거진 → 강연 인사이트 (영구 리다이렉트)
+      { source: '/lectures', destination: '/insights', permanent: true },
+    ]
+  },
   async headers() {
     return [
       {
