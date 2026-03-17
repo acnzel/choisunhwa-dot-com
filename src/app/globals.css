@@ -280,25 +280,35 @@ select:disabled { cursor: not-allowed; opacity: 0.5; }
 .reveal-delay-3 { transition-delay: 0.24s; }
 .reveal-delay-4 { transition-delay: 0.32s; }
 
-/* ─ 강사 카드 그리드 스태거 ─ */
-.sp-card-grid.stagger-grid > .sp-card {
+/* ─ 강사 카드 그리드 스태거 (홈 SpeakerTabs + 연사 라인업 페이지 공용) ─ */
+.sp-card-grid.stagger-grid > .sp-card,
+.sp-card-grid-full.stagger-grid > .sp-card {
   opacity: 0;
   transform: translateY(20px) scale(0.97);
   transition: opacity 0.45s var(--ease-out),
               transform 0.45s var(--ease-spring);
 }
-.sp-card-grid.stagger-grid.visible > .sp-card {
+.sp-card-grid.stagger-grid.visible > .sp-card,
+.sp-card-grid-full.stagger-grid.visible > .sp-card {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(1) { transition-delay: 0.00s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(2) { transition-delay: 0.06s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(3) { transition-delay: 0.12s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(4) { transition-delay: 0.18s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(5) { transition-delay: 0.24s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(6) { transition-delay: 0.30s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(7) { transition-delay: 0.36s; }
-.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(8) { transition-delay: 0.42s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(1),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(1)  { transition-delay: 0.00s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(2),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(2)  { transition-delay: 0.06s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(3),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(3)  { transition-delay: 0.12s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(4),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(4)  { transition-delay: 0.18s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(5),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(5)  { transition-delay: 0.24s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(6),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(6)  { transition-delay: 0.30s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(7),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(7)  { transition-delay: 0.36s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(8),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(8)  { transition-delay: 0.42s; }
 
 /* ─ 강연 카드 그리드 스태거 ─ */
 .lecture-grid.stagger-grid > .lc-card {
@@ -320,6 +330,7 @@ select:disabled { cursor: not-allowed; opacity: 0.5; }
   .reveal, .reveal-left, .reveal-right, .reveal-scale,
   .reveal-stagger > *,
   .sp-card-grid.stagger-grid > .sp-card,
+  .sp-card-grid-full.stagger-grid > .sp-card,
   .lecture-grid.stagger-grid > .lc-card {
     opacity: 1 !important;
     transform: none !important;
