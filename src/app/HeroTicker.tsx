@@ -8,7 +8,6 @@ const TICKER_ITEMS = (count: number) => [
   { label: '등록 강사', value: `${count}명` },
   { label: '주목 분야', value: '조직문화 · 행복심리 · 리더십' },
   { label: '강연 의뢰 접수', value: '즉시 가능' },
-  { label: '최근 업데이트', value: '2025.02' },
 ]
 
 export default function HeroTicker({ speakerCount }: Props) {

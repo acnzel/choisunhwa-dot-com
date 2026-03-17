@@ -151,10 +151,10 @@ export default async function SpeakerDetailPage({ params }: Props) {
             alignItems: 'flex-start',
           }}>
 
-            {/* 프로필 사진 — 3:4 포트레이트 */}
+            {/* 프로필 사진 — 텍스트가 주인공, 사진은 보조 */}
             <div style={{
               position: 'relative',
-              width: 'clamp(96px, 13vw, 200px)',
+              width: 'clamp(72px, 8vw, 100px)',
               aspectRatio: '3 / 4',
               background: 'var(--color-surface)',
               border: '1px solid var(--color-border)',
