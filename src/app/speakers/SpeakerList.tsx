@@ -27,16 +27,27 @@ function buildUrl(params: { page?: number; field?: string; q?: string }) {
   return qs ? `/speakers?${qs}` : '/speakers'
 }
 
+// 현재 페이지 기준 최대 10개 페이지 번호 표시
 function getPaginationRange(current: number, total: number): (number | '…')[] {
-  if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
+  if (total <= 10) return Array.from({ length: total }, (_, i) => i + 1)
+
+  let start = Math.max(1, current - 4)
+  let end = start + 9
+  if (end > total) {
+    end = total
+    start = Math.max(1, end - 9)
+  }
+
   const pages: (number | '…')[] = []
-  pages.push(1)
-  if (current > 3) pages.push('…')
-  const start = Math.max(2, current - 1)
-  const end = Math.min(total - 1, current + 1)
+  if (start > 1) {
+    pages.push(1)
+    if (start > 2) pages.push('…')
+  }
   for (let i = start; i <= end; i++) pages.push(i)
-  if (current < total - 2) pages.push('…')
-  pages.push(total)
+  if (end < total) {
+    if (end < total - 1) pages.push('…')
+    pages.push(total)
+  }
   return pages
 }
 
@@ -75,126 +86,35 @@ export default function SpeakerList({
   const to = Math.min(page * pageSize, total)
 
   return (
-    <>
-      <style>{`
-        .sp-filter-btn {
-          padding: 6px 14px;
-          font-size: 12px; font-weight: 400; font-family: var(--font-body);
-          letter-spacing: 0.04em;
-          color: var(--color-subtle);
-          background: transparent;
-          border: 1px solid var(--color-border);
-          text-decoration: none;
-          display: inline-block;
-          transition: all 0.15s;
-          cursor: pointer;
-        }
-        .sp-filter-btn:hover { border-color: var(--color-ink); color: var(--color-ink); }
-        .sp-filter-btn.active {
-          font-weight: 600;
-          color: var(--color-bg);
-          background: var(--color-ink);
-          border-color: var(--color-ink);
-        }
-        .sp-search-input {
-          width: 100%; padding: 10px 14px 10px 40px;
-          font-size: 13px; font-family: var(--font-body);
-          border: 1px solid var(--color-border);
-          background: var(--color-bg);
-          color: var(--color-ink);
-          outline: none;
-          transition: border-color 0.2s;
-        }
-        .sp-search-input:focus { border-color: var(--color-ink); }
-        .sp-inquiry-btn {
-          margin-top: 8px; display: block; text-align: center;
-          font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
-          font-family: var(--font-body);
-          padding: 9px 0;
-          border: 1px solid var(--color-border);
-          color: var(--color-subtle);
-          background: transparent;
-          text-decoration: none;
-          transition: all 0.2s;
-        }
-        .sp-inquiry-btn:hover {
-          background: var(--color-ink);
-          color: var(--color-bg);
-          border-color: var(--color-ink);
-        }
-        .sp-page-btn {
-          display: inline-flex; align-items: center; justify-content: center;
-          width: 36px; height: 36px;
-          font-size: 13px; font-weight: 400;
-          color: var(--color-subtle);
-          background: transparent;
-          border: 1px solid var(--color-border);
-          text-decoration: none;
-          transition: all 0.15s;
-        }
-        .sp-page-btn:hover { border-color: var(--color-ink); color: var(--color-ink); }
-        .sp-page-btn.active {
-          font-weight: 700;
-          color: var(--color-bg);
-          background: var(--color-ink);
-          border-color: var(--color-ink);
-          cursor: default;
-          pointer-events: none;
-        }
-        .sp-page-btn.disabled {
-          opacity: 0.3;
-          pointer-events: none;
-          cursor: default;
-        }
-        /* 카드 그리드 반응형 */
-        @media (max-width: 640px) {
-          .sp-card-grid-full { grid-template-columns: repeat(2, 1fr) !important; }
-        }
-        @media (min-width: 641px) and (max-width: 1023px) {
-          .sp-card-grid-full { grid-template-columns: repeat(3, 1fr) !important; }
-        }
-        @media (min-width: 1400px) {
-          .sp-card-grid-full { grid-template-columns: repeat(5, 1fr) !important; }
-        }
-        /* 카드 사진 비율 — 모바일 4:3, 데스크탑 3:4 */
-        @media (min-width: 769px) {
-          .sp-card-photo-full { aspect-ratio: 3 / 4 !important; }
-        }
-      `}</style>
-
-      {/* ── 필터 & 검색 ── */}
-      <div style={{
-        padding: 'clamp(20px, 3vw, 28px) var(--space-page)',
-        borderBottom: '1px solid var(--color-border)',
-        display: 'flex', flexDirection: 'column', gap: '16px',
-        opacity: isPending ? 0.6 : 1,
-        transition: 'opacity 0.2s',
-      }}>
+    <div>
+      {/* 필터 & 검색 */}
+      <div className={`flex flex-col gap-3 mb-8 transition-opacity ${isPending ? 'opacity-50' : 'opacity-100'}`}>
         {/* 검색창 */}
-        <div style={{ position: 'relative', maxWidth: '360px' }}>
-          <svg
-            style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-muted)', pointerEvents: 'none' }}
-            width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        <div className="relative max-w-sm">
+          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input
             type="text"
             placeholder="강사명, 키워드 검색"
             value={searchValue}
             onChange={(e) => setSearchValue(e.target.value)}
-            className="sp-search-input"
+            className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-full focus:outline-none focus:border-[#1a1a2e] bg-white"
             aria-label="강사 검색"
           />
         </div>
 
         {/* 분야 필터 */}
-        <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <div className="flex gap-2 flex-wrap">
           {[{ value: 'all', label: '전체' }, ...SPEAKER_FIELDS].map(({ value, label }) => (
             <Link
               key={value}
               href={buildUrl({ field: value, q: currentQ, page: 1 })}
-              className={`sp-filter-btn${currentField === value ? ' active' : ''}`}
+              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                currentField === value
+                  ? 'bg-[#1a1a2e] text-white'
+                  : 'bg-white text-gray-600 border border-gray-200 hover:border-gray-300'
+              }`}
             >
               {label}
             </Link>
@@ -202,170 +122,111 @@ export default function SpeakerList({
         </div>
       </div>
 
-      {/* ── 결과 카운트 ── */}
-      <div style={{
-        padding: '14px var(--space-page)',
-        borderBottom: '1px solid var(--color-border)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <p style={{ fontSize: '12px', color: 'var(--color-muted)', letterSpacing: '0.04em' }}>
-          총 <strong style={{ color: 'var(--color-ink)', fontWeight: 600 }}>{total.toLocaleString()}</strong>명
-          {total > 0 && (
-            <span style={{ marginLeft: '8px', color: 'var(--color-border)', fontSize: '11px' }}>
-              ({from}–{to}번째)
-            </span>
-          )}
-        </p>
-        {isPending && (
-          <span style={{ fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.06em' }}>
-            검색 중…
-          </span>
+      {/* 결과 카운트 */}
+      <p className="text-sm text-gray-500 mb-5">
+        총 <span className="font-semibold text-[#1a1a2e]">{total.toLocaleString()}</span>명의 강사
+        {total > 0 && (
+          <span className="text-gray-400 text-xs ml-2">({from}–{to}번째 표시)</span>
         )}
-      </div>
+        {isPending && <span className="text-gray-400 text-xs ml-3">검색 중…</span>}
+      </p>
 
-      {/* ── 카드 그리드 ── */}
-      <div style={{ padding: 'clamp(28px, 4vw, 48px) var(--space-page)' }}>
-        {speakers.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: 'clamp(60px, 10vw, 100px) 0' }}>
-            <p style={{ fontSize: '14px', color: 'var(--color-muted)' }}>
-              해당 조건의 강사가 없습니다.
-            </p>
-            <p style={{ fontSize: '13px', color: 'var(--color-muted)', marginTop: '8px' }}>
-              직접{' '}
-              <Link href="/inquiry/lecture" style={{
-                color: 'var(--color-ink)',
-                borderBottom: '1px solid currentColor',
-                paddingBottom: '1px',
-              }}>
-                강사 섭외를 문의
-              </Link>
-              해보세요.
-            </p>
-          </div>
-        ) : (
-          <div
-            className="sp-card-grid-full stagger-grid"
-            style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(4, 1fr)',
-              gap: 'clamp(14px, 2vw, 24px)',
-            }}
-          >
-            {speakers.map((speaker) => (
-              <div key={speaker.id} className="sp-card card-lift" style={{
-                background: 'var(--color-surface)',
-                border: '1px solid var(--color-border)',
-                overflow: 'hidden',
-                display: 'flex',
-                flexDirection: 'column',
-              }}>
-                <Link href={`/speakers/${speaker.id}`} style={{ display: 'block', textDecoration: 'none' }}>
-                  <div className="sp-card-photo-full" style={{
-                    aspectRatio: '4 / 3',
-                    position: 'relative',
-                    background: 'var(--color-border)',
-                    overflow: 'hidden',
-                  }}>
-                    {speaker.photo_url ? (
-                      <Image
-                        src={speaker.photo_url}
-                        alt={speaker.name}
-                        fill
-                        style={{ objectFit: 'cover', transition: 'transform 0.4s ease' }}
-                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                      />
-                    ) : (
-                      <div style={{
-                        position: 'absolute', inset: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontFamily: 'var(--font-english)', fontSize: '64px',
-                        color: 'var(--color-border)',
-                      }}>
-                        {speaker.name.charAt(0)}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-
-                <div style={{ padding: '14px 16px 16px', display: 'flex', flexDirection: 'column', flex: 1, gap: '6px' }}>
-                  {/* 분야 태그 */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                    {(speaker.fields ?? [])
-                      .filter(f => !f.startsWith('~') && fieldMap[f])
-                      .slice(0, 2)
-                      .map((f) => (
-                        <span key={f} style={{
-                          fontSize: '10px', fontWeight: 600, letterSpacing: '0.05em',
-                          padding: '3px 7px',
-                          background: 'var(--color-bg)',
-                          color: 'var(--color-subtle)',
-                          border: '1px solid var(--color-border)',
-                        }}>
-                          {fieldMap[f]}
-                        </span>
-                      ))}
-                  </div>
-
-                  {/* 이름 */}
-                  <Link href={`/speakers/${speaker.id}`} style={{ textDecoration: 'none', color: 'inherit' }}>
-                    <h2 style={{
-                      fontFamily: 'var(--font-display)', fontWeight: 900,
-                      fontSize: 'clamp(15px, 1.4vw, 18px)',
-                      letterSpacing: '-0.02em', lineHeight: 1.2,
-                      color: 'var(--color-ink)',
-                    }}>
-                      {speaker.name}
-                    </h2>
-                  </Link>
-
-                  {/* 소개 */}
-                  <p style={{
-                    fontSize: '12px', color: 'var(--color-subtle)', lineHeight: 1.7,
-                    flex: 1,
-                    overflow: 'hidden', display: '-webkit-box',
-                    WebkitBoxOrient: 'vertical', WebkitLineClamp: 2,
-                  }}>
-                    {speaker.bio_short || [speaker.company, speaker.title].filter(Boolean).join(' · ')}
-                  </p>
-
-                  {/* 문의 버튼 */}
-                  <Link
-                    href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
-                    className="sp-inquiry-btn"
-                  >
-                    문의하기
-                  </Link>
+      {/* 카드 그리드 */}
+      {speakers.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-gray-400 text-sm">해당 조건의 강사가 없습니다.</p>
+          <p className="text-gray-400 text-sm mt-1">
+            직접{' '}
+            <Link href="/inquiry/lecture" className="text-[#1a1a2e] underline underline-offset-2">
+              강사 섭외를 문의
+            </Link>
+            해보세요.
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {speakers.map((speaker) => (
+            <div key={speaker.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
+              <Link href={`/speakers/${speaker.id}`}>
+                <div className="relative aspect-[4/3] bg-gray-100">
+                  {speaker.photo_url ? (
+                    <Image
+                      src={speaker.photo_url}
+                      alt={speaker.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-200">
+                      <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
                 </div>
+              </Link>
+              <div className="p-4 flex flex-col flex-1">
+                <div className="flex flex-wrap gap-1 mb-2">
+                  {(speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 3).map((f) => (
+                    <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
+                      {fieldMap[f]}
+                    </span>
+                  ))}
+                </div>
+                <Link href={`/speakers/${speaker.id}`}>
+                  <h2 className="font-semibold text-[#1a1a2e] group-hover:text-blue-800 transition-colors">
+                    {speaker.name}
+                  </h2>
+                </Link>
+                <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">
+                  {speaker.bio_short ||
+                    [speaker.company, speaker.title].filter(Boolean).join(' ')}
+                </p>
+                <Link
+                  href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
+                  className="mt-4 w-full text-center text-xs font-medium py-2 border border-gray-200 rounded-full text-gray-600 hover:bg-[#1a1a2e] hover:text-white hover:border-[#1a1a2e] transition-colors"
+                >
+                  문의하기
+                </Link>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
+          ))}
+        </div>
+      )}
 
-      {/* ── 페이지네이션 ── */}
+      {/* 페이지네이션 */}
       {totalPages > 1 && (
-        <div style={{
-          padding: 'clamp(24px, 4vw, 40px) var(--space-page)',
-          borderTop: '1px solid var(--color-border)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          gap: '4px', flexWrap: 'wrap',
-        }}>
+        <div className="mt-12 flex items-center justify-center gap-1 flex-wrap">
           {/* 이전 */}
           {page > 1 ? (
-            <Link href={buildUrl({ page: page - 1, field: currentField, q: currentQ })} className="sp-page-btn">←</Link>
+            <Link
+              href={buildUrl({ page: page - 1, field: currentField, q: currentQ })}
+              className="w-9 h-9 flex items-center justify-center text-sm border border-gray-200 rounded-full text-gray-500 hover:border-[#1a1a2e] hover:text-[#1a1a2e] transition-colors"
+            >
+              ←
+            </Link>
           ) : (
-            <span className="sp-page-btn disabled">←</span>
+            <span className="w-9 h-9 flex items-center justify-center text-sm border border-gray-100 rounded-full text-gray-300 cursor-default">
+              ←
+            </span>
           )}
 
           {/* 페이지 번호 */}
           {getPaginationRange(page, totalPages).map((p, i) =>
             p === '…' ? (
-              <span key={`e-${i}`} style={{ padding: '0 6px', color: 'var(--color-muted)', fontSize: '12px' }}>…</span>
+              <span key={`e-${i}`} className="w-9 h-9 flex items-center justify-center text-xs text-gray-400">
+                …
+              </span>
             ) : (
               <Link
                 key={p}
                 href={buildUrl({ page: p as number, field: currentField, q: currentQ })}
-                className={`sp-page-btn${p === page ? ' active' : ''}`}
+                className={`w-9 h-9 flex items-center justify-center text-sm rounded-full transition-colors ${
+                  p === page
+                    ? 'bg-[#1a1a2e] text-white font-semibold cursor-default pointer-events-none'
+                    : 'border border-gray-200 text-gray-600 hover:border-[#1a1a2e] hover:text-[#1a1a2e]'
+                }`}
               >
                 {p}
               </Link>
@@ -374,12 +235,19 @@ export default function SpeakerList({
 
           {/* 다음 */}
           {page < totalPages ? (
-            <Link href={buildUrl({ page: page + 1, field: currentField, q: currentQ })} className="sp-page-btn">→</Link>
+            <Link
+              href={buildUrl({ page: page + 1, field: currentField, q: currentQ })}
+              className="w-9 h-9 flex items-center justify-center text-sm border border-gray-200 rounded-full text-gray-500 hover:border-[#1a1a2e] hover:text-[#1a1a2e] transition-colors"
+            >
+              →
+            </Link>
           ) : (
-            <span className="sp-page-btn disabled">→</span>
+            <span className="w-9 h-9 flex items-center justify-center text-sm border border-gray-100 rounded-full text-gray-300 cursor-default">
+              →
+            </span>
           )}
         </div>
       )}
-    </>
+    </div>
   )
 }
