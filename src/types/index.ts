@@ -169,3 +169,47 @@ export interface ApiResponse<T> {
   meta?: PaginationMeta
   error?: string
 }
+
+// ─── 강연 인사이트 ───────────────────────────────────────────
+export type InsightType = 'issue' | 'report' | 'pick'
+export type InsightStatus = 'draft' | 'pending' | 'published'
+
+// type별 meta 구조
+export interface InsightMetaIssue {
+  related_speaker_ids?: string[]
+}
+
+export interface InsightMetaReport {
+  company?: string
+  company_visibility?: 'public' | 'anonymous' | 'industry_only'
+  speaker_id?: string
+  event_date?: string
+  images?: { url: string; caption?: string; order: number }[]
+}
+
+export interface InsightMetaPick {
+  speaker_id?: string
+  reason?: string
+  topics?: string[]
+  start_date?: string
+  end_date?: string
+}
+
+export type InsightMeta = InsightMetaIssue | InsightMetaReport | InsightMetaPick
+
+export interface Insight {
+  id: string
+  type: InsightType
+  title: string
+  thumbnail_url: string | null
+  summary: string | null
+  content_json: object | null    // Tiptap JSON
+  content_html: string | null
+  status: InsightStatus
+  scheduled_at: string | null
+  published_at: string | null
+  home_featured: boolean
+  meta: InsightMeta
+  created_at: string
+  updated_at: string
+}
