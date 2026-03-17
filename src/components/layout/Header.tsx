@@ -87,9 +87,9 @@ export default function Header() {
             href={href}
             style={{
               fontFamily: 'var(--font-body)',
-              fontSize: '12px',
-              fontWeight: 500,
-              letterSpacing: '0.06em',
+              fontSize: '16px',
+              fontWeight: isActive(href) ? 600 : 500,
+              letterSpacing: '0.02em',
               color: isActive(href) ? 'var(--color-ink)' : 'var(--color-subtle)',
               transition: 'color 0.2s',
               position: 'relative',
