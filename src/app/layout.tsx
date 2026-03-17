@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import ConditionalLayout from '@/components/layout/ConditionalLayout'
+import ScrollToTop from '@/components/ScrollToTop'
 
 export const metadata: Metadata = {
   title: {
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="min-h-screen flex flex-col" style={{ backgroundColor: 'var(--color-bg)' }}>
+        <ScrollToTop />
         <ConditionalLayout>{children}</ConditionalLayout>
       </body>
     </html>
