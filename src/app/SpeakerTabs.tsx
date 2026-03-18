@@ -60,57 +60,77 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           gap: 1px;
           background: var(--color-border);
         }
-        @media (max-width: 800px) {
+        @media (max-width: 860px) {
           .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 480px) {
           .sp-card-grid { grid-template-columns: 1fr; }
         }
 
-        /* ── 개별 카드 ── */
+        /* ── 개별 카드 — 수평 레이아웃 ── */
         .sp-card {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
+          align-items: stretch;
           text-decoration: none;
           color: inherit;
           background: var(--color-bg);
           position: relative;
           overflow: hidden;
           transition: background 0.15s ease;
+          min-height: 120px;
         }
         .sp-card:hover { background: #f5f1ea; }
 
-        /* 상단 컬러바 */
-        .sp-card-bar { height: 3px; width: 100%; flex-shrink: 0; }
+        /* 좌측 컬러바 */
+        .sp-card-bar {
+          width: 3px;
+          flex-shrink: 0;
+          align-self: stretch;
+        }
 
-        /* 사진 영역 */
+        /* 사진 영역 — 고정 정사각형, 작게 */
         .sp-card-photo {
           position: relative;
-          width: 100%;
-          aspect-ratio: 4 / 3;
+          width: 100px;
+          height: 100px;
+          flex-shrink: 0;
           background: var(--color-surface);
           overflow: hidden;
+          align-self: center;
+          margin: 12px 0 12px 12px;
         }
         .sp-card-img { transition: transform 0.4s ease; }
-        .sp-card:hover .sp-card-img { transform: scale(1.04); }
+        .sp-card:hover .sp-card-img { transform: scale(1.05); }
         .sp-card-placeholder {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
         }
 
-        /* 정보 영역 */
+        /* 정보 영역 — 우측, 텍스트 중심 */
         .sp-card-body {
-          padding: 12px 16px 16px;
           flex: 1;
+          padding: 14px 16px 14px 14px;
           display: flex;
           flex-direction: column;
-          gap: 5px;
+          justify-content: center;
+          gap: 4px;
+          min-width: 0;
+        }
+
+        /* 번호 */
+        .sp-card-index {
+          font-family: var(--font-english);
+          font-size: 9px; font-weight: 400;
+          color: var(--color-muted);
+          letter-spacing: 0.08em;
+          margin-bottom: 2px;
         }
 
         /* hover 오버레이 */
         .sp-card-hover-overlay {
           position: absolute; bottom: 0; left: 0; right: 0;
-          padding: 12px 16px;
+          padding: 8px 16px;
           background: var(--color-ink); color: var(--color-bg);
           font-family: var(--font-body);
           font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
@@ -120,16 +140,9 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         }
         .sp-card:hover .sp-card-hover-overlay { transform: translateY(0); }
 
-        /* 인덱스 뱃지 */
-        .sp-card-index {
-          position: absolute; top: 10px; right: 10px;
-          font-family: var(--font-english);
-          font-size: 10px; font-weight: 400;
-          color: var(--color-muted);
-          background: rgba(247,243,238,0.85);
-          padding: 2px 6px;
-          letter-spacing: 0.08em;
-          backdrop-filter: blur(2px);
+        /* 모바일 조정 */
+        @media (max-width: 480px) {
+          .sp-card-photo { width: 80px; height: 80px; }
         }
       `}</style>
 
@@ -191,8 +204,10 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
               return (
                 <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="sp-card">
+                  {/* 좌측 컬러바 */}
                   <div className="sp-card-bar" style={{ background: accentColor }} />
 
+                  {/* 사진 — 100×100 정사각형 */}
                   <div className="sp-card-photo">
                     {speaker.photo_url ? (
                       <Image
@@ -201,25 +216,50 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                         fill
                         className="sp-card-img"
                         style={{ objectFit: 'cover', objectPosition: 'top center' }}
-                        sizes="(max-width: 480px) 100vw, (max-width: 800px) 50vw, 33vw"
+                        sizes="100px"
                       />
                     ) : (
                       <div className="sp-card-placeholder">
-                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--color-border)" strokeWidth="1">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-border)" strokeWidth="1">
                           <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
                           <circle cx="12" cy="7" r="4" />
                         </svg>
                       </div>
                     )}
-                    <span className="sp-card-index">{String(i + 1).padStart(2, '0')}</span>
                   </div>
 
+                  {/* 정보 영역 */}
                   <div className="sp-card-body">
+                    {/* 번호 */}
+                    <span className="sp-card-index">{String(i + 1).padStart(2, '0')}</span>
+
+                    {/* 이름 */}
+                    <div style={{
+                      fontFamily: 'var(--font-display)', fontWeight: 800,
+                      fontSize: '17px', letterSpacing: '-0.02em', lineHeight: 1.1,
+                      color: 'var(--color-ink)',
+                      whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                    }}>
+                      {speaker.name}
+                    </div>
+
+                    {/* 직함 · 소속 */}
+                    {subText && (
+                      <div style={{
+                        fontSize: '11px', fontWeight: 300,
+                        color: 'var(--color-subtle)', lineHeight: 1.45,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                      }}>
+                        {subText}
+                      </div>
+                    )}
+
+                    {/* 강의 분야 태그 */}
                     {visibleFields.length > 0 && (
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '2px' }}>
                         {visibleFields.map((f) => (
                           <span key={f} style={{
-                            fontSize: '9px', fontWeight: 700, letterSpacing: '0.06em',
+                            fontSize: '9px', fontWeight: 600, letterSpacing: '0.04em',
                             padding: '2px 6px',
                             border: `1px solid ${accentColor}40`,
                             color: accentColor,
@@ -228,24 +268,6 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                             {fieldMap[f]}
                           </span>
                         ))}
-                      </div>
-                    )}
-                    <div style={{
-                      fontFamily: 'var(--font-display)', fontWeight: 900,
-                      fontSize: 'clamp(15px, 1.8vw, 18px)',
-                      letterSpacing: '-0.02em', lineHeight: 1.15,
-                      color: 'var(--color-ink)',
-                    }}>
-                      {speaker.name}
-                    </div>
-                    {subText && (
-                      <div style={{
-                        fontSize: '11px', fontWeight: 300,
-                        color: 'var(--color-subtle)', lineHeight: 1.5,
-                        display: '-webkit-box', WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                      }}>
-                        {subText}
                       </div>
                     )}
                   </div>

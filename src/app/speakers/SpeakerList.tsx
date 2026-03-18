@@ -144,54 +144,89 @@ export default function SpeakerList({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {speakers.map((speaker) => (
-            <div key={speaker.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
-              <Link href={`/speakers/${speaker.id}`}>
-                <div className="relative aspect-[4/3] bg-gray-100">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e8e4dd]">
+          {speakers.map((speaker) => {
+            const fields = (speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f])
+            const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
+            return (
+              <Link
+                key={speaker.id}
+                href={`/speakers/${speaker.id}`}
+                className="group flex flex-row bg-[var(--color-bg)] hover:bg-[#f5f1ea] transition-colors overflow-hidden"
+                style={{ minHeight: 110, textDecoration: 'none', color: 'inherit' }}
+              >
+                {/* 좌측 컬러라인 */}
+                <div style={{ width: 3, flexShrink: 0, background: fields.length ? '#2B4238' : '#e0ddd7' }} />
+
+                {/* 사진 — 100×100 정사각형 */}
+                <div style={{
+                  position: 'relative', width: 96, height: 96, flexShrink: 0,
+                  background: '#f0ede8', alignSelf: 'center', margin: '10px 0 10px 12px',
+                  overflow: 'hidden',
+                }}>
                   {speaker.photo_url ? (
                     <Image
                       src={speaker.photo_url}
                       alt={speaker.name}
                       fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      style={{ objectFit: 'cover', objectPosition: 'top center' }}
+                      sizes="96px"
                     />
                   ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-200">
-                      <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    <div className="absolute inset-0 flex items-center justify-center text-gray-300">
+                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                   )}
                 </div>
-              </Link>
-              <div className="p-4 flex flex-col flex-1">
-                <div className="flex flex-wrap gap-1 mb-2">
-                  {(speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 5).map((f) => (
-                    <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
-                      {fieldMap[f]}
-                    </span>
-                  ))}
-                </div>
-                <Link href={`/speakers/${speaker.id}`}>
-                  <h2 className="font-semibold text-[#1a1a2e] group-hover:text-blue-800 transition-colors">
+
+                {/* 정보 — 우측 */}
+                <div style={{
+                  flex: 1, padding: '12px 14px', display: 'flex',
+                  flexDirection: 'column', justifyContent: 'center', gap: 4, minWidth: 0,
+                }}>
+                  {/* 이름 */}
+                  <div style={{
+                    fontFamily: 'var(--font-display, serif)', fontWeight: 800,
+                    fontSize: 16, letterSpacing: '-0.02em', lineHeight: 1.15,
+                    color: '#1a1a2e', whiteSpace: 'nowrap',
+                    overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
                     {speaker.name}
-                  </h2>
-                </Link>
-                <p className="text-sm text-gray-500 mt-1 line-clamp-2 flex-1">
-                  {speaker.bio_short ||
-                    [speaker.company, speaker.title].filter(Boolean).join(' ')}
-                </p>
-                <Link
-                  href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
-                  className="mt-4 w-full text-center text-xs font-medium py-2 border border-gray-200 rounded-full text-gray-600 hover:bg-[#1a1a2e] hover:text-white hover:border-[#1a1a2e] transition-colors"
-                >
-                  문의하기
-                </Link>
-              </div>
-            </div>
-          ))}
+                  </div>
+
+                  {/* 직함 · 소속 */}
+                  {subText && (
+                    <div style={{
+                      fontSize: 11, fontWeight: 300, color: '#888',
+                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
+                      {subText}
+                    </div>
+                  )}
+
+                  {/* 강의 분야 태그 */}
+                  {fields.length > 0 && (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
+                      {fields.slice(0, 4).map(f => (
+                        <span key={f} style={{
+                          fontSize: 9, fontWeight: 600, padding: '2px 6px',
+                          border: '1px solid #2B423840', color: '#2B4238',
+                          whiteSpace: 'nowrap', letterSpacing: '0.04em',
+                        }}>
+                          {fieldMap[f]}
+                        </span>
+                      ))}
+                      {fields.length > 4 && (
+                        <span style={{ fontSize: 9, color: '#aaa', padding: '2px 0' }}>+{fields.length - 4}</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Link>
+            )
+          })}
         </div>
       )}
 
