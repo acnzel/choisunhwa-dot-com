@@ -86,7 +86,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           grid-template-columns: repeat(3, 1fr);
           gap: 1px;
           background: var(--color-border);
-          min-height: 252px; /* 2행 확보 (120px × 2 + 12px gap) */
+          min-height: 290px; /* 2행 확보 */
         }
         @media (max-width: 860px) {
           .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
@@ -106,7 +106,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           position: relative;
           overflow: hidden;
           transition: background 0.15s ease;
-          min-height: 120px;
+          min-height: 144px;
         }
         .sp-card:hover { background: #f5f1ea; }
 
@@ -120,8 +120,8 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         /* 사진 영역 */
         .sp-card-photo {
           position: relative;
-          width: 100px;
-          height: 100px;
+          width: 120px;
+          height: 120px;
           flex-shrink: 0;
           background: var(--color-surface);
           overflow: hidden;
@@ -204,7 +204,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
         /* 모바일 */
         @media (max-width: 480px) {
-          .sp-card-photo { width: 80px; height: 80px; }
+          .sp-card-photo { width: 90px; height: 90px; }
         }
       `}</style>
 
@@ -266,7 +266,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
             {paged.map((speaker, i) => {
               const globalIndex = page * PAGE_SIZE + i
               const accentColor = getFieldColor(speaker.fields ?? [])
-              const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 5)
+              const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 2)
               const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
 
               return (
@@ -281,7 +281,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                         fill
                         className="sp-card-img"
                         style={{ objectFit: 'cover', objectPosition: 'top center' }}
-                        sizes="100px"
+                        sizes="120px"
                       />
                     ) : (
                       <div className="sp-card-placeholder">
@@ -312,6 +312,17 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       }}>
                         {subText}
+                      </div>
+                    )}
+
+                    {speaker.bio_short && (
+                      <div style={{
+                        fontSize: '11px', fontWeight: 400,
+                        color: 'var(--color-muted)', lineHeight: 1.5,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                        marginTop: '2px',
+                      }}>
+                        {speaker.bio_short}
                       </div>
                     )}
 

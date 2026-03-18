@@ -15,7 +15,7 @@ async function getData() {
   const [{ data: speakers }, { data: notices }, { data: bestSpeakers }, { count: totalSpeakerCount }] = await Promise.all([
     supabase
       .from('speakers')
-      .select('id, name, title, company, photo_url, fields, is_visible')
+      .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
       .eq('is_visible', true)
       .order('sort_order', { ascending: true })
       .limit(30),
@@ -28,7 +28,7 @@ async function getData() {
     // is_best 컬럼은 스캇이 Supabase에서 SQL 실행 후 생김 → 실패 시 빈 배열 fallback
     supabase
       .from('speakers')
-      .select('id, name, title, company, photo_url, fields, is_visible')
+      .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
       .eq('is_best', true)
       .eq('is_visible', true)
       .order('sort_order', { ascending: true }),
