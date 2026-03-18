@@ -8,8 +8,14 @@
 
 | ID | 우선순위 | assignee | 제목 | 의존성 | 등록자 |
 |----|---------|----------|------|--------|--------|
-
 | T-006 | P1 | @backend | Google OAuth `/api/auth/google` 라우트 추가 | T-004 | @frontend |
+| T-007 | P1 | @frontend | 이달의 강사 F-1: FeaturedSpeakerCard 컴포넌트 | T-008 | @dev |
+| T-008 | P0 | Scott | Supabase migration 011 적용 (featured_speakers 테이블) | — | @dev |
+| T-009 | P1 | @frontend | 이달의 강사 F-2: /insights/featured 페이지 | T-007 | @dev |
+| T-010 | P1 | @frontend | 이달의 강사 F-3: 홈 섹션 연동 (최대 4명) | T-007 | @dev |
+| T-011 | P2 | @frontend | 이달의 강사 F-4: SpeakerTabs "지금 뜨는" 탭 연동 | T-007 | @dev |
+| T-012 | P1 | @frontend | 이달의 강사 F-5: 어드민 관리 UI (/mong-bab/featured-speakers) | T-007 | @dev |
+| T-013 | P1 | @dev | 이달의 강사 B-3: seed 5명 (migration 011 적용 후) | T-008 | @dev |
 
 ---
 
