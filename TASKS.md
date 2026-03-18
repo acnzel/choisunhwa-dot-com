@@ -9,13 +9,10 @@
 | ID | 우선순위 | assignee | 제목 | 의존성 | 등록자 |
 |----|---------|----------|------|--------|--------|
 | T-006 | P1 | @backend | Google OAuth `/api/auth/google` 라우트 추가 | T-004 | @frontend |
-| T-007 | P1 | @frontend | 이달의 강사 F-1: FeaturedSpeakerCard 컴포넌트 | T-008 | @dev |
-| T-008 | P0 | Scott | Supabase migration 011 적용 (featured_speakers 테이블) | — | @dev |
-| T-009 | P1 | @frontend | 이달의 강사 F-2: /insights/featured 페이지 | T-007 | @dev |
-| T-010 | P1 | @frontend | 이달의 강사 F-3: 홈 섹션 연동 (최대 4명) | T-007 | @dev |
-| T-011 | P2 | @frontend | 이달의 강사 F-4: SpeakerTabs "지금 뜨는" 탭 연동 | T-007 | @dev |
-| T-012 | P1 | @frontend | 이달의 강사 F-5: 어드민 관리 UI (/mong-bab/featured-speakers) | T-007 | @dev |
+| T-008 | P0 | Scott | Supabase migration 007+008+011 적용 (insights + trgm + featured_speakers) | — | @dev |
 | T-013 | P1 | @dev | 이달의 강사 B-3: seed 5명 (migration 011 적용 후) | T-008 | @dev |
+| T-014 | P1 | @dev | insights seed: 이 강사 어때요(서은국) + 오늘의 이슈 샘플 (migration 007 후) | T-008 | @dev |
+| T-015 | P1 | @dev | insights seed: 강연 스토리 3건 (migration 007 후) | T-008 | @dev |
 
 ---
 
@@ -36,6 +33,11 @@
 | T-002 | @backend | API Routes 전체 구현 | 2026-02-25 | public + admin |
 | T-003a | @frontend | Phase 1 페이지 전체 구현 | 2026-02-25 | 63 files |
 | T-003b | @qa | 테스트 인프라 + 유닛 테스트 30개 | 2026-02-25 | vitest + playwright |
+| T-007 | @frontend | FeaturedSpeakerCard 컴포넌트 | 2026-03-18 | 번호 제거 fix: 070c192 |
+| T-009 | @frontend | /insights/featured 페이지 | 2026-03-18 | 커밋 84c7ec3 |
+| T-010 | @frontend | FeaturedSection 홈 연동 | 2026-03-18 | graceful fallback 포함 |
+| T-011 | @frontend | SpeakerTabs "지금 뜨는" featured 연동 | 2026-03-18 | featured → trendingForTabs |
+| T-012 | @frontend | 어드민 /mong-bab/featured-speakers | 2026-03-18 | CRUD + sort_order + 노출 토글 |
 
 ---
 
