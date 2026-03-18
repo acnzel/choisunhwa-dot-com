@@ -12,7 +12,7 @@ interface Props {
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
 const PAGE_SIZE = 6   // 3열 × 2행
-const AUTO_MS  = 4000 // 4초마다 자동 롤링
+const AUTO_MS  = 6500 // 6.5초마다 자동 롤링
 
 const FIELD_COLORS: Record<string, string> = {
   leadership:       '#2c3e6b',
@@ -86,7 +86,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           grid-template-columns: repeat(3, 1fr);
           gap: 1px;
           background: var(--color-border);
-          min-height: 290px; /* 2행 확보 */
+          min-height: 322px; /* 2행 확보 (160px × 2 + 1px gap) */
         }
         @media (max-width: 860px) {
           .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
@@ -106,7 +106,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           position: relative;
           overflow: hidden;
           transition: background 0.15s ease;
-          min-height: 144px;
+          min-height: 160px;
         }
         .sp-card:hover { background: #f5f1ea; }
 
@@ -315,17 +315,6 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                       </div>
                     )}
 
-                    {speaker.bio_short && (
-                      <div style={{
-                        fontSize: '11px', fontWeight: 400,
-                        color: 'var(--color-muted)', lineHeight: 1.5,
-                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                        marginTop: '2px',
-                      }}>
-                        {speaker.bio_short}
-                      </div>
-                    )}
-
                     {visibleFields.length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '2px' }}>
                         {visibleFields.map((f) => (
@@ -339,6 +328,20 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                             {fieldMap[f]}
                           </span>
                         ))}
+                      </div>
+                    )}
+
+                    {speaker.bio_short && (
+                      <div style={{
+                        fontSize: '11px', fontWeight: 400,
+                        color: 'var(--color-muted)', lineHeight: 1.55,
+                        marginTop: '5px',
+                        overflow: 'hidden',
+                        display: '-webkit-box',
+                        WebkitBoxOrient: 'vertical',
+                        WebkitLineClamp: 2,
+                      }}>
+                        {speaker.bio_short}
                       </div>
                     )}
                   </div>
