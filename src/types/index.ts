@@ -171,6 +171,28 @@ export interface ApiResponse<T> {
   error?: string
 }
 
+// ─── 이달의 강사 ──────────────────────────────────────────────
+export interface FeaturedSpeakerItem {
+  id: string
+  intro: string
+  tags: string[]
+  is_visible: boolean
+  home_visible: boolean
+  start_date: string | null
+  end_date: string | null
+  sort_order: number
+  created_at: string
+  speaker: {
+    id: string
+    name: string
+    title: string
+    company: string
+    photo_url: string | null
+    bio_short: string | null
+    fields: string[]
+  }
+}
+
 // ─── 강연 인사이트 ───────────────────────────────────────────
 export type InsightType = 'issue' | 'report' | 'pick'
 export type InsightStatus = 'draft' | 'pending' | 'published'

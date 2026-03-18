@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Speaker, Notice } from '@/types'
+import type { Speaker, Notice, FeaturedSpeakerItem } from '@/types'
 import { buildFieldMap } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
@@ -7,6 +7,7 @@ import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import SpeakerCarousel from './SpeakerCarousel'
 import RevealOnScroll from '@/components/RevealOnScroll'
+import FeaturedSection from './FeaturedSection'
 
 const FIELD_MAP = buildFieldMap()
 
@@ -46,11 +47,31 @@ async function getData() {
       .order('sort_order', { ascending: true })
       .limit(18),
   ])
+
+  // 이달의 강사 — featured_speakers 테이블 (migration 011 적용 전엔 빈 배열 fallback)
+  let featuredItems: FeaturedSpeakerItem[] = []
+  try {
+    const { data: featured } = await supabase
+      .from('featured_speakers')
+      .select(`
+        id, intro, tags, is_visible, home_visible,
+        start_date, end_date, sort_order, created_at,
+        speaker:speakers ( id, name, title, company, photo_url, bio_short, fields )
+      `)
+      .eq('is_visible', true)
+      .order('sort_order', { ascending: true })
+      .limit(18)
+    featuredItems = (featured as unknown as FeaturedSpeakerItem[]) ?? []
+  } catch {
+    featuredItems = []
+  }
+
   return {
     speakers: (speakers as Speaker[]) ?? [],
     notices: (notices as Notice[]) ?? [],
     bestSpeakers: (bestSpeakers as Speaker[]) ?? [],
     trendingSpeakers: (trendingSpeakers as Speaker[]) ?? [],
+    featuredItems,
     totalSpeakerCount: totalSpeakerCount ?? 0,
   }
 }
@@ -83,7 +104,24 @@ const PROCESS_ICONS = [
 ]
 
 export default async function HomePage() {
-  const { speakers, notices, bestSpeakers, trendingSpeakers, totalSpeakerCount } = await getData()
+  const { speakers, notices, bestSpeakers, trendingSpeakers, featuredItems, totalSpeakerCount } = await getData()
+
+  // F-4: featured_speakers가 있으면 "지금 뜨는" 탭에 연동 (Speaker[] 형태로 변환)
+  const featuredAsSpeakers: Speaker[] = featuredItems.map(f => ({
+    ...f.speaker,
+    bio_short: f.speaker.bio_short ?? '',
+    is_visible: true,
+    is_best: false,
+    sort_order: f.sort_order,
+    fee_range: null,
+    bio_full: '',
+    careers: [],
+    lecture_histories: [],
+    media_links: [],
+    news_links: [],
+    created_at: f.created_at,
+  }))
+  const trendingForTabs = featuredAsSpeakers.length > 0 ? featuredAsSpeakers : trendingSpeakers
 
   // ── Insight 카드: 실제 데이터가 있는 것만 사용 ──
   const hero   = notices[0] ?? null
@@ -339,8 +377,11 @@ export default async function HomePage() {
             </h2>
             <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
           </div>
-          <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingSpeakers} />
+          <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingForTabs} />
         </section>
+
+        {/* ── 이달의 강사 — home_visible=true 항목만 노출 ── */}
+        <FeaturedSection items={featuredItems.filter(f => f.home_visible)} />
 
         {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}
         {showInsight && (

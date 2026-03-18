@@ -7,7 +7,8 @@ import { useState, useEffect } from 'react'
 
 const NAV_ITEMS = [
   { href: '/mong-bab/dashboard', label: '대시보드', icon: '📊' },
-  { href: '/mong-bab/speakers',  label: '강사 관리', icon: '🎤' },
+  { href: '/mong-bab/speakers',          label: '강사 관리',    icon: '🎤' },
+  { href: '/mong-bab/featured-speakers', label: '이달의 강사',  icon: '⭐' },
   { href: '/mong-bab/lectures',  label: '강연 관리', icon: '📋' },
   { href: '/mong-bab/insights',  label: '인사이트 관리', icon: '✍️' },
   { href: '/mong-bab/inquiries', label: '문의 관리', icon: '💬' },
