@@ -12,7 +12,7 @@ interface Props {
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
 const PAGE_SIZE = 6   // 3열 × 2행
-const AUTO_MS  = 6500 // 6.5초마다 자동 롤링
+const AUTO_MS  = 8000 // 8초마다 자동 롤링
 
 const FIELD_COLORS: Record<string, string> = {
   leadership:       '#2c3e6b',
