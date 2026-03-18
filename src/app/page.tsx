@@ -18,7 +18,7 @@ async function getData() {
       .select('id, name, title, company, photo_url, fields, is_visible')
       .eq('is_visible', true)
       .order('sort_order', { ascending: true })
-      .limit(8),
+      .limit(30),
     supabase
       .from('notices')
       .select('id, title, content, is_pinned, published_at')

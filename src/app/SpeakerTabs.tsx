@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Speaker } from '@/types'
@@ -11,8 +11,9 @@ interface Props {
 }
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
+const PAGE_SIZE = 6   // 3열 × 2행
+const AUTO_MS  = 4000 // 4초마다 자동 롤링
 
-// 분야별 상단 컬러바 매핑
 const FIELD_COLORS: Record<string, string> = {
   leadership:       '#2c3e6b',
   org_culture:      '#4a5e3a',
@@ -30,20 +31,46 @@ function getFieldColor(fields: string[]): string {
   for (const f of fields) {
     if (FIELD_COLORS[f]) return FIELD_COLORS[f]
   }
-  return '#2B4238' // --color-green 기본
+  return '#2B4238'
 }
 
 export default function SpeakerTabs({ speakers, fieldMap }: Props) {
   const [activeTab, setActiveTab] = useState(0)
   const [filterField, setFilterField] = useState<string | null>(null)
+  const [page, setPage] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const filtered = (() => {
     if (activeTab === 1 && filterField) {
       return speakers.filter((s) => (s.fields ?? []).includes(filterField))
     }
-    if (activeTab === 2) return speakers.slice(0, 6)
+    if (activeTab === 2) return speakers.slice(0, 18)
     return speakers
   })()
+
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
+  const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+
+  const goNext = useCallback(() => {
+    setPage((p) => (p + 1) % Math.max(1, totalPages))
+  }, [totalPages])
+
+  const goPrev = useCallback(() => {
+    setPage((p) => (p - 1 + Math.max(1, totalPages)) % Math.max(1, totalPages))
+  }, [totalPages])
+
+  // 탭/필터 변경 시 페이지 초기화
+  useEffect(() => {
+    setPage(0)
+  }, [activeTab, filterField])
+
+  // 자동 롤링
+  useEffect(() => {
+    if (paused || totalPages <= 1) return
+    timerRef.current = setInterval(goNext, AUTO_MS)
+    return () => { if (timerRef.current) clearInterval(timerRef.current) }
+  }, [paused, totalPages, goNext])
 
   const allFields = Array.from(new Set(speakers.flatMap((s) => s.fields ?? []))).filter(f => fieldMap[f])
   const border = '1px solid var(--color-border)'
@@ -59,6 +86,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           grid-template-columns: repeat(3, 1fr);
           gap: 1px;
           background: var(--color-border);
+          min-height: 252px; /* 2행 확보 (120px × 2 + 12px gap) */
         }
         @media (max-width: 860px) {
           .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
@@ -89,7 +117,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           align-self: stretch;
         }
 
-        /* 사진 영역 — 고정 정사각형, 작게 */
+        /* 사진 영역 */
         .sp-card-photo {
           position: relative;
           width: 100px;
@@ -107,7 +135,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           display: flex; align-items: center; justify-content: center;
         }
 
-        /* 정보 영역 — 우측, 텍스트 중심 */
+        /* 정보 영역 */
         .sp-card-body {
           flex: 1;
           padding: 14px 16px 14px 14px;
@@ -118,7 +146,6 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           min-width: 0;
         }
 
-        /* 번호 */
         .sp-card-index {
           font-family: var(--font-english);
           font-size: 9px; font-weight: 400;
@@ -140,7 +167,42 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         }
         .sp-card:hover .sp-card-hover-overlay { transform: translateY(0); }
 
-        /* 모바일 조정 */
+        /* ── 페이지네이션 바 ── */
+        .sp-pager {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          padding: 16px;
+          border-top: 1px solid var(--color-border);
+        }
+        .sp-dot {
+          width: 6px; height: 6px;
+          border-radius: 50%;
+          background: var(--color-border);
+          border: none;
+          cursor: pointer;
+          padding: 0;
+          transition: background 0.2s, transform 0.2s;
+        }
+        .sp-dot.active {
+          background: var(--color-ink);
+          transform: scale(1.4);
+        }
+        .sp-arrow {
+          background: none;
+          border: 1px solid var(--color-border);
+          width: 28px; height: 28px;
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+          font-size: 12px;
+          color: var(--color-muted);
+          transition: border-color 0.15s, color 0.15s;
+          flex-shrink: 0;
+        }
+        .sp-arrow:hover { border-color: var(--color-ink); color: var(--color-ink); }
+
+        /* 모바일 */
         @media (max-width: 480px) {
           .sp-card-photo { width: 80px; height: 80px; }
         }
@@ -190,24 +252,27 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
       )}
 
       {/* 카드 그리드 */}
-      <div style={{ borderTop: border }}>
+      <div
+        style={{ borderTop: border }}
+        onMouseEnter={() => setPaused(true)}
+        onMouseLeave={() => setPaused(false)}
+      >
         {filtered.length === 0 ? (
           <p style={{ padding: '40px var(--space-page)', textAlign: 'center', fontSize: '13px', color: 'var(--color-muted)' }}>
             해당 분야 강사가 없습니다.
           </p>
         ) : (
           <div className="sp-card-grid">
-            {filtered.map((speaker, i) => {
+            {paged.map((speaker, i) => {
+              const globalIndex = page * PAGE_SIZE + i
               const accentColor = getFieldColor(speaker.fields ?? [])
               const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 5)
               const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
 
               return (
                 <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="sp-card">
-                  {/* 좌측 컬러바 */}
                   <div className="sp-card-bar" style={{ background: accentColor }} />
 
-                  {/* 사진 — 100×100 정사각형 */}
                   <div className="sp-card-photo">
                     {speaker.photo_url ? (
                       <Image
@@ -228,12 +293,9 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                     )}
                   </div>
 
-                  {/* 정보 영역 */}
                   <div className="sp-card-body">
-                    {/* 번호 */}
-                    <span className="sp-card-index">{String(i + 1).padStart(2, '0')}</span>
+                    <span className="sp-card-index">{String(globalIndex + 1).padStart(2, '0')}</span>
 
-                    {/* 이름 */}
                     <div style={{
                       fontFamily: 'var(--font-display)', fontWeight: 800,
                       fontSize: '17px', letterSpacing: '-0.02em', lineHeight: 1.1,
@@ -243,7 +305,6 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                       {speaker.name}
                     </div>
 
-                    {/* 직함 · 소속 */}
                     {subText && (
                       <div style={{
                         fontSize: '11px', fontWeight: 300,
@@ -254,7 +315,6 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                       </div>
                     )}
 
-                    {/* 강의 분야 태그 */}
                     {visibleFields.length > 0 && (
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '2px' }}>
                         {visibleFields.map((f) => (
@@ -282,6 +342,24 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
           </div>
         )}
       </div>
+
+      {/* 페이지네이션 — 2페이지 이상일 때만 표시 */}
+      {totalPages > 1 && (
+        <div className="sp-pager">
+          <button className="sp-arrow" onClick={() => { goPrev(); setPaused(true) }} aria-label="이전">‹</button>
+
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              className={`sp-dot${page === i ? ' active' : ''}`}
+              onClick={() => { setPage(i); setPaused(true) }}
+              aria-label={`${i + 1}페이지`}
+            />
+          ))}
+
+          <button className="sp-arrow" onClick={() => { goNext(); setPaused(true) }} aria-label="다음">›</button>
+        </div>
+      )}
     </>
   )
 }
