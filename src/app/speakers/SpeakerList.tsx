@@ -144,7 +144,7 @@ export default function SpeakerList({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {speakers.map((speaker) => (
             <div key={speaker.id} className="group bg-white rounded-2xl border border-gray-100 overflow-hidden hover:shadow-md transition-shadow flex flex-col">
               <Link href={`/speakers/${speaker.id}`}>
@@ -168,7 +168,7 @@ export default function SpeakerList({
               </Link>
               <div className="p-4 flex flex-col flex-1">
                 <div className="flex flex-wrap gap-1 mb-2">
-                  {(speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 3).map((f) => (
+                  {(speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f]).slice(0, 5).map((f) => (
                     <span key={f} className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full">
                       {fieldMap[f]}
                     </span>
@@ -202,6 +202,7 @@ export default function SpeakerList({
           {page > 1 ? (
             <Link
               href={buildUrl({ page: page - 1, field: currentField, q: currentQ })}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="w-9 h-9 flex items-center justify-center text-sm border border-gray-200 rounded-full text-gray-500 hover:border-[#1a1a2e] hover:text-[#1a1a2e] transition-colors"
             >
               ←
@@ -222,6 +223,7 @@ export default function SpeakerList({
               <Link
                 key={p}
                 href={buildUrl({ page: p as number, field: currentField, q: currentQ })}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className={`w-9 h-9 flex items-center justify-center text-sm rounded-full transition-colors ${
                   p === page
                     ? 'bg-[#1a1a2e] text-white font-semibold cursor-default pointer-events-none'
@@ -237,6 +239,7 @@ export default function SpeakerList({
           {page < totalPages ? (
             <Link
               href={buildUrl({ page: page + 1, field: currentField, q: currentQ })}
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="w-9 h-9 flex items-center justify-center text-sm border border-gray-200 rounded-full text-gray-500 hover:border-[#1a1a2e] hover:text-[#1a1a2e] transition-colors"
             >
               →

@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import type { Speaker, Notice } from '@/types'
-import { SPEAKER_FIELDS } from '@/constants'
+import { buildFieldMap } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
 import SpeakerTabs from './SpeakerTabs'
@@ -8,7 +8,7 @@ import TrustStats from './TrustStats'
 import SpeakerCarousel from './SpeakerCarousel'
 import RevealOnScroll from '@/components/RevealOnScroll'
 
-const FIELD_MAP = Object.fromEntries(SPEAKER_FIELDS.map((f) => [f.value, f.label]))
+const FIELD_MAP = buildFieldMap()
 
 async function getData() {
   const supabase = await createClient()

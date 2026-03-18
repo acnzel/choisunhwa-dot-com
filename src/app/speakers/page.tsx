@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { Speaker } from '@/types'
-import { SPEAKER_FIELDS } from '@/constants'
+import { buildFieldMap, getFieldWithAliases } from '@/constants'
 import SpeakerList from './SpeakerList'
 
 export const dynamic = 'force-dynamic'
@@ -12,10 +12,7 @@ export const metadata: Metadata = {
 }
 
 const PAGE_SIZE = 20
-
-const FIELD_MAP: Record<string, string> = Object.fromEntries(
-  SPEAKER_FIELDS.map((f) => [f.value, f.label])
-)
+const FIELD_MAP = buildFieldMap()
 
 interface SearchParams {
   page?: string
@@ -36,7 +33,8 @@ async function getSpeakers(params: SearchParams) {
     .order('sort_order', { ascending: true })
 
   if (field !== 'all') {
-    query = query.contains('fields', [field])
+    // overlaps: 별칭 포함 (예: 'HR' 필터 시 '성과관리', '조직관리'도 매치)
+    query = query.overlaps('fields', getFieldWithAliases(field))
   }
 
   if (q) {

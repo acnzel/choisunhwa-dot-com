@@ -4,15 +4,13 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import type { Speaker, Lecture } from '@/types'
-import { SPEAKER_FIELDS } from '@/constants'
+import { buildFieldMap } from '@/constants'
 import { normalizeSpeaker } from '@/lib/utils/speaker'
 import ShareButton from './ShareButton'
 import ScrollToTop from './ScrollToTop'
 import RevealOnScroll from '@/components/RevealOnScroll'
 
-const FIELD_MAP: Record<string, string> = Object.fromEntries(
-  SPEAKER_FIELDS.map((f) => [f.value, f.label])
-)
+const FIELD_MAP = buildFieldMap()
 
 interface Props {
   params: Promise<{ id: string }>
