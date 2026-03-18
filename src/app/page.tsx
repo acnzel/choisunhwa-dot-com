@@ -287,7 +287,7 @@ export default async function HomePage() {
           <TrustStats stats={TRUST_STATS.map((s, i) => ({ ...s, highlight: i === 2 }))} />
         </section>
 
-        {/* ── BEST 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
+        {/* ── 이달의 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
         {bestSpeakers.length > 0 && (
           <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="best-speakers">
             <div className="section-hd" style={{
@@ -299,9 +299,9 @@ export default async function HomePage() {
                 fontFamily: 'var(--font-display)', fontWeight: 900,
                 fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
               }}>
-                BEST 강사{' '}
+                이달의 강사{' '}
                 <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
-                  Featured Speakers
+                  Speaker of the Month
                 </span>
               </h2>
               <Link href="/speakers" className="see-all-link">전체 보기 →</Link>

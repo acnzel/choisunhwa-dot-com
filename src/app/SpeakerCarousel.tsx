@@ -68,6 +68,17 @@ export default function SpeakerCarousel({ speakers }: Props) {
           font-size: 11px; font-weight: 300;
           color: var(--color-muted);
           white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+          margin-bottom: 4px;
+        }
+        .carousel-bio {
+          font-size: 10.5px; font-weight: 400;
+          color: var(--color-subtle);
+          line-height: 1.5;
+          overflow: hidden;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+          margin-top: 4px;
         }
       `}</style>
 
@@ -103,6 +114,9 @@ export default function SpeakerCarousel({ speakers }: Props) {
                 <div className="carousel-sub">
                   {[speaker.company, speaker.title].filter(Boolean).join(' · ')}
                 </div>
+                {speaker.bio_short && (
+                  <div className="carousel-bio">{speaker.bio_short}</div>
+                )}
               </div>
             </Link>
           ))}
