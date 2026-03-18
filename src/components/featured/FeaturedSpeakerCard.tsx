@@ -4,7 +4,7 @@ import type { FeaturedSpeakerItem } from '@/types'
 
 interface Props {
   item: FeaturedSpeakerItem
-  index: number
+  index?: number
 }
 
 export default function FeaturedSpeakerCard({ item, index }: Props) {
@@ -31,16 +31,6 @@ export default function FeaturedSpeakerCard({ item, index }: Props) {
         .featured-card:hover { opacity: 0.82; }
         .featured-card:hover .featured-photo img { transform: scale(1.04); }
       `}</style>
-
-      {/* 번호 */}
-      <span style={{
-        fontFamily: 'var(--font-english)',
-        fontSize: '11px', fontWeight: 400,
-        color: 'var(--color-muted)', letterSpacing: '0.06em',
-        paddingTop: '4px', flexShrink: 0, width: '20px',
-      }}>
-        {String(index + 1).padStart(2, '0')}
-      </span>
 
       {/* 사진 */}
       <div className="featured-photo" style={{
