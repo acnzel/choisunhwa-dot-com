@@ -12,7 +12,7 @@ const FIELD_MAP = buildFieldMap()
 
 async function getData() {
   const supabase = await createClient()
-  const [{ data: speakers }, { data: notices }, { data: bestSpeakers }, { count: totalSpeakerCount }] = await Promise.all([
+  const [{ data: speakers }, { data: notices }, { data: bestSpeakers }, { count: totalSpeakerCount }, { data: trendingSpeakers }] = await Promise.all([
     supabase
       .from('speakers')
       .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
@@ -37,11 +37,20 @@ async function getData() {
       .from('speakers')
       .select('id', { count: 'exact', head: true })
       .eq('is_visible', true),
+    // '지금 뜨는' 강사 (is_trending=true) — migration 010 적용 전엔 빈 배열 fallback
+    supabase
+      .from('speakers')
+      .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
+      .eq('is_trending', true)
+      .eq('is_visible', true)
+      .order('sort_order', { ascending: true })
+      .limit(18),
   ])
   return {
     speakers: (speakers as Speaker[]) ?? [],
     notices: (notices as Notice[]) ?? [],
     bestSpeakers: (bestSpeakers as Speaker[]) ?? [],
+    trendingSpeakers: (trendingSpeakers as Speaker[]) ?? [],
     totalSpeakerCount: totalSpeakerCount ?? 0,
   }
 }
@@ -74,7 +83,7 @@ const PROCESS_ICONS = [
 ]
 
 export default async function HomePage() {
-  const { speakers, notices, bestSpeakers, totalSpeakerCount } = await getData()
+  const { speakers, notices, bestSpeakers, trendingSpeakers, totalSpeakerCount } = await getData()
 
   // ── Insight 카드: 실제 데이터가 있는 것만 사용 ──
   const hero   = notices[0] ?? null
@@ -330,7 +339,7 @@ export default async function HomePage() {
             </h2>
             <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
           </div>
-          <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} />
+          <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingSpeakers} />
         </section>
 
         {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}

@@ -49,6 +49,7 @@ export interface Speaker {
   fee_range: FeeRange | null
   is_visible: boolean
   is_best: boolean
+  is_trending?: boolean  // migration 010 적용 후 활성화
   sort_order: number
   careers: SpeakerCareer[]
   lecture_histories: SpeakerLectureHistory[]

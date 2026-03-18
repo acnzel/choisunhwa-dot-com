@@ -8,6 +8,7 @@ import type { Speaker } from '@/types'
 interface Props {
   speakers: Speaker[]
   fieldMap: Record<string, string>
+  trendingSpeakers?: Speaker[]  // '지금 뜨는' — is_trending=true, migration 010 필요
 }
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
@@ -34,7 +35,7 @@ function getFieldColor(fields: string[]): string {
   return '#2B4238'
 }
 
-export default function SpeakerTabs({ speakers, fieldMap }: Props) {
+export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] }: Props) {
   const [activeTab, setActiveTab] = useState(0)
   const [filterField, setFilterField] = useState<string | null>(null)
   const [page, setPage] = useState(0)
@@ -45,7 +46,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
     if (activeTab === 1 && filterField) {
       return speakers.filter((s) => (s.fields ?? []).includes(filterField))
     }
-    if (activeTab === 2) return speakers.slice(0, 18)
+    if (activeTab === 2) return trendingSpeakers.length > 0 ? trendingSpeakers : speakers.slice(0, 18)
     return speakers
   })()
 
@@ -120,13 +121,13 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
         /* 사진 영역 */
         .sp-card-photo {
           position: relative;
-          width: 120px;
-          height: 120px;
+          width: 138px;
+          height: 138px;
           flex-shrink: 0;
           background: var(--color-surface);
           overflow: hidden;
           align-self: center;
-          margin: 12px 0 12px 12px;
+          margin: 8px 0 8px 8px;
         }
         .sp-card-img { transition: transform 0.4s ease; }
         .sp-card:hover .sp-card-img { transform: scale(1.05); }
@@ -204,7 +205,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
         /* 모바일 */
         @media (max-width: 480px) {
-          .sp-card-photo { width: 90px; height: 90px; }
+          .sp-card-photo { width: 110px; height: 110px; }
         }
       `}</style>
 
@@ -266,7 +267,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
             {paged.map((speaker, i) => {
               const globalIndex = page * PAGE_SIZE + i
               const accentColor = getFieldColor(speaker.fields ?? [])
-              const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 2)
+              const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 1)
               const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
 
               return (
@@ -281,7 +282,7 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
                         fill
                         className="sp-card-img"
                         style={{ objectFit: 'cover', objectPosition: 'top center' }}
-                        sizes="120px"
+                        sizes="138px"
                       />
                     ) : (
                       <div className="sp-card-placeholder">
@@ -333,9 +334,9 @@ export default function SpeakerTabs({ speakers, fieldMap }: Props) {
 
                     {speaker.bio_short && (
                       <div style={{
-                        fontSize: '11px', fontWeight: 400,
-                        color: 'var(--color-muted)', lineHeight: 1.55,
-                        marginTop: '5px',
+                        fontSize: '11.5px', fontWeight: 400,
+                        color: 'var(--color-subtle)', lineHeight: 1.55,
+                        marginTop: '4px',
                         overflow: 'hidden',
                         display: '-webkit-box',
                         WebkitBoxOrient: 'vertical',

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import type { Speaker } from '@/types'
 import ToggleVisible from './ToggleVisible'
 import ToggleBest from './ToggleBest'
+import ToggleTrending from './ToggleTrending'
 import ClickableRow from '@/components/admin/ClickableRow'
 
 interface Props {
@@ -15,11 +16,13 @@ interface Props {
 
 type VisibilityFilter = 'all' | 'visible' | 'hidden'
 type BestFilter = 'all' | 'best' | 'normal'
+type TrendFilter = 'all' | 'trending' | 'normal'
 
 export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
   const [search, setSearch] = useState('')
   const [visFilter, setVisFilter] = useState<VisibilityFilter>('all')
   const [bestFilter, setBestFilter] = useState<BestFilter>('all')
+  const [trendFilter, setTrendFilter] = useState<TrendFilter>('all')
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -40,9 +43,15 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
         (bestFilter === 'best' && s.is_best) ||
         (bestFilter === 'normal' && !s.is_best)
 
-      return matchSearch && matchVis && matchBest
+      const spTrending = (s as Speaker & { is_trending?: boolean }).is_trending
+      const matchTrend =
+        trendFilter === 'all' ||
+        (trendFilter === 'trending' && spTrending) ||
+        (trendFilter === 'normal' && !spTrending)
+
+      return matchSearch && matchVis && matchBest && matchTrend
     })
-  }, [speakers, search, visFilter, bestFilter])
+  }, [speakers, search, visFilter, bestFilter, trendFilter])
 
   return (
     <>
@@ -117,10 +126,30 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
             </div>
           </div>
 
+          {/* 지금 뜨는 */}
+          <div className="flex items-center gap-1">
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mr-1">🔥지금뜨는</span>
+            <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+              {(['all', 'trending', 'normal'] as const).map((v, idx) => (
+                <button
+                  key={v}
+                  onClick={() => setTrendFilter(v)}
+                  className={`px-3 py-1.5 text-xs font-medium transition-colors ${idx > 0 ? 'border-l border-gray-200' : ''} ${
+                    trendFilter === v
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-white text-gray-500 hover:bg-gray-50'
+                  }`}
+                >
+                  {v === 'all' ? '전체' : v === 'trending' ? '뜨는중' : '일반'}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {/* 리셋 버튼 — 필터 활성화 시에만 노출 */}
-          {(search || visFilter !== 'all' || bestFilter !== 'all') && (
+          {(search || visFilter !== 'all' || bestFilter !== 'all' || trendFilter !== 'all') && (
             <button
-              onClick={() => { setSearch(''); setVisFilter('all'); setBestFilter('all') }}
+              onClick={() => { setSearch(''); setVisFilter('all'); setBestFilter('all'); setTrendFilter('all') }}
               className="ml-auto text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
             >
               필터 초기화
@@ -146,6 +175,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
                 <th className="text-left px-4 py-3 font-medium text-gray-500">분야</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">공개</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-500 w-16">BEST</th>
+                <th className="text-center px-4 py-3 font-medium text-gray-500 w-16">🔥뜨는</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">순서</th>
                 <th className="px-4 py-3 w-16" />
               </tr>
@@ -193,6 +223,9 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <ToggleBest speakerId={s.id} isBest={s.is_best ?? false} />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <ToggleTrending speakerId={s.id} isTrending={(s as Speaker & { is_trending?: boolean }).is_trending ?? false} />
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-center">{s.sort_order}</td>
                     <td className="px-4 py-3">

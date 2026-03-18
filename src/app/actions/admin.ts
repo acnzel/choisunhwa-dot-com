@@ -34,6 +34,20 @@ export async function toggleSpeakerBest(speakerId: string, isBest: boolean) {
   return { ok: true }
 }
 
+export async function toggleSpeakerTrending(speakerId: string, isTrending: boolean) {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from('speakers')
+    .update({ is_trending: isTrending } as Record<string, unknown>)
+    .eq('id', speakerId)
+
+  if (error) return { ok: false, error: error.message }
+
+  revalidatePath('/mong-bab/speakers')
+  revalidatePath('/')
+  return { ok: true }
+}
+
 export async function upsertSpeaker(formData: FormData) {
   const supabase = createAdminClient()
 
