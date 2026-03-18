@@ -92,8 +92,8 @@ export default async function FeaturedSpeakersPage() {
             gridTemplateColumns: 'repeat(2, 1fr)',
             gap: '0 clamp(32px, 5vw, 64px)',
           }}>
-            {items.map((item, i) => (
-              <FeaturedSpeakerCard key={item.id} item={item} index={i} />
+            {items.map((item) => (
+              <FeaturedSpeakerCard key={item.id} item={item} />
             ))}
           </div>
         </>

@@ -4,10 +4,9 @@ import type { FeaturedSpeakerItem } from '@/types'
 
 interface Props {
   item: FeaturedSpeakerItem
-  index?: number
 }
 
-export default function FeaturedSpeakerCard({ item, index }: Props) {
+export default function FeaturedSpeakerCard({ item }: Props) {
   const { speaker } = item
   const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
 

@@ -54,7 +54,7 @@ export default function FeaturedSection({ items }: Props) {
               paddingLeft: i % 2 === 1 ? 'clamp(24px, 3vw, 48px)' : '0',
             }}
           >
-            <FeaturedSpeakerCard item={item} index={i} />
+            <FeaturedSpeakerCard item={item} />
           </div>
         ))}
       </div>
