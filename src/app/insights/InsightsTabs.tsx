@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation'
 const TABS = [
   { href: '/insights/issue',    label: '오늘의 이슈' },
   { href: '/insights/report',   label: '강연 현장' },
-  { href: '/insights/pick',     label: '이 강사 어때요?' },
   { href: '/insights/featured', label: '이달의 강사' },
 ]
 
