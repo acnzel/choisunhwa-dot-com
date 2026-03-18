@@ -13,17 +13,7 @@ interface Props {
   searchParams: Promise<{ fields?: string; topics?: string; targets?: string }>
 }
 
-// 분야 레이블
-const FIELD_DB_MAP: Record<string, string[]> = {
-  leadership:    ['leadership', 'org_culture'],
-  motivation:    ['motivation', 'self_development'],
-  marketing:     ['marketing', 'sales'],
-  communication: ['communication'],
-  ai:            ['ai_tech'],
-  psychology:    ['motivation'],
-  finance:       ['finance'],
-  other:         [],
-}
+// FIELD_DB_MAP은 WIZARD_FIELDS.dbFields로 통합 — 별도 정의 불필요
 
 async function getScoredSpeakers(
   fields: string[],
@@ -49,10 +39,11 @@ async function getScoredSpeakers(
       ? (sp.careers as Array<{ content: string }>)
       : []
 
-    // 분야 매칭: +3점/개
+    // 분야 매칭: +3점/개 — WIZARD_FIELDS.dbFields(한글)와 speakers.fields(한글) 직접 비교
     fields.forEach((wizardFieldId) => {
-      const dbFields = FIELD_DB_MAP[wizardFieldId] ?? []
-      const fieldLabel = WIZARD_FIELDS.find(f => f.id === wizardFieldId)?.label ?? wizardFieldId
+      const wf = WIZARD_FIELDS.find(f => f.id === wizardFieldId)
+      const dbFields: readonly string[] = wf?.dbFields ?? []
+      const fieldLabel = wf?.label ?? wizardFieldId
       if (dbFields.length === 0 || dbFields.some(db => spFields.includes(db))) {
         score += 3
         reasons.push(`${fieldLabel} 분야 일치`)

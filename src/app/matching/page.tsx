@@ -1,7 +1,8 @@
 'use client'
 
-import { Suspense, useState, useEffect } from 'react'
+import { Suspense, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { WIZARD_FIELDS, TOPICS_BY_FIELD, WIZARD_TARGETS, type WizardFieldId } from '@/constants/matching'
 
 const TOTAL_STEPS = 3
@@ -140,15 +141,24 @@ function WizardContent() {
           from { opacity: 0; transform: translateX(24px); }
           to   { opacity: 1; transform: translateX(0); }
         }
+        /* Step 1: 4열 (PC) / 2열 (모바일) */
         .select-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-          gap: 12px;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 10px;
         }
-        @media (max-width: 480px) {
-          .select-grid {
-            grid-template-columns: 1fr 1fr;
-          }
+        /* Step 2/3: 유동 */
+        .select-grid-fluid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 10px;
+        }
+        @media (max-width: 860px) {
+          .select-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 600px) {
+          .select-grid { grid-template-columns: repeat(2, 1fr); }
+          .select-grid-fluid { grid-template-columns: 1fr 1fr; }
         }
         /* PC: 버튼 인라인 (카드 아래) */
         .wizard-nav {
@@ -173,6 +183,21 @@ function WizardContent() {
           .mobile-nav-spacer {
             height: 72px !important;
           }
+        }
+        /* 잘 모르겠어요 버튼 */
+        .btn-skip-consult {
+          display: inline-flex; align-items: center; gap: 6px;
+          font-family: var(--font-body);
+          font-size: 12px; font-weight: 500;
+          color: var(--color-subtle);
+          text-decoration: none;
+          padding: 10px 20px;
+          border: 1px dashed var(--color-border);
+          transition: color 0.15s, border-color 0.15s;
+        }
+        .btn-skip-consult:hover {
+          color: var(--color-ink);
+          border-color: var(--color-ink);
         }
         /* 버튼 스피너 */
         @keyframes spin {
@@ -298,25 +323,34 @@ function WizardContent() {
               <p style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '32px' }}>복수 선택 가능</p>
             )}
 
-            {/* Step 1: 분야 선택 */}
+            {/* Step 1: 목적 카드 14개 */}
             {step === 1 && (
-              <div className="select-grid">
-                {WIZARD_FIELDS.map((f) => (
-                  <SelectCard
-                    key={f.id}
-                    icon={f.icon}
-                    label={f.label}
-                    selected={selectedFields.includes(f.id)}
-                    disabled={selectedFields.length >= 2 && !selectedFields.includes(f.id)}
-                    onClick={() => toggleField(f.id)}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="select-grid">
+                  {WIZARD_FIELDS.map((f) => (
+                    <SelectCard
+                      key={f.id}
+                      icon={f.icon}
+                      label={f.label}
+                      selected={selectedFields.includes(f.id)}
+                      disabled={selectedFields.length >= 2 && !selectedFields.includes(f.id)}
+                      onClick={() => toggleField(f.id)}
+                    />
+                  ))}
+                </div>
+
+                {/* M-4: 잘 모르겠어요 — 바로 상담 신청 */}
+                <div style={{ marginTop: '20px', textAlign: 'center' }}>
+                  <Link href="/inquiry/lecture" className="btn-skip-consult">
+                    잘 모르겠어요 — 바로 상담 신청하기 →
+                  </Link>
+                </div>
+              </>
             )}
 
             {/* Step 2: 주제 선택 (Step 1 기반 동적) */}
             {step === 2 && (
-              <div className="select-grid">
+              <div className="select-grid-fluid">
                 {availableTopics.map((t) => (
                   <SelectCard
                     key={t}
@@ -331,7 +365,7 @@ function WizardContent() {
 
             {/* Step 3: 대상 선택 */}
             {step === 3 && (
-              <div className="select-grid">
+              <div className="select-grid-fluid">
                 {WIZARD_TARGETS.map((t) => (
                   <SelectCard
                     key={t.id}
