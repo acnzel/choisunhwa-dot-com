@@ -55,8 +55,9 @@ export default function FeaturedSpeakersAdminPage() {
   // ── 데이터 로드 ─────────────────────────────────────────
   const loadItems = useCallback(async () => {
     try {
-      const data = await apiFetch('/api/featured-speakers?all=true')
-      setItems(data)
+      const res = await apiFetch('/api/featured-speakers?all=true')
+      // API returns { data: [...], meta: {...} }
+      setItems(Array.isArray(res) ? res : (res.data ?? []))
     } catch {
       setError('이달의 강사 목록을 불러오지 못했습니다.')
     } finally {
