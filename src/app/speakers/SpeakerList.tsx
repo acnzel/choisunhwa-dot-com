@@ -66,140 +66,202 @@ export default function SpeakerList({
   return (
     <>
       <style>{`
-        .spk-layout { display: grid; grid-template-columns: 220px 1fr; gap: 32px; }
-        @media (max-width: 900px) { .spk-layout { grid-template-columns: 1fr; } .spk-sidebar { display: none; } }
-
-        /* 사이드바 */
-        .spk-sidebar { position: sticky; top: calc(var(--nav-height, 64px) + 24px); align-self: start; }
-        .spk-filter-section { margin-bottom: 24px; }
-        .spk-filter-title {
-          font-size: 11px; font-weight: 700; letter-spacing: 1px;
-          color: #8a8178; text-transform: uppercase;
-          margin-bottom: 10px; padding-bottom: 8px;
-          border-bottom: 1px solid #e8e4de;
+        /* ── 레이아웃 ── */
+        .spk-wrap {
+          display: flex;
+          gap: 36px;
+          opacity: ${isPending ? 0.6 : 1};
+          transition: opacity .2s;
         }
-        .spk-filter-item {
+        @media (max-width: 900px) { .spk-wrap { flex-direction: column; } .spk-sidebar { display: none; } }
+
+        /* ── 사이드바 ── */
+        .spk-sidebar {
+          width: 220px;
+          flex-shrink: 0;
+          position: sticky;
+          top: calc(var(--nav-height, 64px) + 24px);
+          align-self: start;
+        }
+        .spk-sidebar-title {
+          font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+          color: #9C8570; text-transform: uppercase;
+          margin-bottom: 14px; padding-bottom: 8px;
+          border-bottom: 1px solid #E0D8CE;
+        }
+        .spk-filter-group { margin-bottom: 20px; }
+        .spk-filter-group-label {
+          font-size: 13px; font-weight: 700; color: #2C1A0E;
+          margin-bottom: 8px; cursor: pointer;
+          display: flex; justify-content: space-between; align-items: center;
+        }
+        .spk-filter-group-label::after { content: '∨'; font-size: 11px; color: #9C8570; }
+        .spk-filter-options { display: flex; flex-direction: column; gap: 6px; padding-left: 2px; }
+        .spk-filter-opt {
           display: flex; align-items: center; gap: 8px;
-          padding: 5px 0; cursor: pointer;
-          font-size: 13px; color: #555;
-          text-decoration: none;
+          font-size: 13px; color: #5A4A3A;
+          text-decoration: none; padding: 3px 0;
           transition: color .15s;
         }
-        .spk-filter-item:hover { color: #1E3A2F; }
-        .spk-filter-item.active { color: #1E3A2F; font-weight: 700; }
-        .spk-filter-count { font-size: 11px; color: #bbb; margin-left: auto; }
+        .spk-filter-opt:hover { color: #2C6B5A; }
+        .spk-filter-opt.active { color: #2C6B5A; font-weight: 700; }
+        .spk-filter-opt .dot {
+          width: 14px; height: 14px; border-radius: 3px;
+          border: 1.5px solid #C5B8A8; flex-shrink: 0;
+          transition: background .15s, border-color .15s;
+        }
+        .spk-filter-opt.active .dot { background: #2C6B5A; border-color: #2C6B5A; }
+        .spk-active-tag {
+          display: inline-flex; align-items: center; gap: 4px;
+          background: #E8EDE9; color: #2C6B5A;
+          font-size: 12px; font-weight: 600;
+          padding: 4px 10px; border-radius: 20px;
+          margin-bottom: 16px;
+          text-decoration: none;
+        }
 
-        /* 카드 */
-        .spk-grid-5 {
+        /* ── 카드 그리드 ── */
+        .spk-grid {
+          flex: 1; min-width: 0;
+        }
+        .spk-cards {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
-          gap: 16px;
+          gap: 20px;
         }
-        @media (max-width: 1200px) { .spk-grid-5 { grid-template-columns: repeat(4, 1fr); } }
-        @media (max-width: 900px)  { .spk-grid-5 { grid-template-columns: repeat(3, 1fr); } }
-        @media (max-width: 560px)  { .spk-grid-5 { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 1200px) { .spk-cards { grid-template-columns: repeat(4, 1fr); } }
+        @media (max-width: 900px)  { .spk-cards { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 560px)  { .spk-cards { grid-template-columns: repeat(2, 1fr); } }
 
+        /* ── 카드 ── */
         .spk-card {
-          background: #fff;
-          border: 1px solid #e8e4de;
-          border-radius: 16px;
+          background: #FDFAF6;
+          border-radius: 12px;
+          border: 1px solid #EAE3D8;
           overflow: hidden;
           text-decoration: none; color: inherit;
           display: flex; flex-direction: column;
-          transition: box-shadow .2s, transform .2s;
+          transition: transform .22s ease, box-shadow .22s ease;
         }
         .spk-card:hover {
-          box-shadow: 0 6px 24px rgba(0,0,0,0.12);
-          transform: translateY(-3px);
+          transform: translateY(-4px);
+          box-shadow: 0 12px 36px rgba(44, 26, 14, 0.12);
         }
-        .spk-card:hover .spk-card-img img { transform: scale(1.04); }
-        .spk-card-img img { transition: transform .4s ease; }
 
-        .spk-card-img {
+        /* 사진 */
+        .spk-card-photo {
           position: relative; width: 100%;
-          aspect-ratio: 4 / 3; overflow: hidden;
-          background: #ede8e0;
+          aspect-ratio: 3 / 4; overflow: hidden;
+          background: #E5DDD3;
         }
+        .spk-card-photo img {
+          transition: transform .4s ease;
+        }
+        .spk-card:hover .spk-card-photo img { transform: scale(1.04); }
+
+        /* hover overlay */
+        .spk-card-overlay {
+          position: absolute; inset: 0;
+          background: linear-gradient(to top, rgba(30,15,5,0.72) 0%, transparent 55%);
+          opacity: 0; transition: opacity .28s ease;
+          display: flex; align-items: flex-end; padding: 16px;
+        }
+        .spk-card:hover .spk-card-overlay { opacity: 1; }
+        .spk-overlay-btn {
+          background: #FDFAF6; color: #2C6B5A;
+          font-size: 12px; font-weight: 700;
+          padding: 8px 14px; border-radius: 6px;
+          width: 100%; text-align: center;
+        }
+
+        /* 이니셜 플레이스홀더 */
         .spk-card-placeholder {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
-          font-size: clamp(32px, 4vw, 48px); font-weight: 900;
-          color: #b8b0a8;
+          font-size: clamp(28px, 3vw, 40px); font-weight: 900; color: #C5B8A8;
+          background: linear-gradient(135deg, #EDE6DC, #DDD5C8);
           font-family: var(--font-display, serif);
-          background: #ede8e0;
-        }
-        .spk-card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .spk-card-name { font-size: 18px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.02em; line-height: 1.2; }
-        .spk-card-title { font-size: 14px; font-weight: 400; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
-        .spk-card-bio {
-          font-size: 14px; color: #666; line-height: 1.6; margin-top: 6px;
-          display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
-        }
-        .spk-card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-        .spk-card-tag {
-          font-size: 12px; font-weight: 400;
-          padding: 3px 10px;
-          background: #F2EDDF; color: #444;
-          border-radius: 20px; white-space: nowrap;
         }
 
-        /* 페이지네이션 */
-        .spk-page-btn {
-          width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center;
-          font-size: 13px; text-decoration: none; border: 1px solid #e0dbd4;
-          color: #666; transition: all .15s;
+        /* 카드 텍스트 */
+        .spk-card-body { padding: 14px 14px 16px; }
+        .spk-card-name { font-size: 15px; font-weight: 800; color: #1F1007; letter-spacing: -0.3px; margin-bottom: 3px; }
+        .spk-card-affil { font-size: 12px; color: #9C8570; font-weight: 500; margin-bottom: 7px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .spk-card-intro {
+          font-size: 12px; color: #6B5B4E; line-height: 1.55; margin-bottom: 10px;
+          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .spk-page-btn:hover { border-color: #1E3A2F; color: #1E3A2F; }
-        .spk-page-btn.active { background: #1E3A2F; color: #fff; border-color: #1E3A2F; font-weight: 700; }
+        .spk-card-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+        .spk-card-tag {
+          background: #EDE6DC; color: #7A5E40;
+          font-size: 10px; font-weight: 600;
+          padding: 3px 8px; border-radius: 20px;
+        }
+
+        /* ── 페이지네이션 ── */
+        .spk-pagination { display: flex; justify-content: center; gap: 6px; margin-top: 52px; }
+        .spk-pg-btn {
+          width: 36px; height: 36px; border-radius: 8px;
+          border: 1px solid #D5CCBE; background: #FDFAF6;
+          font-size: 14px; color: #5A4A3A; cursor: pointer;
+          display: inline-flex; align-items: center; justify-content: center;
+          font-weight: 500; transition: all .15s; text-decoration: none;
+        }
+        .spk-pg-btn:hover { background: #EDE6DC; }
+        .spk-pg-btn.active { background: #2C6B5A; color: #fff; border-color: #2C6B5A; font-weight: 700; }
+        .spk-pg-btn.disabled { color: #C5B8A8; cursor: default; border-color: #EAE3D8; }
       `}</style>
 
-      <div className="spk-layout" style={{ opacity: isPending ? 0.6 : 1, transition: 'opacity .2s' }}>
+      <div className="spk-wrap">
 
-        {/* ── 왼쪽 사이드바 ── */}
+        {/* ── 사이드바 ── */}
         <aside className="spk-sidebar">
-          <div className="spk-filter-section">
-            <div className="spk-filter-title">필터</div>
-            {currentField !== 'all' && (
-              <Link
-                href={buildUrl({ field: 'all', q: currentQ, page: 1 })}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 6,
-                  fontSize: 12, color: '#1E3A2F', fontWeight: 600,
-                  textDecoration: 'none', marginBottom: 12,
-                  padding: '3px 10px', background: '#e8f0eb', borderRadius: 2,
-                }}
-              >
-                {fieldMap[currentField] ?? currentField} ×
-              </Link>
-            )}
-          </div>
+          <div className="spk-sidebar-title">필터</div>
 
-          <div className="spk-filter-section">
-            <div className="spk-filter-title">강연 분야</div>
+          {currentField !== 'all' && (
             <Link
               href={buildUrl({ field: 'all', q: currentQ, page: 1 })}
-              className={`spk-filter-item${currentField === 'all' ? ' active' : ''}`}
+              className="spk-active-tag"
             >
-              전체
+              {fieldMap[currentField] ?? currentField}
+              <span style={{ fontSize: 15, lineHeight: 1 }}>×</span>
             </Link>
-            {SPEAKER_FIELDS.map(({ value, label }) => (
+          )}
+
+          <div className="spk-filter-group">
+            <div className="spk-filter-group-label">강연 분야</div>
+            <div className="spk-filter-options">
               <Link
-                key={value}
-                href={buildUrl({ field: value, q: currentQ, page: 1 })}
-                className={`spk-filter-item${currentField === value ? ' active' : ''}`}
+                href={buildUrl({ field: 'all', q: currentQ, page: 1 })}
+                className={`spk-filter-opt${currentField === 'all' ? ' active' : ''}`}
               >
-                {label}
+                <span className="dot" />
+                전체
               </Link>
-            ))}
+              {SPEAKER_FIELDS.map(({ value, label }) => (
+                <Link
+                  key={value}
+                  href={buildUrl({ field: value, q: currentQ, page: 1 })}
+                  className={`spk-filter-opt${currentField === value ? ' active' : ''}`}
+                >
+                  <span className="dot" />
+                  {label}
+                </Link>
+              ))}
+            </div>
           </div>
         </aside>
 
-        {/* ── 오른쪽 메인 ── */}
-        <main>
+        {/* ── 메인 그리드 ── */}
+        <div className="spk-grid">
+
           {/* 검색 + 카운트 */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', flex: 1, minWidth: 200 }}>
-              <svg style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', width: 14, height: 14, color: '#aaa' }}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 12,
+            marginBottom: 24, flexWrap: 'wrap',
+          }}>
+            <div style={{ position: 'relative', flex: 1, minWidth: 220, maxWidth: 440 }}>
+              <svg style={{ position: 'absolute', left: 13, top: '50%', transform: 'translateY(-50%)', width: 15, height: 15, color: '#B0A090' }}
                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -210,50 +272,61 @@ export default function SpeakerList({
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 style={{
-                  width: '100%', paddingLeft: 36, paddingRight: 16,
-                  paddingTop: 9, paddingBottom: 9,
-                  fontSize: 13, border: '1px solid #e0dbd4',
-                  background: '#fff', outline: 'none', fontFamily: 'inherit',
+                  width: '100%', paddingLeft: 40, paddingRight: 16,
+                  paddingTop: 10, paddingBottom: 10,
+                  fontSize: 14, border: '1px solid #D5CCBE', borderRadius: 8,
+                  background: '#FDFAF6', outline: 'none', fontFamily: 'inherit',
+                  color: '#333',
                 }}
                 aria-label="강사 검색"
               />
             </div>
-            <span style={{ fontSize: 13, color: '#8a8178', whiteSpace: 'nowrap' }}>
-              <strong style={{ color: '#1a1a1a' }}>{total.toLocaleString()}</strong>명의 강사
-            </span>
+            <p style={{ fontSize: 13, color: '#9C8570', marginLeft: 'auto', whiteSpace: 'nowrap' }}>
+              <strong style={{ color: '#2C6B5A', fontWeight: 700 }}>{total.toLocaleString()}명</strong>의 강사
+              {total > 0 && (
+                <span style={{ color: '#C5B8A8', marginLeft: 6 }}>({from}–{to})</span>
+              )}
+            </p>
           </div>
 
-          {/* 카드 그리드 */}
+          {/* 카드 */}
           {speakers.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '80px 0' }}>
-              <p style={{ color: '#aaa', fontSize: 14 }}>해당 조건의 강사가 없습니다.</p>
+              <p style={{ color: '#B0A090', fontSize: 14 }}>해당 조건의 강사가 없습니다.</p>
+              <p style={{ color: '#B0A090', fontSize: 13, marginTop: 8 }}>
+                <Link href="/inquiry/lecture" style={{ color: '#2C6B5A', textDecoration: 'underline' }}>
+                  강사 섭외를 직접 문의
+                </Link>해보세요.
+              </p>
             </div>
           ) : (
-            <div className="spk-grid-5">
+            <div className="spk-cards">
               {speakers.map((speaker) => {
                 const catFields = (speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f])
-                const titleLine = [speaker.title, speaker.company].filter(Boolean).join(' · ')
+                const affil = [speaker.title, speaker.company].filter(Boolean).join(' · ')
                 return (
                   <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="spk-card">
-                    <div className="spk-card-img">
+                    <div className="spk-card-photo">
                       {speaker.photo_url ? (
                         <Image
                           src={speaker.photo_url}
                           alt={speaker.name}
                           fill
-                          style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
+                          style={{ objectFit: 'cover', objectPosition: 'top center' }}
                           sizes="(max-width: 560px) 50vw, (max-width: 900px) 33vw, (max-width: 1200px) 25vw, 20vw"
-                          className="spk-card-img"
                         />
                       ) : (
                         <div className="spk-card-placeholder">{speaker.name.charAt(0)}</div>
                       )}
+                      <div className="spk-card-overlay">
+                        <div className="spk-overlay-btn">섭외 문의 →</div>
+                      </div>
                     </div>
                     <div className="spk-card-body">
                       <div className="spk-card-name">{speaker.name}</div>
-                      {titleLine && <div className="spk-card-title">{titleLine}</div>}
+                      {affil && <div className="spk-card-affil">{affil}</div>}
                       {speaker.bio_short && (
-                        <div className="spk-card-bio">{speaker.bio_short}</div>
+                        <div className="spk-card-intro">{speaker.bio_short}</div>
                       )}
                       {catFields.length > 0 && (
                         <div className="spk-card-tags">
@@ -271,33 +344,33 @@ export default function SpeakerList({
 
           {/* 페이지네이션 */}
           {totalPages > 1 && (
-            <div style={{ marginTop: 40, display: 'flex', justifyContent: 'center', gap: 4, flexWrap: 'wrap' }}>
+            <div className="spk-pagination">
               {page > 1 ? (
                 <Link href={buildUrl({ page: page - 1, field: currentField, q: currentQ })}
-                  className="spk-page-btn">‹</Link>
+                  className="spk-pg-btn">‹</Link>
               ) : (
-                <span className="spk-page-btn" style={{ color: '#ccc', borderColor: '#eee' }}>‹</span>
+                <span className="spk-pg-btn disabled">‹</span>
               )}
               {getPaginationRange(page, totalPages).map((p, i) =>
                 p === '…' ? (
-                  <span key={`e-${i}`} className="spk-page-btn" style={{ border: 'none', color: '#aaa' }}>…</span>
+                  <span key={`e-${i}`} className="spk-pg-btn" style={{ border: 'none' }}>…</span>
                 ) : (
                   <Link key={p}
                     href={buildUrl({ page: p as number, field: currentField, q: currentQ })}
-                    className={`spk-page-btn${p === page ? ' active' : ''}`}>
+                    className={`spk-pg-btn${p === page ? ' active' : ''}`}>
                     {p}
                   </Link>
                 )
               )}
               {page < totalPages ? (
                 <Link href={buildUrl({ page: page + 1, field: currentField, q: currentQ })}
-                  className="spk-page-btn">›</Link>
+                  className="spk-pg-btn">›</Link>
               ) : (
-                <span className="spk-page-btn" style={{ color: '#ccc', borderColor: '#eee' }}>›</span>
+                <span className="spk-pg-btn disabled">›</span>
               )}
             </div>
           )}
-        </main>
+        </div>
       </div>
     </>
   )
