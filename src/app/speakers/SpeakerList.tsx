@@ -144,88 +144,114 @@ export default function SpeakerList({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {speakers.map((speaker) => {
-            const fields = (speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f])
-            const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
-            return (
-              <Link
-                key={speaker.id}
-                href={`/speakers/${speaker.id}`}
-                className="group bg-white border border-[#ede9e3] hover:border-[#1D4229] hover:shadow-md transition-all overflow-hidden"
-                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
-              >
-                {/* 사진 — 정사각형 */}
-                <div style={{
-                  position: 'relative',
-                  aspectRatio: '1 / 1',
-                  overflow: 'hidden',
-                  background: '#f0ede8',
-                }}>
-                  {speaker.photo_url ? (
-                    <Image
-                      src={speaker.photo_url}
-                      alt={speaker.name}
-                      fill
-                      style={{ objectFit: 'cover', objectPosition: 'top center' }}
-                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
+        <>
+          <style>{`
+            .spk-card {
+              background: #fff;
+              text-decoration: none;
+              color: inherit;
+              display: block;
+              border-radius: 2px;
+              transition: box-shadow 0.22s ease, transform 0.22s ease;
+              box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            }
+            .spk-card:hover {
+              box-shadow: 0 8px 24px rgba(0,0,0,0.11);
+              transform: translateY(-2px);
+            }
+            .spk-card:hover .spk-img img { transform: scale(1.04); }
+            .spk-img img { transition: transform 0.45s ease; }
+          `}</style>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+            {speakers.map((speaker) => {
+              const fields = (speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f])
+              const title   = speaker.title   ?? ''
+              const company = speaker.company ?? ''
+              return (
+                <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="spk-card">
 
-                {/* 딥그린 액센트 */}
-                <div style={{ height: 3, background: '#1D4229' }} />
-
-                {/* 텍스트 */}
-                <div style={{ padding: '12px 13px 14px' }}>
-                  {/* 이름 */}
-                  <div style={{
-                    fontFamily: 'var(--font-display, serif)', fontWeight: 800,
-                    fontSize: 15, letterSpacing: '-0.02em', lineHeight: 1.2,
-                    color: '#1a1a2e', marginBottom: 4,
-                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  }}>
-                    {speaker.name}
+                  {/* 사진 — 고정 높이, 얼굴 위주 크롭 */}
+                  <div
+                    className="spk-img"
+                    style={{ position: 'relative', height: 180, overflow: 'hidden', background: '#f0ede8' }}
+                  >
+                    {speaker.photo_url ? (
+                      <Image
+                        src={speaker.photo_url}
+                        alt={speaker.name}
+                        fill
+                        style={{ objectFit: 'cover', objectPosition: 'center 15%' }}
+                        sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center" style={{ color: '#ccc' }}>
+                        <svg width="36" height="36" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1}
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                        </svg>
+                      </div>
+                    )}
                   </div>
 
-                  {/* 직함 · 소속 */}
-                  {subText && (
-                    <div style={{
-                      fontSize: 11, color: '#888', marginBottom: 8,
-                      overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                    }}>
-                      {subText}
-                    </div>
-                  )}
+                  {/* 딥그린 포인트 라인 */}
+                  <div style={{ height: 2, background: '#1D4229' }} />
 
-                  {/* 분야 태그 */}
-                  {fields.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
-                      {fields.slice(0, 3).map(f => (
-                        <span key={f} style={{
-                          fontSize: 9, fontWeight: 600, padding: '2px 6px',
-                          border: '1px solid #1D422930', color: '#1D4229',
-                          whiteSpace: 'nowrap', letterSpacing: '0.03em',
-                        }}>
-                          {fieldMap[f]}
-                        </span>
-                      ))}
-                      {fields.length > 3 && (
-                        <span style={{ fontSize: 9, color: '#aaa', padding: '2px 0' }}>+{fields.length - 3}</span>
-                      )}
-                    </div>
-                  )}
-                </div>
-              </Link>
-            )
-          })}
-        </div>
+                  {/* 텍스트 영역 */}
+                  <div style={{ padding: '13px 14px 15px' }}>
+                    {/* 이름 */}
+                    <p style={{
+                      fontFamily: 'var(--font-display, serif)', fontWeight: 800,
+                      fontSize: 15, letterSpacing: '-0.02em', lineHeight: 1.2,
+                      color: '#1a1a2e', marginBottom: 3,
+                    }}>
+                      {speaker.name}
+                    </p>
+
+                    {/* 직함 */}
+                    {title && (
+                      <p style={{ fontSize: 12, color: '#555', lineHeight: 1.4, marginBottom: 1,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {title}
+                      </p>
+                    )}
+
+                    {/* 소속 */}
+                    {company && (
+                      <p style={{ fontSize: 11, color: '#999', lineHeight: 1.4, marginBottom: 10,
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {company}
+                      </p>
+                    )}
+
+                    {/* 분야 태그 */}
+                    {fields.length > 0 && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px 4px' }}>
+                        {fields.slice(0, 3).map(f => (
+                          <span key={f} style={{
+                            fontSize: 10, fontWeight: 500,
+                            padding: '2px 7px',
+                            background: '#f5f2ed',
+                            color: '#1D4229',
+                            borderRadius: 2,
+                            whiteSpace: 'nowrap',
+                          }}>
+                            {fieldMap[f]}
+                          </span>
+                        ))}
+                        {fields.length > 3 && (
+                          <span style={{ fontSize: 10, color: '#aaa', padding: '2px 0' }}>
+                            +{fields.length - 3}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              )
+            })}
+          </div>
+        </>
+      
       )}
 
       {/* 페이지네이션 */}
