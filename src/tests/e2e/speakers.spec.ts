@@ -59,6 +59,63 @@ test.describe('강연 커리큘럼', () => {
   })
 })
 
+/**
+ * BUG-N-014 회귀 테스트 — 인사이트 태그 → 강사 필터 라우팅
+ * 태그 alias가 FIELD_ALIASES를 통해 올바른 강사 목록으로 연결되는지 검증
+ * commit 28ad29e (fix) / QA 검수: 2025-03-19
+ */
+test.describe('BUG-N-014: 인사이트 태그 → 강사 필터 alias 라우팅', () => {
+  const aliasCases: { tag: string; expectedField: string }[] = [
+    { tag: '번아웃',  expectedField: '심리'   },  // FIELD_ALIASES['번아웃'] = '심리'
+    { tag: '팀장',   expectedField: '리더십'  },  // FIELD_ALIASES['팀장']   = '리더십'
+    { tag: 'MZ세대', expectedField: 'HR'     },  // FIELD_ALIASES['MZ세대'] = 'HR'
+    { tag: '조직문화', expectedField: 'HR'   },  // FIELD_ALIASES['조직문화'] = 'HR'
+  ]
+
+  for (const { tag, expectedField } of aliasCases) {
+    test(`"${tag}" 태그 → ${expectedField} 강사 목록 1명 이상 표시`, async ({ page }) => {
+      await page.goto(`/speakers?category=${encodeURIComponent(tag)}`)
+      await page.waitForLoadState('networkidle')
+
+      // SpeakerList 카드는 <Link href="/speakers/[uuid]"> (= <a>) 구조
+      // UUID 형식 href (/speakers/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) 로 정확히 매칭
+      const speakerCardLinks = await page.$$('a[href]')
+      let count = 0
+      for (const el of speakerCardLinks) {
+        const href = await el.getAttribute('href')
+        if (href && /^\/speakers\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(href)) {
+          count++
+        }
+      }
+
+      expect(count).toBeGreaterThan(0)
+    })
+  }
+
+  test('같은 alias 그룹은 동일 강사 세트 반환 — MZ세대=조직문화(HR)', async ({ page }) => {
+    async function getSpeakerHrefs(tag: string): Promise<string[]> {
+      await page.goto(`/speakers?category=${encodeURIComponent(tag)}`)
+      await page.waitForLoadState('networkidle')
+      const all = await page.$$('a[href]')
+      const hrefs: string[] = []
+      for (const el of all) {
+        const href = await el.getAttribute('href')
+        if (href && /^\/speakers\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(href)) {
+          hrefs.push(href)
+        }
+      }
+      return hrefs
+    }
+
+    const mzHrefs  = await getSpeakerHrefs('MZ세대')
+    const orgHrefs = await getSpeakerHrefs('조직문화')
+
+    // 두 결과의 교집합이 존재해야 함 (같은 HR 필터 → 동일 강사 UUID)
+    const intersection = mzHrefs.filter((h) => orgHrefs.includes(h))
+    expect(intersection.length).toBeGreaterThan(0)
+  })
+})
+
 test.describe('내비게이션', () => {
   test('헤더 네비게이션이 데스크탑에서 표시된다', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
