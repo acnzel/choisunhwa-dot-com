@@ -137,7 +137,7 @@ export default async function IssuePage() {
                         <Link href={`/insights/issue/${item.id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
                           <div
                             className="ig-card-img"
-                            style={{ width: '100%', aspectRatio: '16 / 10', overflow: 'hidden', background: bg, marginBottom: 14 }}
+                            style={{ width: '100%', aspectRatio: '16 / 10', overflow: 'hidden', background: bg, marginBottom: 14, position: 'relative' }}
                           >
                             {item.thumbnail_url ? (
                               <Image

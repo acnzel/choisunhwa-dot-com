@@ -110,7 +110,7 @@ export default function InsightCarousel({ items }: Props) {
                 {/* 이미지 */}
                 <div
                   className="ic-card-img"
-                  style={{ width: '100%', height: 170, overflow: 'hidden', background: bg, marginBottom: 14 }}
+                  style={{ width: '100%', height: 170, overflow: 'hidden', background: bg, marginBottom: 14, position: 'relative' }}
                 >
                   {item.thumbnail_url ? (
                     <Image
