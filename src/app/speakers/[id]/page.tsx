@@ -70,13 +70,21 @@ export default async function SpeakerDetailPage({ params }: Props) {
   const mediaLinks = (speaker.media_links ?? []).filter((m) => m.url)
 
   const bioText = speaker.bio_full?.trim() || speaker.bio_short?.trim() || ''
+
+  // 강연 주제: fields 배열에서 ~ prefix 항목 (엑셀 원본 강연주제 키워드)
+  const lectureTopicKeywords = speaker.fields
+    .filter(f => f.startsWith('~'))
+    .map(f => f.slice(1))
+    .filter(Boolean)
+
   const hasContent = {
-    bio:           !!bioText,
-    careers:       careers.length > 0,
-    education:     education.length > 0,
-    lectureTopics: lectureTopics.length > 0,
-    books:         books.length > 0,
-    media:         mediaLinks.length > 0,
+    bio:                  !!bioText,
+    lectureTopicKeywords: lectureTopicKeywords.length > 0,
+    careers:              careers.length > 0,
+    education:            education.length > 0,
+    lectureTopics:        lectureTopics.length > 0,
+    books:                books.length > 0,
+    media:                mediaLinks.length > 0,
   }
 
   return (
@@ -167,20 +175,19 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
             {/* 기본 정보 */}
             <div>
-              {/* 분야 태그 — 엑셀 강연분야(~접두어) 원본 표시 */}
-              {speaker.fields.some(f => f.startsWith('~')) && (
+              {/* 강연 분야 카테고리 태그 — 헤더 상단 */}
+              {speaker.fields.some(f => !f.startsWith('~') && FIELD_MAP[f]) && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
                   {speaker.fields
-                    .filter(f => f.startsWith('~'))
-                    .map(f => f.slice(1))
-                    .map((topic) => (
-                      <span key={topic} style={{
+                    .filter(f => !f.startsWith('~') && FIELD_MAP[f])
+                    .map((f) => (
+                      <span key={f} style={{
                         fontSize: '10px', fontWeight: 700, letterSpacing: '0.08em',
                         padding: '3px 10px',
                         background: 'var(--color-surface)', border: '1px solid var(--color-border)',
                         color: 'var(--color-subtle)',
                       }}>
-                        {topic}
+                        {FIELD_MAP[f]}
                       </span>
                     ))}
                 </div>
@@ -237,23 +244,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 <ShareButton />
               </div>
 
-              {/* 강연 분야 태그 — 헤더 하단 */}
-              {speaker.fields.some(f => !f.startsWith('~') && FIELD_MAP[f]) && (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {speaker.fields
-                    .filter(f => !f.startsWith('~') && FIELD_MAP[f])
-                    .map((f) => (
-                      <span key={f} style={{
-                        fontSize: '10px', fontWeight: 600,
-                        padding: '4px 10px',
-                        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                        color: 'var(--color-subtle)',
-                      }}>
-                        {FIELD_MAP[f]}
-                      </span>
-                    ))}
-                </div>
-              )}
+
             </div>
           </div>
         </header>
@@ -264,11 +255,25 @@ export default async function SpeakerDetailPage({ params }: Props) {
           {/* ── 메인 콘텐츠 ── */}
           <main style={{ borderRight: '1px solid var(--color-border)' }}>
 
-            {/* 강연 주제 (bio_full 텍스트 — 줄 단위 마커 표시) */}
+            {/* 강연 주제 (fields ~ prefix 항목 — 엑셀 원본 강연주제 키워드) */}
+            {hasContent.lectureTopicKeywords && (
+              <DetailSection title="강연 주제">
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {lectureTopicKeywords.map((topic, idx) => (
+                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px' }}>
+                      <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
+                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400, wordBreak: 'keep-all' }}>{topic}</span>
+                    </li>
+                  ))}
+                </ul>
+              </DetailSection>
+            )}
+
+            {/* 강사 소개 (bio_full 텍스트) */}
             {hasContent.bio && (() => {
               const bioLines = bioText.split('\n').map(l => l.trim()).filter(Boolean)
               return (
-                <DetailSection title="강연 주제">
+                <DetailSection title="강사 소개">
                   {bioLines.length > 1 ? (
                     <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                       {bioLines.map((line, idx) => (
