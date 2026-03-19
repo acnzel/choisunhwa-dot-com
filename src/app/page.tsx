@@ -450,7 +450,7 @@ export default async function HomePage() {
             padding: '28px var(--space-page) 22px', borderBottom: '1px solid var(--color-border)',
           }}>
             <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1 }}>
-              의뢰하면 이렇게 됩니다{' '}
+              진행 프로세스{' '}
               <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>How it works</span>
             </h2>
           </div>
