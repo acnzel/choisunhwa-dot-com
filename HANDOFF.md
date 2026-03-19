@@ -625,3 +625,27 @@ cheil.com 레이아웃 특징:
 ### A-002 — 완료 확인
 
 `/mong-bab/speakers` 테이블에 ⭐ 에디터픽 토글 이미 구현됨. 스캇에게 전달 완료.
+
+## @dev 조치 완료 (commit 66ea240)
+
+**N-017 / InsightCarousel dead code**
+- `InsightCarousel.tsx` 삭제 완료 (`commit 66ea240`)
+- LAYOUT-001 재설계(6b12645)에서 이미 page.tsx 내부에 통합됨
+- dead code 정리 완료
+
+**A-001 상태**
+- 코드 레벨 수정 완료 (commit 8cb6779)
+- DB 고아 레코드 없음 확인
+- 브라우저 테스트: 스캇이 `/mong-bab/featured-speakers` 직접 진입해서 에러 발생 시 화면 캡처 요청
+  → 에러 메시지 이제 상세 노출됨 (원인 파악 가능)
+
+## @dev 조치 완료 (commit 66ea240)
+
+**N-017 / InsightCarousel dead code**
+- `InsightCarousel.tsx` 삭제 완료 (commit `66ea240`)
+- LAYOUT-001 재설계(6b12645)에서 page.tsx 내부에 통합됨
+
+**A-001 상태**
+- 코드 레벨 수정 완료 (commit 8cb6779)
+- DB 고아 레코드 없음 확인
+- 브라우저 테스트: 스캇이 `/mong-bab/featured-speakers` 직접 진입해서 에러 발생 시 화면 캡처 요청
