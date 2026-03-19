@@ -673,3 +673,12 @@ cheil.com 레이아웃 특징:
 - 번아웃(category) → 심리 강사 (리더십과 다른 별개 세트) 확인
 
 **BUG-N-014 공식 CLOSE ✅**
+
+---
+
+## N-017 최종 CLOSE ✅ (commit 66ea240)
+
+- `InsightCarousel.tsx` 삭제 완료 (dead code 정리)
+- `InsightCarousel` 참조 전체 검색: 0건 ✅
+- TSC `--noEmit`: 에러 0건 ✅
+- 핵심 라우트 HTTP 200 확인: `/insights/issue`, `/report`, `/featured`, `/speakers`, `/` ✅
