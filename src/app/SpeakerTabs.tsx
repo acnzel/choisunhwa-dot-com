@@ -152,11 +152,11 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
           position: relative;
           overflow: hidden;
           border-radius: 16px;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          box-shadow: 0 0 0 1px rgba(0,0,0,0.06), 0 2px 12px rgba(0,0,0,0.06);
           transition: background 0.15s ease, box-shadow 0.2s ease, transform 0.2s ease;
           min-height: 160px;
         }
-        .sp-card:hover { background: #f5f1ea; box-shadow: 0 6px 20px rgba(0,0,0,0.13); transform: translateY(-2px); }
+        .sp-card:hover { background: #f5f1ea; box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.12); transform: translateY(-2px); }
 
         /* 좌측 컬러바 */
         .sp-card-bar {
