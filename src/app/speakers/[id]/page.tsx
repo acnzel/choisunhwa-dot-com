@@ -261,20 +261,32 @@ export default async function SpeakerDetailPage({ params }: Props) {
           {/* ── 메인 콘텐츠 ── */}
           <main style={{ borderRight: '1px solid var(--color-border)' }}>
 
-            {/* 강연 주제 (bio_full 텍스트) */}
-            {hasContent.bio && (
-              <DetailSection title="강연 주제">
-                <p style={{
-                  fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 400,
-                  color: 'var(--color-ink)', lineHeight: 1.9,
-                  whiteSpace: 'pre-line',
-                  wordBreak: 'keep-all',
-                  overflowWrap: 'break-word',
-                }}>
-                  {bioText}
-                </p>
-              </DetailSection>
-            )}
+            {/* 강연 주제 (bio_full 텍스트 — 줄 단위 마커 표시) */}
+            {hasContent.bio && (() => {
+              const bioLines = bioText.split('\n').map(l => l.trim()).filter(Boolean)
+              return (
+                <DetailSection title="강연 주제">
+                  {bioLines.length > 1 ? (
+                    <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                      {bioLines.map((line, idx) => (
+                        <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px' }}>
+                          <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
+                          <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400, wordBreak: 'keep-all' }}>{line}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p style={{
+                      fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 400,
+                      color: 'var(--color-ink)', lineHeight: 1.9,
+                      wordBreak: 'keep-all', overflowWrap: 'break-word',
+                    }}>
+                      {bioText}
+                    </p>
+                  )}
+                </DetailSection>
+              )
+            })()}
 
             {/* 약력 */}
             {hasContent.careers && (
@@ -336,7 +348,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {lectureTopics.map((topic, idx) => (
                     <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
-                      <span style={{ color: 'var(--color-green)', flexShrink: 0, lineHeight: 1.8 }}>›</span>
+                      <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
                       <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontSize: '14px', fontWeight: 400 }}>{topic}</span>
                     </li>
                   ))}
