@@ -339,10 +339,9 @@ export default async function HomePage() {
 
         {/* ── SPEAKERS ── */}
         <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)', background: '#F7F3EC' }} id="speakers">
-          <div className="section-hd" style={{
+          <div style={{
             display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-            padding: '28px var(--space-page) 22px',
-            borderBottom: '1px solid var(--color-border)',
+            padding: '28px var(--space-page) 20px',
           }}>
             <h2 style={{
               fontFamily: 'var(--font-display)', fontWeight: 900,

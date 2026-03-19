@@ -129,7 +129,9 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
         .sp-card-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
+          column-gap: 20px;
+          row-gap: 24px;
+          background: transparent;
           min-height: 340px;
         }
         @media (max-width: 860px) {
@@ -299,7 +301,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
 
       {/* 카드 그리드 */}
       <div
-        style={{ padding: '20px var(--space-page) 0' }}
+        style={{ padding: '16px var(--space-page) 24px' }}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
