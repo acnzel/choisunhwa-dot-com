@@ -144,7 +144,7 @@ export default function SpeakerList({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[#e8e4dd]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {speakers.map((speaker) => {
             const fields = (speaker.fields ?? []).filter(f => !f.startsWith('~') && fieldMap[f])
             const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
@@ -152,17 +152,15 @@ export default function SpeakerList({
               <Link
                 key={speaker.id}
                 href={`/speakers/${speaker.id}`}
-                className="group flex flex-row bg-[var(--color-bg)] hover:bg-[#f5f1ea] transition-colors overflow-hidden"
-                style={{ minHeight: 110, textDecoration: 'none', color: 'inherit' }}
+                className="group bg-white border border-[#ede9e3] hover:border-[#1D4229] hover:shadow-md transition-all overflow-hidden"
+                style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}
               >
-                {/* 좌측 컬러라인 */}
-                <div style={{ width: 3, flexShrink: 0, background: fields.length ? '#2B4238' : '#e0ddd7' }} />
-
-                {/* 사진 — 100×100 정사각형 */}
+                {/* 사진 — 정사각형 */}
                 <div style={{
-                  position: 'relative', width: 96, height: 96, flexShrink: 0,
-                  background: '#f0ede8', alignSelf: 'center', margin: '10px 0 10px 12px',
+                  position: 'relative',
+                  aspectRatio: '1 / 1',
                   overflow: 'hidden',
+                  background: '#f0ede8',
                 }}>
                   {speaker.photo_url ? (
                     <Image
@@ -170,28 +168,28 @@ export default function SpeakerList({
                       alt={speaker.name}
                       fill
                       style={{ objectFit: 'cover', objectPosition: 'top center' }}
-                      sizes="96px"
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center text-gray-300">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                     </div>
                   )}
                 </div>
 
-                {/* 정보 — 우측 */}
-                <div style={{
-                  flex: 1, padding: '12px 14px', display: 'flex',
-                  flexDirection: 'column', justifyContent: 'center', gap: 4, minWidth: 0,
-                }}>
+                {/* 딥그린 액센트 */}
+                <div style={{ height: 3, background: '#1D4229' }} />
+
+                {/* 텍스트 */}
+                <div style={{ padding: '12px 13px 14px' }}>
                   {/* 이름 */}
                   <div style={{
                     fontFamily: 'var(--font-display, serif)', fontWeight: 800,
-                    fontSize: 16, letterSpacing: '-0.02em', lineHeight: 1.15,
-                    color: '#1a1a2e', whiteSpace: 'nowrap',
-                    overflow: 'hidden', textOverflow: 'ellipsis',
+                    fontSize: 15, letterSpacing: '-0.02em', lineHeight: 1.2,
+                    color: '#1a1a2e', marginBottom: 4,
+                    overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                   }}>
                     {speaker.name}
                   </div>
@@ -199,27 +197,27 @@ export default function SpeakerList({
                   {/* 직함 · 소속 */}
                   {subText && (
                     <div style={{
-                      fontSize: 11, fontWeight: 300, color: '#888',
+                      fontSize: 11, color: '#888', marginBottom: 8,
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
                       {subText}
                     </div>
                   )}
 
-                  {/* 강의 분야 태그 */}
+                  {/* 분야 태그 */}
                   {fields.length > 0 && (
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, marginTop: 2 }}>
-                      {fields.slice(0, 4).map(f => (
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                      {fields.slice(0, 3).map(f => (
                         <span key={f} style={{
                           fontSize: 9, fontWeight: 600, padding: '2px 6px',
-                          border: '1px solid #2B423840', color: '#2B4238',
-                          whiteSpace: 'nowrap', letterSpacing: '0.04em',
+                          border: '1px solid #1D422930', color: '#1D4229',
+                          whiteSpace: 'nowrap', letterSpacing: '0.03em',
                         }}>
                           {fieldMap[f]}
                         </span>
                       ))}
-                      {fields.length > 4 && (
-                        <span style={{ fontSize: 9, color: '#aaa', padding: '2px 0' }}>+{fields.length - 4}</span>
+                      {fields.length > 3 && (
+                        <span style={{ fontSize: 9, color: '#aaa', padding: '2px 0' }}>+{fields.length - 3}</span>
                       )}
                     </div>
                   )}
