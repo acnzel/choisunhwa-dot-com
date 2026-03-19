@@ -6,7 +6,7 @@ import FeaturedSpeakerCard from '@/components/featured/FeaturedSpeakerCard'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: '에디터 추천 강사',
+  title: '에디터 픽',
   description: '최선화닷컴 에디터가 직접 엄선한 추천 강사를 만나보세요.',
 }
 
@@ -48,7 +48,7 @@ export default async function FeaturedSpeakersPage() {
             fontSize: 'clamp(24px, 3vw, 40px)',
             letterSpacing: '-0.03em', lineHeight: 1,
           }}>
-            에디터 추천 강사
+            에디터 픽
           </h2>
           <p style={{
             fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)',
@@ -74,7 +74,7 @@ export default async function FeaturedSpeakersPage() {
             fontSize: '14px', color: 'var(--color-muted)',
             letterSpacing: '0.04em',
           }}>
-            아직 등록된 에디터 추천 강사가 없습니다.
+            아직 등록된 에디터 픽가 없습니다.
           </p>
         </div>
       )}

@@ -4,7 +4,7 @@ import type { Insight } from '@/types'
 
 const TYPE_LABEL: Record<string, string> = {
   issue:  '인사이트',
-  report: '강연 현장',
+  report: '현장 스토리',
   pick:   '에디터 픽',
 }
 const TYPE_COLOR: Record<string, string> = {

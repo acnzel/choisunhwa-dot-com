@@ -29,7 +29,7 @@ export default function FeaturedSection({ items }: Props) {
           fontFamily: 'var(--font-display)', fontWeight: 900,
           fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
         }}>
-          에디터 추천 강사{' '}
+          에디터 픽{' '}
           <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
             Editor's Pick
           </span>

@@ -59,7 +59,7 @@ export default function FeaturedSpeakersAdminPage() {
       // API returns { data: [...], meta: {...} }
       setItems(Array.isArray(res) ? res : (res.data ?? []))
     } catch {
-      setError('에디터 추천 강사 목록을 불러오지 못했습니다.')
+      setError('에디터 픽 목록을 불러오지 못했습니다.')
     } finally {
       setLoading(false)
     }
@@ -192,7 +192,7 @@ export default function FeaturedSpeakersAdminPage() {
       {/* 헤더 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
         <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1a1a2e', margin: 0 }}>⭐ 에디터 추천 강사</h1>
+          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1a1a2e', margin: 0 }}>⭐ 에디터 픽</h1>
           <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
             홈 메인 및 인사이트 탭에 노출할 강사를 관리합니다.
           </p>
@@ -233,7 +233,7 @@ export default function FeaturedSpeakersAdminPage() {
           textAlign: 'center', padding: '60px 0',
           border: '2px dashed #e5e7eb', borderRadius: '12px',
         }}>
-          <p style={{ fontSize: '14px', color: '#9ca3af' }}>등록된 에디터 추천 강사가 없습니다.</p>
+          <p style={{ fontSize: '14px', color: '#9ca3af' }}>등록된 에디터 픽가 없습니다.</p>
           <p style={{ fontSize: '13px', color: '#d1d5db', marginTop: '6px' }}>위의 "강사 추가" 버튼을 눌러 시작하세요.</p>
         </div>
       )}
@@ -364,7 +364,7 @@ export default function FeaturedSpeakersAdminPage() {
               삭제하시겠습니까?
             </p>
             <p style={{ fontSize: '13px', color: '#6b7280', marginBottom: '24px' }}>
-              에디터 추천 강사에서 제거됩니다.
+              에디터 픽에서 제거됩니다.
             </p>
             <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
               <button onClick={() => setDeleteId(null)} style={{ padding: '10px 24px', fontSize: '13px', border: '1px solid #e5e7eb', borderRadius: '8px', cursor: 'pointer', background: '#fff', color: '#374151' }}>
@@ -395,7 +395,7 @@ export default function FeaturedSpeakersAdminPage() {
             maxHeight: '90vh', overflowY: 'auto',
           }}>
             <h2 style={{ fontSize: '18px', fontWeight: 700, color: '#1a1a2e', marginBottom: '24px' }}>
-              {modal === 'add' ? '에디터 추천 강사 추가' : '에디터 추천 강사 수정'}
+              {modal === 'add' ? '에디터 픽 추가' : '에디터 픽 수정'}
             </h2>
 
             {/* 에러 */}

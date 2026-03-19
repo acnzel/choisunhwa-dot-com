@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const admin = createAdminClient()
   const { data } = await admin.from('insights').select('title, summary').eq('id', id).single()
-  if (!data) return { title: '강연 현장' }
+  if (!data) return { title: '현장 스토리' }
   return {
     title: data.title,
     description: data.summary ?? undefined,

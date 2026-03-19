@@ -4,8 +4,8 @@ import InsightCard from '@/components/insights/InsightCard'
 import type { Insight, InsightMetaReport } from '@/types'
 
 export const metadata: Metadata = {
-  title: '강연 현장',
-  description: '실제 진행된 강연의 현장 리포트 — 최선화닷컴이 함께한 강연 현장',
+  title: '현장 스토리',
+  description: '실제 진행된 강연의 현장 리포트 — 최선화닷컴이 함께한 현장 스토리',
 }
 
 async function getReports(): Promise<Insight[]> {

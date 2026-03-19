@@ -347,7 +347,7 @@ export default async function HomePage() {
                 fontFamily: 'var(--font-display)', fontWeight: 900,
                 fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
               }}>
-                에디터 추천 강사{' '}
+                에디터 픽{' '}
                 <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
                   Editor's Pick
                 </span>
@@ -424,7 +424,7 @@ export default async function HomePage() {
                 >
                   <div>
                     <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-ochre)', marginBottom: '12px' }}>
-                      {hero.type === 'issue' ? '트렌드 브리핑' : hero.type === 'report' ? '강연 현장' : '에디터 추천'}
+                      {hero.type === 'issue' ? '인사이트' : hero.type === 'report' ? '현장 스토리' : '에디터 픽'}
                     </div>
                     <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 26px)', letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '10px', color: 'var(--color-bg)' }}>
                       {hero.title}
@@ -453,7 +453,7 @@ export default async function HomePage() {
                   }}
                 >
                   <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
-                    {item.type === 'issue' ? '트렌드 브리핑' : item.type === 'report' ? '강연 현장' : '에디터 추천'}
+                    {item.type === 'issue' ? '인사이트' : item.type === 'report' ? '현장 스토리' : '에디터 픽'}
                   </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '16px', letterSpacing: '-0.02em', lineHeight: 1.45, color: 'var(--color-ink)' }}>
                     {item.title}

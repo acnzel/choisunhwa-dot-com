@@ -9,7 +9,7 @@ const NAV_ITEMS = [
   { href: '/mong-bab/dashboard', label: '대시보드', icon: '📊' },
   { href: '/mong-bab/speakers',              label: '강사 관리',    icon: '🎤' },
   { href: '/mong-bab/speaker-applications', label: '강사 신청 검토', icon: '📝' },
-  { href: '/mong-bab/featured-speakers',    label: '에디터 추천 강사',  icon: '⭐' },
+  { href: '/mong-bab/featured-speakers',    label: '에디터 픽',  icon: '⭐' },
   { href: '/mong-bab/lectures',  label: '강연 관리', icon: '📋' },
   { href: '/mong-bab/insights',  label: '인사이트 관리', icon: '✍️' },
   { href: '/mong-bab/inquiries', label: '문의 관리', icon: '💬' },
