@@ -297,26 +297,26 @@ Response: {
 - `InsightsTabs.tsx` — 탭 레이블 인사이트 / 현장 스토리 / 에디터 픽 ✅
 - HTTP 라우트 전체 200 OK (issue ✅ / report ✅ / featured ✅)
 
-### ❌ 구버전 텍스트 잔류 (수정 필요) → @frontend
+### ✅ N-001~N-013 전체 수정 완료 — @dev (commit `f1dcfa3`)
 
-| # | 파일 | 잔류 텍스트 | 교체 필요 |
-|---|------|------------|---------|
-| N-001 | `src/app/insights/report/page.tsx` | `title: '강연 현장'`, `description: '...강연 현장'` | → 현장 스토리 |
-| N-002 | `src/app/insights/report/[id]/page.tsx` | fallback `title: '강연 현장'` | → 현장 스토리 |
-| N-003 | `src/app/mong-bab/insights/InsightForm.tsx` | `label: '강연 현장'` (드롭다운) | → 현장 스토리 |
-| N-004 | `src/app/mong-bab/insights/page.tsx` | `report: '강연 현장'` (타입 레이블 맵) | → 현장 스토리 |
-| N-005 | `src/components/insights/InsightCard.tsx` | `report: '강연 현장'` (TYPE_LABEL 맵) | → 현장 스토리 |
-| N-006 | `src/components/insights/InsightDetail.tsx` | `report: '강연 현장'` (TYPE_LABEL 맵) | → 현장 스토리 |
-| N-007 | `src/app/page.tsx` (홈 배지) | `'트렌드 브리핑'` (issue 타입) | → 인사이트 |
-| N-008 | `src/app/page.tsx` (홈 배지) | `'강연 현장'` (report 타입) | → 현장 스토리 |
-| N-009 | `src/app/page.tsx` (홈 섹션 헤딩 L350) | `에디터 추천 강사` | → 에디터 픽 |
-| N-010 | `src/app/insights/featured/page.tsx` | `title: '에디터 추천 강사'`, UI 텍스트 전체 | → 에디터 픽 |
-| N-011 | `src/app/FeaturedSection.tsx` | `에디터 추천 강사` (섹션 헤딩) | → 에디터 픽 |
-| N-012 | `src/app/mong-bab/AdminSidebar.tsx` | `label: '에디터 추천 강사'` (사이드바) | → 에디터 픽 |
-| N-013 | `src/app/mong-bab/featured-speakers/page.tsx` | `에디터 추천 강사` 다수 (h1, error, modal 등) | → 에디터 픽 |
+| # | 파일 | 수정 내용 | 상태 |
+|---|------|----------|------|
+| N-001 | `src/app/insights/report/page.tsx` | 강연 현장 → 현장 스토리 | ✅ |
+| N-002 | `src/app/insights/report/[id]/page.tsx` | fallback title 수정 | ✅ |
+| N-003 | `src/app/mong-bab/insights/InsightForm.tsx` | 드롭다운 label 수정 | ✅ |
+| N-004 | `src/app/mong-bab/insights/page.tsx` | 타입 레이블 맵 수정 | ✅ |
+| N-005 | `src/components/insights/InsightCard.tsx` | TYPE_LABEL 맵 수정 | ✅ |
+| N-006 | `src/components/insights/InsightDetail.tsx` | TYPE_LABEL 맵 수정 | ✅ |
+| N-007 | `src/app/page.tsx` | 트렌드 브리핑 → 인사이트 | ✅ |
+| N-008 | `src/app/page.tsx` | 강연 현장 → 현장 스토리 | ✅ |
+| N-009 | `src/app/page.tsx` | 에디터 추천 강사 → 에디터 픽 | ✅ |
+| N-010 | `src/app/insights/featured/page.tsx` | 에디터 추천 강사 → 에디터 픽 (전체) | ✅ |
+| N-011 | `src/app/FeaturedSection.tsx` | 섹션 헤딩 수정 | ✅ |
+| N-012 | `src/app/mong-bab/AdminSidebar.tsx` | 사이드바 메뉴 수정 | ✅ |
+| N-013 | `src/app/mong-bab/featured-speakers/page.tsx` | h1/error/modal 등 전체 수정 | ✅ |
 
-**총 13곳 잔류. 탭 레이블은 정상이나 페이지 메타데이터·카드 배지·어드민 UI·홈 섹션에서 구버전 노출 중.**
+**11개 파일, 20→20 교체 완료. Vercel 자동 배포 중.**
 
-### 요청사항
-@frontend: 위 N-001~N-013 일괄 수정 후 재배포 + QA 재검수 요청 부탁드립니다.
+### 재검수 요청
+@qa: N-001~N-013 재검수 부탁드립니다. commit `f1dcfa3`
 
