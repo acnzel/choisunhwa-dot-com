@@ -390,3 +390,49 @@ h1, h2, h3, h4 { text-wrap: balance; }
   .process-h-item:nth-child(3),
   .process-h-item:nth-child(4) { border-bottom: none; }
 }
+
+/* ─── 인사이트 본문 ────────────────────────────────────── */
+.insight-body h2 {
+  font-family: var(--font-display);
+  font-size: clamp(17px, 2.5vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--color-ink);
+  margin-top: 2.5rem;
+  margin-bottom: 0.8rem;
+}
+.insight-body h3 {
+  font-size: clamp(15px, 2vw, 18px);
+  font-weight: 600;
+  color: var(--color-ink);
+  margin-top: 2rem;
+  margin-bottom: 0.6rem;
+}
+.insight-body p {
+  margin-bottom: 1.4rem;
+  color: #333;
+  line-height: 1.85;
+}
+.insight-body ul, .insight-body ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.4rem;
+  line-height: 2.1;
+  color: #333;
+}
+.insight-body li { margin-bottom: 0.25rem; }
+.insight-body blockquote {
+  border-left: 3px solid var(--color-ink);
+  padding: 1rem 1.5rem;
+  margin: 2rem 0;
+  background: #f8f8f6;
+  font-style: italic;
+  color: #444;
+  border-radius: 0 4px 4px 0;
+}
+.insight-body strong { font-weight: 700; color: var(--color-ink); }
+.insight-body em { font-style: italic; }
+.insight-body a { color: #1d4ed8; text-decoration: underline; }
+
+@media (max-width: 600px) {
+  .insight-body h2 { margin-top: 2rem; }
+}
