@@ -649,3 +649,27 @@ cheil.com 레이아웃 특징:
 - 코드 레벨 수정 완료 (commit 8cb6779)
 - DB 고아 레코드 없음 확인
 - 브라우저 테스트: 스캇이 `/mong-bab/featured-speakers` 직접 진입해서 에러 발생 시 화면 캡처 요청
+
+---
+
+## BUG-N-014 공식 QA CLOSE ✅ (commit 50eea9d)
+
+**검수일:** 2025-03-19
+**테스트:** Playwright E2E — chromium + Mobile Chrome, 10/10 PASS
+
+### 테스트 결과
+
+| 태그 | 기대 필드 | 강사 수 | 결과 |
+|------|----------|--------|------|
+| 번아웃 | 심리 | 1명+ | ✅ PASS |
+| 팀장 | 리더십 | 1명+ | ✅ PASS |
+| MZ세대 | HR | 1명+ | ✅ PASS |
+| 조직문화 | HR | 1명+ | ✅ PASS |
+| MZ세대 = 조직문화 (교집합 검증) | HR | 동일세트 | ✅ PASS |
+
+### 교차 검증 (alt 이름 기준)
+- 팀장(category) → 리더십(field) 동일 강사 세트 확인
+- MZ세대(category) = 조직문화(category) → HR 동일 강사 세트 확인
+- 번아웃(category) → 심리 강사 (리더십과 다른 별개 세트) 확인
+
+**BUG-N-014 공식 CLOSE ✅**
