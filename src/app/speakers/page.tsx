@@ -70,37 +70,29 @@ export default async function SpeakersPage({
   const { speakers, total, page, totalPages, field, q } = await getSpeakers(params)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F5F0E8' }}>
+    <div style={{ minHeight: '100vh', background: '#F7F3EE', paddingTop: 'var(--nav-height)' }}>
 
-      {/* ── 히어로 배너 (딥그린) ── */}
+      {/* ── 페이지 헤더 (딥그린) ── */}
       <div style={{
         background: '#1E3A2F',
-        padding: 'clamp(40px, 6vw, 72px) clamp(20px, 5vw, 80px) clamp(32px, 5vw, 56px)',
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-        gap: 24,
+        padding: 'clamp(28px, 4vw, 44px) clamp(20px, 5vw, 60px)',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
       }}>
         <div>
-          <div style={{
-            fontSize: 10, fontWeight: 700, letterSpacing: '3px',
-            color: '#C8962A', textTransform: 'uppercase', marginBottom: 12,
-          }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '3px', color: '#C8962A', textTransform: 'uppercase', marginBottom: 8 }}>
             Speaker Lineup · 2026
-          </div>
+          </p>
           <h1 style={{
             fontFamily: 'var(--font-display, serif)',
-            fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.1,
-            color: '#fff', letterSpacing: '-0.04em', marginBottom: 14,
+            fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 900,
+            color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.15,
           }}>
-            당신의 시간을<br />
-            <span style={{ color: '#C8962A' }}>바꿀 전문가</span>
+            강사 라인업
           </h1>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7 }}>
-            각 분야를 이끄는 강사진이 지식과 인사이트를 나눕니다.
-          </p>
         </div>
         <div style={{
-          fontSize: 'clamp(48px, 8vw, 88px)', fontWeight: 900,
-          color: 'rgba(255,255,255,0.06)', letterSpacing: '-4px', lineHeight: 1,
+          fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 900,
+          color: 'rgba(255,255,255,0.07)', letterSpacing: '-3px', lineHeight: 1,
           whiteSpace: 'nowrap', flexShrink: 0,
         }}>
           {total.toLocaleString()}
@@ -108,7 +100,7 @@ export default async function SpeakersPage({
       </div>
 
       {/* ── 콘텐츠 ── */}
-      <div style={{ padding: 'clamp(28px, 4vw, 48px) clamp(20px, 5vw, 80px) 80px' }}>
+      <div style={{ padding: 'clamp(24px, 3vw, 40px) clamp(20px, 5vw, 60px) 80px' }}>
         <SpeakerList
           speakers={speakers}
           total={total}
