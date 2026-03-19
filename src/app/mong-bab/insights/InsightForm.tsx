@@ -17,9 +17,9 @@ interface Props {
 }
 
 const TYPE_OPTIONS = [
-  { value: 'issue',  label: '트렌드 브리핑' },
+  { value: 'issue',  label: '인사이트' },
   { value: 'report', label: '강연 현장' },
-  { value: 'pick',   label: '에디터 추천 강사' },
+  { value: 'pick',   label: '에디터 픽' },
 ] as const
 
 export default function InsightForm({ insight, mode }: Props) {

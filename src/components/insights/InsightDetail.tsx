@@ -3,9 +3,9 @@ import Link from 'next/link'
 import type { Insight } from '@/types'
 
 const TYPE_LABEL: Record<string, string> = {
-  issue:  '트렌드 브리핑',
+  issue:  '인사이트',
   report: '강연 현장',
-  pick:   '에디터 추천 강사',
+  pick:   '에디터 픽',
 }
 const TYPE_COLOR: Record<string, string> = {
   issue:  '#1d4ed8',

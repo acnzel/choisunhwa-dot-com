@@ -23,9 +23,9 @@ const NAV_ITEMS: NavItem[] = [
     href: '/insights',
     label: '강연 인사이트',
     submenu: [
-      { href: '/insights/issue',     label: '트렌드 브리핑' },
-      { href: '/insights/report',    label: '강연 현장' },
-      { href: '/insights/featured',  label: '에디터 추천 강사' },
+      { href: '/insights/issue',     label: '인사이트' },
+      { href: '/insights/report',    label: '현장 스토리' },
+      { href: '/insights/featured',  label: '에디터 픽' },
     ],
   },
   { href: '/matching?step=1', label: '강사 매칭 신청' },
