@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: '최선화닷컴의 검증된 전문 강사들을 만나보세요.',
 }
 
-const PAGE_SIZE = 25
+const PAGE_SIZE = 20
 const FIELD_MAP = buildFieldMap()
 
 interface SearchParams {
@@ -66,13 +66,13 @@ export default async function SpeakersPage({
   const { speakers, total, page, totalPages, field, q } = await getSpeakers(params)
 
   return (
-    <div style={{ minHeight: '100vh', background: '#F7F3EE', paddingTop: 'var(--nav-height)' }}>
+    <div style={{ minHeight: '100vh', background: '#F7F3EE' }}>
 
-      {/* ── 페이지 헤더 ── */}
+      {/* ── 페이지 헤더 — paddingTop으로 nav 높이 처리 (흰 띠 방지) ── */}
       <div style={{
         background: '#EDE6DC',
         borderBottom: '1px solid #DDD5C8',
-        padding: '52px clamp(20px, 4vw, 48px) 40px',
+        padding: 'calc(var(--nav-height) + 36px) clamp(20px, 4vw, 48px) 40px',
       }}>
         <div style={{ maxWidth: 1400, margin: '0 auto' }}>
           <p style={{
