@@ -12,6 +12,14 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'lh3.googleusercontent.com', // Google 프로필 이미지
       },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com', // 트렌드 브리핑 썸네일
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.pexels.com', // 외부 이미지 소스
+      },
     ],
   },
   async redirects() {
