@@ -189,7 +189,11 @@ export default function Header() {
             return (
               <div
                 key={href}
-                style={{ position: 'relative', paddingBottom: hasSubmenu ? '8px' : '0' }}
+                style={{
+                  position: 'relative',
+                  /* 모든 아이템 동일 padding → alignItems:center 수직 정렬 통일 */
+                  paddingTop: '8px', paddingBottom: '8px',
+                }}
                 onMouseEnter={() => hasSubmenu ? onNavMouseEnter(href) : undefined}
                 onMouseLeave={() => hasSubmenu ? onNavMouseLeave() : undefined}
               >
