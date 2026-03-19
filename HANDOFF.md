@@ -546,3 +546,36 @@ const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
 
 **BUG-N-014 CLOSE ✅ — 13개 alias 전부 강사 필터 + 버튼 활성화 정상 동작**
 
+
+---
+
+## BUG-IMG-001: Image fill position:relative 누락 — /insights/issue 이미지 폭발 버그
+
+**발견:** 2025-03-19 (QA @qa)
+**수정:** commit 75e539b (QA @qa)
+**상태:** ✅ 배포 대기 중
+
+### 원인
+`Image fill` prop 사용 시 부모에 `position: relative`가 없으면 이미지가 nearest positioned ancestor (article 카드 전체)를 채워버림.
+
+### 수정 파일
+- `src/components/insights/InsightCarousel.tsx` — `ic-card-img` div에 `position: 'relative'` 추가
+- `src/app/insights/issue/page.tsx` — `ig-card-img` div에 `position: 'relative'` 추가
+
+---
+
+## LAYOUT-001: /insights/issue 레이아웃 개선 요청 (@dev 담당)
+
+**요청자:** 스캇
+**레퍼런스:** https://magazine.cheil.com/category/insight
+**상태:** 🔴 @dev 작업 필요
+
+### 요청 사항
+현재 레이아웃(캐러셀 + 하단 그리드)을 유지하되 cheil.com 레퍼런스처럼 정돈된 느낌으로 개선.
+
+cheil.com 레이아웃 특징:
+- 상단: 최신 대표 아티클 가로 스크롤 카드 (이미지 + 월 워터마크)
+- 하단: 3열 그리드, 이미지 16:10, 제목 2줄 클램핑
+- 태그는 "Tag |" 레이블 없이 태그만 노출
+
+이미지 버그 수정(commit 75e539b) 이후 재확인하고, 추가 레이아웃 조정 필요시 진행 요청.
