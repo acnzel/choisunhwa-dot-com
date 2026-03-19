@@ -180,11 +180,9 @@ export default async function IssuePage() {
 
                         {/* 태그 — Link 밖 */}
                         {tags.length > 0 && (
-                          <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 0' }}>
-                            <span style={{ fontSize: 12, fontWeight: 700, color: 'var(--color-ink)', marginRight: 8 }}>Tag</span>
-                            <span style={{ color: '#CCC', marginRight: 8, fontSize: 12 }}>|</span>
+                          <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 8px' }}>
                             {tags.map((tag) => (
-                              <Link key={tag} href={`/speakers?category=${encodeURIComponent(tag)}`} className="ig-tag-kw" style={{ marginRight: 8 }}>
+                              <Link key={tag} href={`/speakers?category=${encodeURIComponent(tag)}`} className="ig-tag-kw">
                                 {tag}
                               </Link>
                             ))}

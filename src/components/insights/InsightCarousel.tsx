@@ -157,11 +157,9 @@ export default function InsightCarousel({ items }: Props) {
 
               {/* 태그 — Link 밖 (a inside a 방지) */}
               {tags.length > 0 && (
-                <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 0', position: 'relative', zIndex: 1 }}>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--color-ink)', marginRight: 8 }}>Tag</span>
-                  <span style={{ color: '#CCC', marginRight: 8, fontSize: 13 }}>|</span>
+                <div style={{ display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: '4px 6px', position: 'relative', zIndex: 1 }}>
                   {tags.map((tag) => (
-                    <Link key={tag} href={`/speakers?category=${encodeURIComponent(tag)}`} className="ic-tag-kw" style={{ marginRight: 10 }}>
+                    <Link key={tag} href={`/speakers?category=${encodeURIComponent(tag)}`} className="ic-tag-kw">
                       {tag}
                     </Link>
                   ))}
