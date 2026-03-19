@@ -7,7 +7,7 @@ import HeroTicker from './HeroTicker'
 import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import RevealOnScroll from '@/components/RevealOnScroll'
-import FeaturedSection from './FeaturedSection'
+// FeaturedSection은 홈에서 제거됨 (SpeakerTabs 이달의 강사 탭과 중복)
 
 const FIELD_MAP = buildFieldMap()
 
@@ -360,8 +360,7 @@ export default async function HomePage() {
           </Suspense>
         </section>
 
-        {/* ── 이달의 강사 — home_visible=true 항목만 노출 ── */}
-        <FeaturedSection items={featuredItems.filter(f => f.home_visible && f.speaker != null)} />
+        {/* FeaturedSection 제거 — SpeakerTabs "이달의 강사" 탭과 중복 */}
 
         {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}
         {showInsight && (

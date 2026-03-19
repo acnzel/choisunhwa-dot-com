@@ -79,7 +79,7 @@ export default async function SpeakersPage({
         display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
       }}>
         <div>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '3px', color: '#C8962A', textTransform: 'uppercase', marginBottom: 8 }}>
+          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '3px', color: '#1D4229', textTransform: 'uppercase', marginBottom: 8 }}>
             Speaker Lineup · 2026
           </p>
           <h1 style={{
