@@ -285,3 +285,38 @@ Response: {
 - 강사 카드 클릭 → `POST /api/matching/click` (선택적 로그)
 - `match_reasons` 배열 → 추천 이유 뱃지로 노출
 - `fallback: true` → "맞춤 강사를 찾는 중이에요. 추천 강사를 소개해드릴게요." 문구
+
+---
+
+## 🔍 QA 검수: 네이밍 리뉴얼 (commit f316593) — 2026-03-19
+
+### 검수 범위
+`InsightsTabs.tsx`, `InsightCard.tsx`, `InsightDetail.tsx`, `InsightForm.tsx`, `featured/page.tsx`, `report/page.tsx`, `page.tsx`, `AdminSidebar.tsx`
+
+### ✅ 정상 반영
+- `InsightsTabs.tsx` — 탭 레이블 인사이트 / 현장 스토리 / 에디터 픽 ✅
+- HTTP 라우트 전체 200 OK (issue ✅ / report ✅ / featured ✅)
+
+### ❌ 구버전 텍스트 잔류 (수정 필요) → @frontend
+
+| # | 파일 | 잔류 텍스트 | 교체 필요 |
+|---|------|------------|---------|
+| N-001 | `src/app/insights/report/page.tsx` | `title: '강연 현장'`, `description: '...강연 현장'` | → 현장 스토리 |
+| N-002 | `src/app/insights/report/[id]/page.tsx` | fallback `title: '강연 현장'` | → 현장 스토리 |
+| N-003 | `src/app/mong-bab/insights/InsightForm.tsx` | `label: '강연 현장'` (드롭다운) | → 현장 스토리 |
+| N-004 | `src/app/mong-bab/insights/page.tsx` | `report: '강연 현장'` (타입 레이블 맵) | → 현장 스토리 |
+| N-005 | `src/components/insights/InsightCard.tsx` | `report: '강연 현장'` (TYPE_LABEL 맵) | → 현장 스토리 |
+| N-006 | `src/components/insights/InsightDetail.tsx` | `report: '강연 현장'` (TYPE_LABEL 맵) | → 현장 스토리 |
+| N-007 | `src/app/page.tsx` (홈 배지) | `'트렌드 브리핑'` (issue 타입) | → 인사이트 |
+| N-008 | `src/app/page.tsx` (홈 배지) | `'강연 현장'` (report 타입) | → 현장 스토리 |
+| N-009 | `src/app/page.tsx` (홈 섹션 헤딩 L350) | `에디터 추천 강사` | → 에디터 픽 |
+| N-010 | `src/app/insights/featured/page.tsx` | `title: '에디터 추천 강사'`, UI 텍스트 전체 | → 에디터 픽 |
+| N-011 | `src/app/FeaturedSection.tsx` | `에디터 추천 강사` (섹션 헤딩) | → 에디터 픽 |
+| N-012 | `src/app/mong-bab/AdminSidebar.tsx` | `label: '에디터 추천 강사'` (사이드바) | → 에디터 픽 |
+| N-013 | `src/app/mong-bab/featured-speakers/page.tsx` | `에디터 추천 강사` 다수 (h1, error, modal 등) | → 에디터 픽 |
+
+**총 13곳 잔류. 탭 레이블은 정상이나 페이지 메타데이터·카드 배지·어드민 UI·홈 섹션에서 구버전 노출 중.**
+
+### 요청사항
+@frontend: 위 N-001~N-013 일괄 수정 후 재배포 + QA 재검수 요청 부탁드립니다.
+
