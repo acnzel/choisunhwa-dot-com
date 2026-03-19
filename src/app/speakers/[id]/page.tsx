@@ -281,19 +281,22 @@ export default async function SpeakerDetailPage({ params }: Props) {
               <DetailSection title="약력">
                 <ul style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {careers.map((career, idx) => (
-                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '14px' }}>
-                      {career.year && (
-                        <span style={{
-                          fontFamily: 'var(--font-english)', fontWeight: 700,
-                          fontSize: '11px', letterSpacing: '0.06em',
-                          color: 'var(--color-muted)', whiteSpace: 'nowrap',
-                          width: '52px', flexShrink: 0, paddingTop: '3px',
-                        }}>
-                          {career.year}
+                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px' }}>
+                      <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
+                      <span style={{ display: 'flex', gap: '12px', flex: 1 }}>
+                        {career.year && (
+                          <span style={{
+                            fontFamily: 'var(--font-english)', fontWeight: 700,
+                            fontSize: '11px', letterSpacing: '0.06em',
+                            color: 'var(--color-muted)', whiteSpace: 'nowrap',
+                            flexShrink: 0, paddingTop: '3px',
+                          }}>
+                            {career.year}
+                          </span>
+                        )}
+                        <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>
+                          {career.content}
                         </span>
-                      )}
-                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>
-                        {career.content}
                       </span>
                     </li>
                   ))}
@@ -306,18 +309,21 @@ export default async function SpeakerDetailPage({ params }: Props) {
               <DetailSection title="학력">
                 <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {education.map((edu, idx) => (
-                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '14px' }}>
-                      {edu.year && (
-                        <span style={{
-                          fontFamily: 'var(--font-english)', fontWeight: 700,
-                          fontSize: '11px', letterSpacing: '0.06em',
-                          color: 'var(--color-muted)', whiteSpace: 'nowrap',
-                          width: '52px', flexShrink: 0, paddingTop: '3px',
-                        }}>
-                          {edu.year}
-                        </span>
-                      )}
-                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>{edu.content}</span>
+                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px' }}>
+                      <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
+                      <span style={{ display: 'flex', gap: '12px', flex: 1 }}>
+                        {edu.year && (
+                          <span style={{
+                            fontFamily: 'var(--font-english)', fontWeight: 700,
+                            fontSize: '11px', letterSpacing: '0.06em',
+                            color: 'var(--color-muted)', whiteSpace: 'nowrap',
+                            flexShrink: 0, paddingTop: '3px',
+                          }}>
+                            {edu.year}
+                          </span>
+                        )}
+                        <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>{edu.content}</span>
+                      </span>
                     </li>
                   ))}
                 </ul>
@@ -540,21 +546,36 @@ function DetailSection({
   children: React.ReactNode
   className?: string
 }) {
+  const SECTION_ICONS: Record<string, string> = {
+    '강연 주제':     '✦',
+    '약력':         '◈',
+    '학력':         '◈',
+    '강연 커리큘럼': '▸',
+    '저서':         '◉',
+    '참고영상':      '▶',
+    '보유 커리큘럼': '▸',
+  }
+  const icon = SECTION_ICONS[title] ?? '◆'
+
   return (
     <section
       className={className}
       style={{ borderBottom: '1px solid var(--color-border)', padding: 'clamp(24px, 4vw, 40px) var(--space-page)' }}
     >
       <h2 style={{
-        display: 'flex', alignItems: 'center', gap: '10px',
+        display: 'flex', alignItems: 'center', gap: '8px',
         fontFamily: 'var(--font-display)', fontWeight: 900,
-        fontSize: '16px', letterSpacing: '-0.01em',
-        color: 'var(--color-ink)', marginBottom: '20px',
+        fontSize: '18px', letterSpacing: '-0.02em',
+        color: 'var(--color-ink)', marginBottom: '22px',
       }}>
         <span style={{
-          display: 'inline-block', width: '4px', height: '16px',
-          background: 'var(--color-green)', borderRadius: '2px', flexShrink: 0,
-        }} />
+          fontSize: '14px',
+          color: 'var(--color-green)',
+          flexShrink: 0,
+          lineHeight: 1,
+        }}>
+          {icon}
+        </span>
         {title}
       </h2>
       {children}
