@@ -100,6 +100,9 @@ export default async function SpeakerDetailPage({ params }: Props) {
             border-left: none !important;
             border-top: 1px solid var(--color-border) !important;
           }
+          .sp-header-info {
+            padding-right: 0 !important;
+          }
         }
         /* 미디어 링크 */
         .media-link:hover { color: var(--color-rust) !important; }
@@ -167,7 +170,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
             </div>
 
             {/* 기본 정보 */}
-            <div>
+            <div className="sp-header-info" style={{ paddingRight: '320px' }}>
               {/* 강연 분야 카테고리 태그 — 헤더 상단 */}
               {speaker.fields.some(f => !f.startsWith('~') && FIELD_MAP[f]) && (
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '14px' }}>
