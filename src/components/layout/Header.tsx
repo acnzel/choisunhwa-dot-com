@@ -69,7 +69,7 @@ export default function Header() {
     setHoverItem(href)
   }
   const onNavMouseLeave = () => {
-    hoverTimeout.current = setTimeout(() => setHoverItem(null), 120)
+    hoverTimeout.current = setTimeout(() => setHoverItem(null), 300)
   }
 
   async function handleLogout() {
@@ -91,7 +91,7 @@ export default function Header() {
         /* 서브메뉴 드롭다운 */
         .nav-dropdown {
           position: absolute;
-          top: calc(100% + 1px);
+          top: 100%;
           left: 50%;
           transform: translateX(-50%);
           min-width: 160px;
@@ -189,7 +189,7 @@ export default function Header() {
             return (
               <div
                 key={href}
-                style={{ position: 'relative' }}
+                style={{ position: 'relative', paddingBottom: hasSubmenu ? '8px' : '0' }}
                 onMouseEnter={() => hasSubmenu ? onNavMouseEnter(href) : undefined}
                 onMouseLeave={() => hasSubmenu ? onNavMouseLeave() : undefined}
               >
