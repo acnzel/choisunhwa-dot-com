@@ -291,6 +291,14 @@ select:disabled { cursor: not-allowed; opacity: 0.5; }
 .sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(7)  { transition-delay: 0.36s; }
 .sp-card-grid.stagger-grid.visible > .sp-card:nth-child(8),
 .sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(8)  { transition-delay: 0.42s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(9),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(9)  { transition-delay: 0.48s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(10),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(10) { transition-delay: 0.54s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(11),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(11) { transition-delay: 0.60s; }
+.sp-card-grid.stagger-grid.visible > .sp-card:nth-child(12),
+.sp-card-grid-full.stagger-grid.visible > .sp-card:nth-child(12) { transition-delay: 0.66s; }
 
 /* ─ 강연 카드 그리드 스태거 ─ */
 .lecture-grid.stagger-grid > .lc-card {

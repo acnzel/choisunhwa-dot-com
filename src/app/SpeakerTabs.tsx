@@ -13,7 +13,7 @@ interface Props {
 }
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
-const PAGE_SIZE = 6   // 3열 × 2행
+const PAGE_SIZE = 12  // 최대 2행 꽉 채움 (5열 × 2행 = 10, 또는 3열 × 4행)
 const AUTO_MS  = 8000 // 8초마다 자동 롤링
 
 const FIELD_COLORS: Record<string, string> = {
@@ -180,8 +180,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
           align-items: center;
           justify-content: center;
           gap: 8px;
-          padding: 16px;
-          border-top: 1px solid var(--color-border);
+          padding: 20px 16px;
         }
         .sp-dot {
           width: 6px; height: 6px;
