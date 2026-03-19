@@ -55,11 +55,14 @@ export default function FeaturedSpeakersAdminPage() {
   // ── 데이터 로드 ─────────────────────────────────────────
   const loadItems = useCallback(async () => {
     try {
-      const res = await apiFetch('/api/featured-speakers?all=true')
+      const res = await apiFetch('/api/featured-speakers?all=true&limit=100')
       // API returns { data: [...], meta: {...} }
-      setItems(Array.isArray(res) ? res : (res.data ?? []))
-    } catch {
-      setError('에디터 픽 목록을 불러오지 못했습니다.')
+      const list = Array.isArray(res) ? res : (res.data ?? [])
+      setItems(list)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e)
+      setError(`에디터 픽 목록을 불러오지 못했습니다. (${msg})`)
+      console.error('[featured-speakers] loadItems error:', e)
     } finally {
       setLoading(false)
     }
@@ -91,8 +94,11 @@ export default function FeaturedSpeakersAdminPage() {
   }
 
   function openEdit(item: FeaturedSpeakerItem) {
+    // speaker가 null인 경우 (삭제된 강사) 방어
+    const spId   = (item.speaker as { id?: string } | null)?.id   ?? ''
+    const spName = (item.speaker as { name?: string } | null)?.name ?? ''
     setForm({
-      speaker_id: item.speaker.id,
+      speaker_id: spId,
       intro: item.intro,
       tags: [...item.tags],
       is_visible: item.is_visible,
@@ -101,7 +107,7 @@ export default function FeaturedSpeakersAdminPage() {
       start_date: item.start_date ?? '',
       end_date: item.end_date ?? '',
     })
-    setSpeakerQuery(item.speaker.name)
+    setSpeakerQuery(spName)
     setTagInput('')
     setEditTarget(item)
     setModal('edit')
