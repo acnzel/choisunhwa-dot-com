@@ -23,6 +23,16 @@ export default function InsightDetail({ insight }: Props) {
 
   return (
     <article style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(28px, 5vw, 60px) var(--space-page)' }}>
+      <style>{`
+        .insight-tag-link:hover {
+          border-color: var(--color-green) !important;
+          color: var(--color-green) !important;
+          background: var(--color-bg) !important;
+        }
+        .insight-body p { margin-bottom: 1.4em; }
+        .insight-body strong { font-weight: 700; }
+        .insight-body em { font-style: italic; color: var(--color-subtle); }
+      `}</style>
 
       {/* 뒤로가기 */}
       <Link
@@ -136,10 +146,51 @@ export default function InsightDetail({ insight }: Props) {
         />
       )}
 
+      {/* 태그 → 관련 강사 라인업 연결 */}
+      {(() => {
+        const tags: string[] = (insight.meta as Record<string, unknown>)?.tags as string[] ?? []
+        if (tags.length === 0) return null
+        return (
+          <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--color-border)' }}>
+            <p style={{
+              fontSize: 11, fontWeight: 700, letterSpacing: '0.12em',
+              textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: 14,
+            }}>
+              Tag
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+              {tags.map((tag) => (
+                <Link
+                  key={tag}
+                  href={`/speakers?field=${encodeURIComponent(tag)}`}
+                  style={{
+                    display: 'inline-block',
+                    padding: '6px 14px',
+                    border: '1px solid var(--color-border)',
+                    background: 'var(--color-surface)',
+                    color: 'var(--color-subtle)',
+                    fontSize: 13, fontWeight: 500,
+                    textDecoration: 'none',
+                    transition: 'border-color 0.15s, color 0.15s, background 0.15s',
+                  }}
+                  className="insight-tag-link"
+                >
+                  {tag}
+                </Link>
+              ))}
+            </div>
+            {/* 강사 보러 가기 CTA */}
+            <p style={{ fontSize: 12, color: 'var(--color-muted)', marginTop: 12, lineHeight: 1.6 }}>
+              태그를 클릭하면 관련 분야 강사를 바로 찾아볼 수 있어요
+            </p>
+          </div>
+        )
+      })()}
+
       {/* 하단 구분 + 목록 버튼 */}
       <div style={{
-        marginTop: 64,
-        paddingTop: 32,
+        marginTop: 40,
+        paddingTop: 28,
         borderTop: '1px solid var(--color-border)',
         display: 'flex',
         justifyContent: 'space-between',
@@ -158,7 +209,6 @@ export default function InsightDetail({ insight }: Props) {
             fontSize: 13,
             fontWeight: 600,
             textDecoration: 'none',
-            borderRadius: 2,
           }}
         >
           ← 목록으로
@@ -168,12 +218,11 @@ export default function InsightDetail({ insight }: Props) {
           style={{
             display: 'inline-block',
             padding: '10px 24px',
-            background: 'var(--color-ink)',
+            background: 'var(--color-green)',
             color: '#fff',
             fontSize: 13,
             fontWeight: 600,
             textDecoration: 'none',
-            borderRadius: 2,
           }}
         >
           강연 의뢰하기 →

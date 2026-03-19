@@ -90,7 +90,7 @@ export default function InsightCard({ insight, href, size = 'normal' }: Props) {
         <div style={{
           fontFamily: 'var(--font-display)',
           fontWeight: 800,
-          fontSize: isLarge ? 'clamp(17px, 2vw, 22px)' : 'clamp(14px, 1.5vw, 17px)',
+          fontSize: isLarge ? 'clamp(15px, 1.6vw, 19px)' : 'clamp(13px, 1.3vw, 16px)',
           letterSpacing: '-0.02em',
           lineHeight: 1.3,
           color: 'var(--color-ink)',
