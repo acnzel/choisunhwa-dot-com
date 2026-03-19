@@ -18,13 +18,15 @@ const FIELD_MAP = buildFieldMap()
 interface SearchParams {
   page?: string
   field?: string
+  category?: string  // 인사이트 태그 링크용 alias (/speakers?category=리더십)
   q?: string
 }
 
 async function getSpeakers(params: SearchParams) {
   const supabase = await createClient()
   const page = Math.max(1, Number(params.page ?? 1))
-  const field = params.field ?? 'all'
+  // category는 field의 alias — 인사이트 태그 클릭 시 사용
+  const field = params.field ?? params.category ?? 'all'
   const q = (params.q ?? '').trim()
 
   let query = supabase

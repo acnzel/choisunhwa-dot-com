@@ -162,7 +162,7 @@ export default function InsightDetail({ insight }: Props) {
               {tags.map((tag) => (
                 <Link
                   key={tag}
-                  href={`/speakers?field=${encodeURIComponent(tag)}`}
+                  href={`/speakers?category=${encodeURIComponent(tag)}`}
                   style={{
                     display: 'inline-block',
                     padding: '6px 14px',
