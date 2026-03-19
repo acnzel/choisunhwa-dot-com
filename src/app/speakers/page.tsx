@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { Speaker } from '@/types'
-import { buildFieldMap, getFieldWithAliases } from '@/constants'
+import { buildFieldMap, getFieldWithAliases, FIELD_ALIASES } from '@/constants'
 import SpeakerList from './SpeakerList'
 import Link from 'next/link'
 
@@ -26,7 +26,9 @@ async function getSpeakers(params: SearchParams) {
   const supabase = await createClient()
   const page = Math.max(1, Number(params.page ?? 1))
   // category는 field의 alias — 인사이트 태그 클릭 시 사용
-  const field = params.field ?? params.category ?? 'all'
+  // FIELD_ALIASES로 resolve: 예) category=AI → IT, 번아웃 → 심리
+  const rawField = params.field ?? params.category ?? 'all'
+  const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
   const q = (params.q ?? '').trim()
 
   let query = supabase
