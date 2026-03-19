@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import type { Speaker } from '@/types'
 import { buildFieldMap, getFieldWithAliases, FIELD_ALIASES } from '@/constants'
 import SpeakerList from './SpeakerList'
-import Link from 'next/link'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,7 +11,7 @@ export const metadata: Metadata = {
   description: '최선화닷컴의 검증된 전문 강사들을 만나보세요.',
 }
 
-const PAGE_SIZE = 20
+const PAGE_SIZE = 25
 const FIELD_MAP = buildFieldMap()
 
 interface SearchParams {
@@ -71,28 +70,45 @@ export default async function SpeakersPage({
   const { speakers, total, page, totalPages, field, q } = await getSpeakers(params)
 
   return (
-    <div className="min-h-screen">
-      {/* 페이지 헤더 */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10" style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <h1 className="text-3xl font-bold text-[#1a1a2e]">강사 라인업</h1>
-            <p className="mt-2 text-gray-500 text-sm">
-              최선화닷컴이 직접 검증한 전문 강사들을 만나보세요.
-            </p>
-          </div>
-          <Link href="/speakers/apply" style={{
-            fontSize: '13px', fontWeight: 600, color: 'var(--color-green)',
-            textDecoration: 'none', whiteSpace: 'nowrap',
-            padding: '8px 16px', border: '1.5px solid var(--color-green)',
-            borderRadius: '6px',
+    <div style={{ minHeight: '100vh', background: '#F5F0E8' }}>
+
+      {/* ── 히어로 배너 (딥그린) ── */}
+      <div style={{
+        background: '#1E3A2F',
+        padding: 'clamp(40px, 6vw, 72px) clamp(20px, 5vw, 80px) clamp(32px, 5vw, 56px)',
+        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
+        gap: 24,
+      }}>
+        <div>
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: '3px',
+            color: '#C8962A', textTransform: 'uppercase', marginBottom: 12,
           }}>
-            강사이신가요? 등록 신청 →
-          </Link>
+            Speaker Lineup · 2026
+          </div>
+          <h1 style={{
+            fontFamily: 'var(--font-display, serif)',
+            fontSize: 'clamp(32px, 5vw, 52px)', fontWeight: 900, lineHeight: 1.1,
+            color: '#fff', letterSpacing: '-0.04em', marginBottom: 14,
+          }}>
+            당신의 시간을<br />
+            <span style={{ color: '#C8962A' }}>바꿀 전문가</span>
+          </h1>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', lineHeight: 1.7 }}>
+            각 분야를 이끄는 강사진이 지식과 인사이트를 나눕니다.
+          </p>
+        </div>
+        <div style={{
+          fontSize: 'clamp(48px, 8vw, 88px)', fontWeight: 900,
+          color: 'rgba(255,255,255,0.06)', letterSpacing: '-4px', lineHeight: 1,
+          whiteSpace: 'nowrap', flexShrink: 0,
+        }}>
+          {total.toLocaleString()}
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      {/* ── 콘텐츠 ── */}
+      <div style={{ padding: 'clamp(28px, 4vw, 48px) clamp(20px, 5vw, 80px) 80px' }}>
         <SpeakerList
           speakers={speakers}
           total={total}
