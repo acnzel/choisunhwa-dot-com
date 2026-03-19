@@ -13,8 +13,47 @@ interface Props {
 }
 
 const TABS = ['전체 보기', '주제로 찾기', '지금 뜨는']
-const PAGE_SIZE = 12  // 최대 2행 꽉 채움 (5열 × 2행 = 10, 또는 3열 × 4행)
+const PAGE_SIZE = 10  // 5열 × 2행 = 10 (globals.css @1400px+ 5열 고정)
 const AUTO_MS  = 8000 // 8초마다 자동 롤링
+
+// ── 사진 폴백 컴포넌트 (broken URL → 이니셜 아바타) ──
+function SpeakerAvatar({ photoUrl, name }: { photoUrl: string | null; name: string }) {
+  const [error, setError] = useState(false)
+  const initial = (name ?? '?').charAt(0)
+
+  if (!photoUrl || error) {
+    return (
+      <div style={{
+        position: 'absolute', inset: 0,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        background: '#eae5db',
+      }}>
+        <div style={{
+          width: 56, height: 56, borderRadius: '50%',
+          background: '#1D4229',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexShrink: 0,
+        }}>
+          <span style={{ color: '#fff', fontSize: '22px', fontWeight: 700, fontFamily: 'var(--font-body)' }}>
+            {initial}
+          </span>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <Image
+      src={photoUrl}
+      alt={name}
+      fill
+      className="sp-card-img"
+      style={{ objectFit: 'cover', objectPosition: 'top center' }}
+      sizes="138px"
+      onError={() => setError(true)}
+    />
+  )
+}
 
 const FIELD_COLORS: Record<string, string> = {
   leadership:       '#2c3e6b',
@@ -215,7 +254,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
       `}</style>
 
       {/* 서브 탭 */}
-      <nav style={{ display: 'flex', gap: '32px', borderBottom: border, padding: '0 var(--space-page)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <nav style={{ display: 'flex', gap: '32px', padding: '0 var(--space-page)', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {TABS.map((tab, i) => (
           <button
             key={tab}
@@ -281,23 +320,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
                   <div className="sp-card-bar" style={{ background: accentColor }} />
 
                   <div className="sp-card-photo">
-                    {speaker.photo_url ? (
-                      <Image
-                        src={speaker.photo_url}
-                        alt={speaker.name}
-                        fill
-                        className="sp-card-img"
-                        style={{ objectFit: 'cover', objectPosition: 'top center' }}
-                        sizes="138px"
-                      />
-                    ) : (
-                      <div className="sp-card-placeholder">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-border)" strokeWidth="1">
-                          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                          <circle cx="12" cy="7" r="4" />
-                        </svg>
-                      </div>
-                    )}
+                    <SpeakerAvatar photoUrl={speaker.photo_url ?? null} name={speaker.name} />
                   </div>
 
                   <div className="sp-card-body">
