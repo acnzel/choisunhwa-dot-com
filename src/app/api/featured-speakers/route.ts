@@ -87,3 +87,22 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ data }, { status: 201 })
 }
+
+// ── DELETE ?speaker_id=xxx — 강사 ID로 에디터 픽 해제 ────────
+export async function DELETE(req: NextRequest) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: '인증 필요' }, { status: 401 })
+
+  const speaker_id = req.nextUrl.searchParams.get('speaker_id')
+  if (!speaker_id) return NextResponse.json({ error: 'speaker_id 필요' }, { status: 400 })
+
+  const admin = createAdminClient()
+  const { error } = await admin
+    .from('featured_speakers')
+    .delete()
+    .eq('speaker_id', speaker_id)
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ ok: true })
+}

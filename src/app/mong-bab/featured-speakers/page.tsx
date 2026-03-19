@@ -67,11 +67,12 @@ export default function FeaturedSpeakersAdminPage() {
 
   const loadSpeakers = useCallback(async () => {
     try {
-      const res = await fetch('/api/speakers?limit=600')
-      if (res.ok) {
-        const data = await res.json()
-        setSpeakers(data.speakers ?? data ?? [])
-      }
+      // MAX_LIMIT=100이므로 여러 페이지 로드 (총 600명 지원)
+      const pages = await Promise.all(
+        [1,2,3,4,5,6].map(p => fetch(`/api/speakers?limit=100&page=${p}`).then(r => r.json()))
+      )
+      const all = pages.flatMap(p => p.data ?? []) as SpeakerOption[]
+      setSpeakers(all.filter(s => s?.id))
     } catch { /* 무시 */ }
   }, [])
 
@@ -260,11 +261,11 @@ export default function FeaturedSpeakersAdminPage() {
                 borderRadius: '6px', overflow: 'hidden',
                 background: '#f3f4f6', position: 'relative',
               }}>
-                {item.speaker.photo_url ? (
-                  <Image src={item.speaker.photo_url} alt={item.speaker.name} fill style={{ objectFit: 'cover' }} sizes="52px" />
+                {item.speaker?.photo_url ? (
+                  <Image src={item.speaker.photo_url} alt={item.speaker.name ?? ''} fill style={{ objectFit: 'cover' }} sizes="52px" />
                 ) : (
                   <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: '#d1d5db' }}>
-                    {item.speaker.name.charAt(0)}
+                    {item.speaker?.name?.charAt(0) ?? '?'}
                   </div>
                 )}
               </div>
@@ -272,9 +273,9 @@ export default function FeaturedSpeakersAdminPage() {
               {/* 정보 */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                  <span style={{ fontWeight: 700, fontSize: '15px', color: '#1a1a2e' }}>{item.speaker.name}</span>
+                  <span style={{ fontWeight: 700, fontSize: '15px', color: '#1a1a2e' }}>{item.speaker?.name ?? '(삭제된 강사)'}</span>
                   <span style={{ fontSize: '12px', color: '#9ca3af' }}>
-                    {[item.speaker.title, item.speaker.company].filter(Boolean).join(' · ')}
+                    {[item.speaker?.title, item.speaker?.company].filter(Boolean).join(' · ')}
                   </span>
                 </div>
                 <p style={{

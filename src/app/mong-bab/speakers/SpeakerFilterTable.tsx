@@ -1,12 +1,13 @@
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Speaker } from '@/types'
 import ToggleVisible from './ToggleVisible'
 import ToggleBest from './ToggleBest'
 import ToggleTrending from './ToggleTrending'
+import ToggleFeatured from './ToggleFeatured'
 import ClickableRow from '@/components/admin/ClickableRow'
 
 interface Props {
@@ -23,6 +24,28 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
   const [visFilter, setVisFilter] = useState<VisibilityFilter>('all')
   const [bestFilter, setBestFilter] = useState<BestFilter>('all')
   const [trendFilter, setTrendFilter] = useState<TrendFilter>('all')
+  const [featuredIds, setFeaturedIds] = useState<Set<string>>(new Set())
+
+  // 에디터 픽 목록 로드
+  const loadFeatured = useCallback(async () => {
+    try {
+      const res = await fetch('/api/featured-speakers?all=true&limit=100')
+      const json = await res.json()
+      const ids = (json.data ?? []).map((f: { speaker?: { id: string } }) => f.speaker?.id).filter(Boolean)
+      setFeaturedIds(new Set(ids))
+    } catch { /* 무시 */ }
+  }, [])
+
+  useEffect(() => { loadFeatured() }, [loadFeatured])
+
+  function handleFeaturedToggle(speakerId: string, newValue: boolean) {
+    setFeaturedIds(prev => {
+      const next = new Set(prev)
+      if (newValue) next.add(speakerId)
+      else next.delete(speakerId)
+      return next
+    })
+  }
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
@@ -176,6 +199,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
                 <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">공개</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-500 w-16">BEST</th>
                 <th className="text-center px-4 py-3 font-medium text-gray-500 w-16">🔥뜨는</th>
+                <th className="text-center px-4 py-3 font-medium text-gray-500 w-16">⭐에디터픽</th>
                 <th className="text-left px-4 py-3 font-medium text-gray-500 w-20">순서</th>
                 <th className="px-4 py-3 w-16" />
               </tr>
@@ -183,7 +207,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
             <tbody className="divide-y divide-gray-50">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-gray-400">
+                  <td colSpan={7} className="text-center py-12 text-gray-400">
                     {search || visFilter !== 'all' || bestFilter !== 'all'
                       ? '검색 결과가 없습니다.'
                       : '등록된 강사가 없습니다.'}
@@ -226,6 +250,13 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
                     </td>
                     <td className="px-4 py-3 text-center">
                       <ToggleTrending speakerId={s.id} isTrending={(s as Speaker & { is_trending?: boolean }).is_trending ?? false} />
+                    </td>
+                    <td className="px-4 py-3 text-center">
+                      <ToggleFeatured
+                        speakerId={s.id}
+                        isFeatured={featuredIds.has(s.id)}
+                        onToggle={handleFeaturedToggle}
+                      />
                     </td>
                     <td className="px-4 py-3 text-gray-500 text-center">{s.sort_order}</td>
                     <td className="px-4 py-3">
