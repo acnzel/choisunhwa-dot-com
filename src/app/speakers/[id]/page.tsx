@@ -102,6 +102,8 @@ export default async function SpeakerDetailPage({ params }: Props) {
         }
         /* 미디어 링크 */
         .media-link:hover { color: var(--color-rust) !important; }
+        /* 매칭 CTA */
+        .matching-cta-btn:hover { background: var(--color-green) !important; color: var(--color-bg) !important; }
       `}</style>
 
       <div className="page-max-wrap" style={{ minHeight: '100dvh', paddingTop: 'var(--nav-height)', background: 'var(--color-bg)' }}>
@@ -416,18 +418,39 @@ export default async function SpeakerDetailPage({ params }: Props) {
           >
             <div style={{ position: 'sticky', top: 'calc(var(--nav-height) + 24px)' }}>
 
-              {/* 매칭으로 다른 강사 보기 */}
-              <div style={{ padding: 'clamp(20px, 3vw, 32px)' }}>
-                <p style={{ fontSize: '11px', color: 'var(--color-muted)', lineHeight: 1.7, marginBottom: '12px' }}>
-                  다른 조건으로 강사를 찾고 싶으신가요?
+              {/* 매칭 카드 */}
+              <div style={{ padding: 'clamp(24px, 3vw, 36px)' }}>
+                <p style={{
+                  fontFamily: 'var(--font-english)', fontWeight: 700,
+                  fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase',
+                  color: 'var(--color-muted)', marginBottom: '14px',
+                }}>
+                  FIND YOUR SPEAKER
+                </p>
+                <h3 style={{
+                  fontFamily: 'var(--font-display)', fontWeight: 900,
+                  fontSize: 'clamp(17px, 1.8vw, 20px)', letterSpacing: '-0.02em',
+                  color: 'var(--color-ink)', lineHeight: 1.3, marginBottom: '10px',
+                }}>
+                  딱 맞는 강사,<br />매칭으로 찾아보세요
+                </h3>
+                <p style={{
+                  fontSize: '13px', color: 'var(--color-subtle)',
+                  lineHeight: 1.75, marginBottom: '20px', wordBreak: 'keep-all',
+                }}>
+                  주제 · 대상 · 예산 조건으로<br />최적의 강사를 추천해드립니다.
                 </p>
                 <Link
                   href="/matching?step=1"
                   style={{
-                    fontSize: '11px', fontWeight: 600, color: 'var(--color-green)',
-                    textDecoration: 'underline', textUnderlineOffset: '3px',
-                    display: 'flex', alignItems: 'center', gap: '4px',
+                    display: 'block', textAlign: 'center',
+                    padding: '13px 0',
+                    border: '2px solid var(--color-green)', color: 'var(--color-green)',
+                    fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em',
+                    fontFamily: 'var(--font-body)', textDecoration: 'none',
+                    transition: 'background 0.15s, color 0.15s',
                   }}
+                  className="matching-cta-btn"
                 >
                   강사 매칭 시작 →
                 </Link>
