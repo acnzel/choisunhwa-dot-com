@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
-import type { Speaker, Lecture } from '@/types'
+import type { Speaker } from '@/types'
 import { buildFieldMap } from '@/constants'
 import { normalizeSpeaker } from '@/lib/utils/speaker'
 import ShareButton from './ShareButton'
@@ -28,15 +28,6 @@ async function getSpeaker(id: string): Promise<Speaker | null> {
   return normalizeSpeaker(data as Speaker)
 }
 
-async function getSpeakerLectures(speakerId: string): Promise<Lecture[]> {
-  const supabase = await createClient()
-  const { data } = await supabase
-    .from('lectures')
-    .select('*')
-    .eq('speaker_id', speakerId)
-    .eq('is_visible', true)
-  return (data as Lecture[]) ?? []
-}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
@@ -55,10 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SpeakerDetailPage({ params }: Props) {
   const { id } = await params
-  const [speaker, lectures] = await Promise.all([
-    getSpeaker(id),
-    getSpeakerLectures(id),
-  ])
+  const speaker = await getSpeaker(id)
 
   if (!speaker) notFound()
 
@@ -89,7 +77,6 @@ export default async function SpeakerDetailPage({ params }: Props) {
     lectureTopics: lectureTopics.length > 0,
     books:         books.length > 0,
     media:         mediaLinks.length > 0,
-    lectures:      lectures.length > 0,
   }
 
   return (
@@ -112,10 +99,6 @@ export default async function SpeakerDetailPage({ params }: Props) {
             border-left: none !important;
             border-top: 1px solid var(--color-border) !important;
           }
-        }
-        /* 강연 카드 호버 */
-        .lec-card:hover {
-          background: var(--color-surface) !important;
         }
         /* 미디어 링크 */
         .media-link:hover { color: var(--color-rust) !important; }
@@ -404,54 +387,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
               </DetailSection>
             )}
 
-            {/* 보유 커리큘럼 */}
-            {hasContent.lectures && (
-              <DetailSection title="보유 커리큘럼">
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
-                  {lectures.map((lecture) => (
-                    <Link
-                      key={lecture.id}
-                      href={`/lectures/${lecture.id}`}
-                      className="lec-card"
-                      style={{
-                        display: 'block', padding: '18px 0',
-                        borderBottom: '1px solid var(--color-border)',
-                        textDecoration: 'none', transition: 'background 0.15s',
-                      }}
-                    >
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '8px' }}>
-                        {lecture.fields.slice(0, 2).map((f) => (
-                          <span key={f} style={{
-                            fontSize: '9px', fontWeight: 700, letterSpacing: '0.08em',
-                            padding: '2px 8px', textTransform: 'uppercase',
-                            background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                            color: 'var(--color-muted)',
-                          }}>
-                            {FIELD_MAP[f] ?? f}
-                          </span>
-                        ))}
-                      </div>
-                      <h3 style={{
-                        fontFamily: 'var(--font-display)', fontWeight: 800,
-                        fontSize: 'clamp(14px, 1.8vw, 18px)', letterSpacing: '-0.02em',
-                        color: 'var(--color-ink)', lineHeight: 1.3, marginBottom: '6px',
-                      }}>
-                        {lecture.title}
-                      </h3>
-                      {lecture.summary && (
-                        <p style={{
-                          fontSize: '12px', color: 'var(--color-muted)', lineHeight: 1.7,
-                          display: '-webkit-box', WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical', overflow: 'hidden',
-                        }}>
-                          {lecture.summary}
-                        </p>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              </DetailSection>
-            )}
+
 
           </main>
 
