@@ -71,20 +71,13 @@ export default async function SpeakerDetailPage({ params }: Props) {
 
   const bioText = speaker.bio_full?.trim() || speaker.bio_short?.trim() || ''
 
-  // 강연 주제: fields 배열에서 ~ prefix 항목 (엑셀 원본 강연주제 키워드)
-  const lectureTopicKeywords = speaker.fields
-    .filter(f => f.startsWith('~'))
-    .map(f => f.slice(1))
-    .filter(Boolean)
-
   const hasContent = {
-    bio:                  !!bioText,
-    lectureTopicKeywords: lectureTopicKeywords.length > 0,
-    careers:              careers.length > 0,
-    education:            education.length > 0,
-    lectureTopics:        lectureTopics.length > 0,
-    books:                books.length > 0,
-    media:                mediaLinks.length > 0,
+    bio:           !!bioText,
+    careers:       careers.length > 0,
+    education:     education.length > 0,
+    lectureTopics: lectureTopics.length > 0,
+    books:         books.length > 0,
+    media:         mediaLinks.length > 0,
   }
 
   return (
@@ -255,14 +248,14 @@ export default async function SpeakerDetailPage({ params }: Props) {
           {/* ── 메인 콘텐츠 ── */}
           <main style={{ borderRight: '1px solid var(--color-border)' }}>
 
-            {/* 강연 주제 (fields ~ prefix 항목 — 엑셀 원본 강연주제 키워드) */}
-            {hasContent.lectureTopicKeywords && (
+            {/* 강연 주제 */}
+            {hasContent.lectureTopics && (
               <DetailSection title="강연 주제">
-                <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                  {lectureTopicKeywords.map((topic, idx) => (
-                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px' }}>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  {lectureTopics.map((topic, idx) => (
+                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
                       <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
-                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400, wordBreak: 'keep-all' }}>{topic}</span>
+                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontSize: '14px', fontWeight: 400 }}>{topic}</span>
                     </li>
                   ))}
                 </ul>
@@ -344,20 +337,6 @@ export default async function SpeakerDetailPage({ params }: Props) {
                         )}
                         <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>{edu.content}</span>
                       </span>
-                    </li>
-                  ))}
-                </ul>
-              </DetailSection>
-            )}
-
-            {/* 강연 커리큘럼 */}
-            {hasContent.lectureTopics && (
-              <DetailSection title="강연 커리큘럼">
-                <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {lectureTopics.map((topic, idx) => (
-                    <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
-                      <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
-                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontSize: '14px', fontWeight: 400 }}>{topic}</span>
                     </li>
                   ))}
                 </ul>
