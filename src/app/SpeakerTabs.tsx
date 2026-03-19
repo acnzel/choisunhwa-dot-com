@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Speaker } from '@/types'
@@ -36,7 +37,11 @@ function getFieldColor(fields: string[]): string {
 }
 
 export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] }: Props) {
-  const [activeTab, setActiveTab] = useState(0)
+  const searchParams = useSearchParams()
+  const viewParam = searchParams?.get('view')
+  const initTab = viewParam === 'field' ? 1 : viewParam === 'trending' ? 2 : 0
+
+  const [activeTab, setActiveTab] = useState(initTab)
   const [filterField, setFilterField] = useState<string | null>(null)
   const [page, setPage] = useState(0)
   const [paused, setPaused] = useState(false)

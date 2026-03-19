@@ -10,7 +10,15 @@ type SubItem = { href: string; label: string }
 type NavItem  = { href: string; label: string; submenu?: SubItem[] }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/speakers', label: '강사 라인업' },
+  {
+    href: '/speakers',
+    label: '강사 라인업',
+    submenu: [
+      { href: '/speakers',              label: '전체보기' },
+      { href: '/speakers?view=field',   label: '주제로 찾기' },
+      { href: '/speakers?view=trending', label: '지금 뜨는' },
+    ],
+  },
   {
     href: '/insights',
     label: '강연 인사이트',

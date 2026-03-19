@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Speaker, Notice, FeaturedSpeakerItem } from '@/types'
+import { Suspense } from 'react'
+import type { Speaker, Insight, FeaturedSpeakerItem } from '@/types'
 import { buildFieldMap } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
@@ -13,7 +14,7 @@ const FIELD_MAP = buildFieldMap()
 
 async function getData() {
   const supabase = await createClient()
-  const [{ data: speakers }, { data: notices }, { data: bestSpeakers }, { count: totalSpeakerCount }, { data: trendingSpeakers }] = await Promise.all([
+  const [{ data: speakers }, { data: insightItems }, { data: bestSpeakers }, { count: totalSpeakerCount }, { data: trendingSpeakers }] = await Promise.all([
     supabase
       .from('speakers')
       .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
@@ -21,9 +22,9 @@ async function getData() {
       .order('sort_order', { ascending: true })
       .limit(30),
     supabase
-      .from('notices')
-      .select('id, title, content, is_pinned, published_at')
-      .eq('is_visible', true)
+      .from('insights')
+      .select('id, type, title, summary, published_at, home_featured')
+      .eq('status', 'published')
       .order('published_at', { ascending: false })
       .limit(4),
     // is_best 컬럼은 스캇이 Supabase에서 SQL 실행 후 생김 → 실패 시 빈 배열 fallback
@@ -56,7 +57,7 @@ async function getData() {
       .select(`
         id, intro, tags, is_visible, home_visible,
         start_date, end_date, sort_order, created_at,
-        speaker:speakers ( id, name, title, company, photo_url, bio_short, fields )
+        speaker:speaker_id ( id, name, title, company, photo_url, bio_short, fields )
       `)
       .eq('is_visible', true)
       .order('sort_order', { ascending: true })
@@ -68,7 +69,7 @@ async function getData() {
 
   return {
     speakers: (speakers as Speaker[]) ?? [],
-    notices: (notices as Notice[]) ?? [],
+    insightItems: (insightItems as Insight[]) ?? [],
     bestSpeakers: (bestSpeakers as Speaker[]) ?? [],
     trendingSpeakers: (trendingSpeakers as Speaker[]) ?? [],
     featuredItems,
@@ -104,7 +105,7 @@ const PROCESS_ICONS = [
 ]
 
 export default async function HomePage() {
-  const { speakers, notices, bestSpeakers, trendingSpeakers, featuredItems, totalSpeakerCount } = await getData()
+  const { speakers, insightItems, bestSpeakers, trendingSpeakers, featuredItems, totalSpeakerCount } = await getData()
 
   // F-4: featured_speakers가 있으면 "지금 뜨는" 탭에 연동 (Speaker[] 형태로 변환)
   const featuredAsSpeakers: Speaker[] = featuredItems.map(f => ({
@@ -124,9 +125,9 @@ export default async function HomePage() {
   const trendingForTabs = featuredAsSpeakers.length > 0 ? featuredAsSpeakers : trendingSpeakers
 
   // ── Insight 카드: 실제 데이터가 있는 것만 사용 ──
-  const hero   = notices[0] ?? null
-  const subs   = notices.slice(1, 4).filter(Boolean) as Notice[]
-  const showInsight = hero !== null || subs.length > 0
+  const hero   = insightItems[0] ?? null
+  const subs   = insightItems.slice(1, 4).filter(Boolean) as Insight[]
+  const showInsight = insightItems.length > 0
 
   return (
     <>
@@ -377,7 +378,9 @@ export default async function HomePage() {
             </h2>
             <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
           </div>
-          <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingForTabs} />
+          <Suspense fallback={null}>
+            <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingForTabs} />
+          </Suspense>
         </section>
 
         {/* ── 이달의 강사 — home_visible=true 항목만 노출 ── */}
@@ -398,17 +401,17 @@ export default async function HomePage() {
                 인사이트{' '}
                 <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>Insight</span>
               </h2>
-              <Link href="/support/notice" className="see-all-link">전체 보기 →</Link>
+              <Link href="/insights" className="see-all-link">전체 보기 →</Link>
             </div>
 
             <div className="insight-grid" style={{
               display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)',
               borderLeft: '1px solid var(--color-border)',
             }}>
-              {/* 히어로 카드 (데이터 있을 때만) */}
+              {/* 히어로 카드 */}
               {hero && (
                 <Link
-                  href={`/support/notice/${hero.id}`}
+                  href={hero.type === 'report' ? '/insights/report' : hero.type === 'pick' ? '/insights/featured' : '/insights/issue'}
                   className="insight-hero-card reveal-scale"
                   style={{
                     gridColumn: 'span 2',
@@ -421,26 +424,26 @@ export default async function HomePage() {
                 >
                   <div>
                     <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-ochre)', marginBottom: '12px' }}>
-                      {hero.is_pinned ? '📌 공지' : '에디터 픽'}
+                      {hero.type === 'issue' ? '트렌드 브리핑' : hero.type === 'report' ? '강연 현장' : '에디터 추천'}
                     </div>
                     <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 26px)', letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '10px', color: 'var(--color-bg)' }}>
                       {hero.title}
                     </div>
                     <p style={{ fontSize: '13px', fontWeight: 300, color: 'rgba(247,243,238,0.65)', lineHeight: 1.75 }}>
-                      {hero.content ? hero.content.substring(0, 80) + (hero.content.length > 80 ? '…' : '') : ''}
+                      {hero.summary ? hero.summary.substring(0, 100) + (hero.summary.length > 100 ? '…' : '') : ''}
                     </p>
                   </div>
                   <div style={{ fontSize: '11px', color: 'rgba(247,243,238,0.45)', letterSpacing: '0.04em', marginTop: '16px' }}>
-                    {new Date(hero.published_at).toLocaleDateString('ko-KR')} · Editor&apos;s Pick
+                    {hero.published_at ? new Date(hero.published_at).toLocaleDateString('ko-KR') : ''} · 강연 인사이트
                   </div>
                 </Link>
               )}
 
-              {/* 서브 카드: 실제 데이터만 렌더링 (F-D/E: 빈 카드 숨김) */}
-              {subs.map((notice) => (
+              {/* 서브 카드 */}
+              {subs.map((item) => (
                 <Link
-                  key={notice.id}
-                  href={`/support/notice/${notice.id}`}
+                  key={item.id}
+                  href={item.type === 'report' ? '/insights/report' : item.type === 'pick' ? '/insights/featured' : '/insights/issue'}
                   className="insight-card-plain"
                   style={{
                     padding: 'clamp(20px, 2.5vw, 28px)',
@@ -450,13 +453,13 @@ export default async function HomePage() {
                   }}
                 >
                   <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
-                    인사이트
+                    {item.type === 'issue' ? '트렌드 브리핑' : item.type === 'report' ? '강연 현장' : '에디터 추천'}
                   </div>
                   <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: '16px', letterSpacing: '-0.02em', lineHeight: 1.45, color: 'var(--color-ink)' }}>
-                    {notice.title}
+                    {item.title}
                   </div>
                   <div style={{ fontSize: '11px', color: 'var(--color-muted)', letterSpacing: '0.04em', marginTop: 'auto' }}>
-                    {new Date(notice.published_at).toLocaleDateString('ko-KR')}
+                    {item.published_at ? new Date(item.published_at).toLocaleDateString('ko-KR') : ''}
                   </div>
                 </Link>
               ))}
