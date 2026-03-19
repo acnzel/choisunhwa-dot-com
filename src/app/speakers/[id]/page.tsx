@@ -200,14 +200,14 @@ export default async function SpeakerDetailPage({ params }: Props) {
               <p style={{
                 fontFamily: 'var(--font-body)', fontSize: 'clamp(15px, 1.8vw, 18px)',
                 fontWeight: 500, color: 'var(--color-ink)',
-                marginBottom: speaker.bio_short ? '14px' : '24px', lineHeight: 1.5,
+                marginBottom: bioText ? '14px' : '24px', lineHeight: 1.5,
                 letterSpacing: '-0.01em',
               }}>
                 {[speaker.title, speaker.company].filter(Boolean).join(' · ')}
               </p>
 
-              {/* 강사 소개글 (bio_short) */}
-              {speaker.bio_short && (
+              {/* 강사 소개글 — 이름 바로 아래 */}
+              {bioText && (
                 <p style={{
                   fontFamily: 'var(--font-body)', fontSize: 'clamp(13px, 1.4vw, 15px)',
                   fontWeight: 400, color: 'var(--color-subtle)',
@@ -216,7 +216,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
                   borderLeft: '3px solid var(--color-green)',
                   wordBreak: 'keep-all',
                 }}>
-                  {speaker.bio_short}
+                  {bioText}
                 </p>
               )}
 
@@ -261,33 +261,6 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 </ul>
               </DetailSection>
             )}
-
-            {/* 강사 소개 (bio_full 텍스트) */}
-            {hasContent.bio && (() => {
-              const bioLines = bioText.split('\n').map(l => l.trim()).filter(Boolean)
-              return (
-                <DetailSection title="강사 소개">
-                  {bioLines.length > 1 ? (
-                    <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                      {bioLines.map((line, idx) => (
-                        <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px' }}>
-                          <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
-                          <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400, wordBreak: 'keep-all' }}>{line}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <p style={{
-                      fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 400,
-                      color: 'var(--color-ink)', lineHeight: 1.9,
-                      wordBreak: 'keep-all', overflowWrap: 'break-word',
-                    }}>
-                      {bioText}
-                    </p>
-                  )}
-                </DetailSection>
-              )
-            })()}
 
             {/* 약력 */}
             {hasContent.careers && (
