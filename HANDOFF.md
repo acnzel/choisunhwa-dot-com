@@ -352,3 +352,74 @@ Response: {
 ### 최종 판정
 **N-001~N-013 전체 PASS ✅ — 배포 승인**
 
+
+---
+
+## 🔍 QA: 인사이트 레이아웃 + 태그 라우팅 (commit 70f92e0) — 2026-03-19
+
+### ✅ PASS 항목
+
+| 항목 | 결과 |
+|------|------|
+| 캐러셀 카드 수 | 4개 ✅ |
+| 그리드 카드 수 | 9개 (총 13건 - 최신 4개) ✅ |
+| 카운트 텍스트 | "총 13건 · 최신 4개 제외" 정상 표시 ✅ |
+| ← → 버튼 + 끝에서 disabled | ✅ |
+| 캐러셀↔그리드 중복 없음 | ✅ |
+| 태그→강사 라우팅 (리더십) | 18명 표시 ✅ |
+| 태그→강사 라우팅 (동기부여) | 19명 표시 ✅ |
+| 태그→강사 라우팅 (심리) | 20명 표시 ✅ |
+| 반응형 CSS (2열→1열) | 코드 확인 ✅ |
+
+### ❌ BUG-N-014: 태그→강사 필터 미매핑 (2가지 케이스)
+
+#### Case A — FIELD_ALIASES에 있지만 resolve 안 됨
+`category=AI` → `field='AI'` → `getFieldWithAliases('AI')=['AI']` → DB에 'AI' 필드 강사 없음 → **0명**
+
+- 원인: `category` 파라미터가 FIELD_ALIASES로 resolve되지 않은 채 바로 `getFieldWithAliases()` 전달
+- 기대: "AI" → FIELD_ALIASES['AI']='IT' → IT 강사 표시
+
+#### Case B — 인사이트 태그가 필드 시스템에 미등록
+아래 태그들이 SPEAKER_FIELDS / FIELD_ALIASES에 없음:
+
+| 태그 | 결과 | 연결해야 할 필드 |
+|------|------|----------------|
+| 번아웃 | 0명 ❌ | 심리 |
+| 멘탈헬스 | 0명 ❌ | 심리 |
+| 팀장 | 0명 ❌ | 리더십 |
+| MZ세대 | 0명 ❌ | HR 또는 리더십 |
+| 조직문화 | 0명 ❌ | HR |
+| 심리적안전감 | 0명 ❌ | 심리 |
+| 조용한퇴사 | 0명 ❌ | 동기부여 |
+
+### 수정 방법 (2단계)
+
+**Step 1 — `constants/index.ts` FIELD_ALIASES 추가:**
+```ts
+'번아웃':       '심리',
+'멘탈헬스':     '심리',
+'팀장':         '리더십',
+'MZ세대':       'HR',
+'MZ':           'HR',
+'조직문화':     'HR',
+'심리적안전감': '심리',
+'조용한퇴사':   '동기부여',
+'1on1':         '리더십',
+'창의력':       '창의',
+'AI강연':       'IT',
+'직원복지':     'HR',
+'회복탄력성':   '심리',
+```
+
+**Step 2 — `speakers/page.tsx` category alias resolve 추가:**
+```ts
+// 현재
+const field = params.field ?? params.category ?? 'all'
+
+// 수정 후
+const rawField = params.field ?? params.category ?? 'all'
+const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
+```
+
+**→ @frontend: Step 1+2 수정 후 QA 재검수 요청**
+
