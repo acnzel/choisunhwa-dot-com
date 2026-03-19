@@ -460,3 +460,40 @@ const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
 - 요청: 강사 관리(`/mong-bab/speakers`)에서 `is_best` 체크박스 한 번에 관리
 - 기대: 에디터 추천 체크 → 에디터 픽 섹션 반영
 
+
+---
+
+## ✅ QA 공식 테스트 결과: commit 70f92e0 — 2026-03-19
+
+### 테스트 1 — 인사이트 레이아웃
+
+| 항목 | 방법 | 결과 |
+|------|------|------|
+| 캐러셀 카드 4개 | DOM query `.ic-card` | ✅ 4개 |
+| 그리드 카드 9개 | DOM query `.ig-card` | ✅ 9개 |
+| 총합 13건 일치 | 4+9=13 vs 카운트 텍스트 | ✅ 일치 |
+| 캐러셀↔그리드 중복 없음 | ID set intersection | ✅ 중복 0개 |
+| ← 버튼 disabled (시작점) | `button.disabled + bg` | ✅ disabled, bg=#ccc |
+| → 버튼 활성 | `button.disabled=false` | ✅ active, bg=var(--color-ink) |
+| 카운트 텍스트 | HTML 파싱 | ✅ "총 13건 · 최신 4개 제외" |
+| 모바일 반응형 (900px 2열, 600px 1열) | CSS 파싱 | ✅ media query 존재 |
+| scroll-snap 설정 | HTML 파싱 | ✅ scroll-snap-type:x 설정됨 |
+
+### 테스트 2 — 태그 클릭 → 강사 필터링
+
+| 항목 | 방법 | 결과 |
+|------|------|------|
+| 카드 태그 → `/speakers?category=` 링크 | HTML 파싱 | ✅ 34개 태그 링크 |
+| 강사 페이지 리더십 버튼 active | curl + CSS class 확인 | ✅ `bg-[#1a1a2e] text-white` |
+| 리더십 필터 강사 수 | HTTP 응답 파싱 | ✅ 18명 표시 |
+| 상세 페이지 태그 링크 | `/insights/issue/46b9...` | ✅ 5개 태그 모두 `/speakers?category=` |
+| 상세 페이지 정상 렌더 | HTTP 200 + title | ✅ |
+
+### ⚠️ 미결 — BUG-N-014 (기존 문서화)
+일부 태그 클릭 시 강사 0명 표시 (FIELD_ALIASES 미매핑):
+- 번아웃, 팀장, MZ세대, 조직문화, 심리적안전감 등
+- 수정 방법: HANDOFF.md BUG-N-014 참고
+
+### 최종 판정
+**테스트 1, 2 핵심 기능 PASS ✅ — 단, BUG-N-014 별도 수정 필요**
+
