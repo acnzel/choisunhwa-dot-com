@@ -7,7 +7,7 @@ import SpeakerList from './SpeakerList'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: '강사 소개',
+  title: '강사 라인업',
   description: '최선화닷컴의 검증된 전문 강사들을 만나보세요.',
 }
 
@@ -17,15 +17,13 @@ const FIELD_MAP = buildFieldMap()
 interface SearchParams {
   page?: string
   field?: string
-  category?: string  // 인사이트 태그 링크용 alias (/speakers?category=리더십)
+  category?: string
   q?: string
 }
 
 async function getSpeakers(params: SearchParams) {
   const supabase = await createClient()
   const page = Math.max(1, Number(params.page ?? 1))
-  // category는 field의 alias — 인사이트 태그 클릭 시 사용
-  // FIELD_ALIASES로 resolve: 예) category=AI → IT, 번아웃 → 심리
   const rawField = params.field ?? params.category ?? 'all'
   const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
   const q = (params.q ?? '').trim()
@@ -37,10 +35,8 @@ async function getSpeakers(params: SearchParams) {
     .order('sort_order', { ascending: true })
 
   if (field !== 'all') {
-    // overlaps: 별칭 포함 (예: 'HR' 필터 시 '성과관리', '조직관리'도 매치)
     query = query.overlaps('fields', getFieldWithAliases(field))
   }
-
   if (q) {
     query = query.or(
       `name.ilike.%${q}%,bio_short.ilike.%${q}%,company.ilike.%${q}%,title.ilike.%${q}%`
@@ -72,35 +68,51 @@ export default async function SpeakersPage({
   return (
     <div style={{ minHeight: '100vh', background: '#F7F3EE', paddingTop: 'var(--nav-height)' }}>
 
-      {/* ── 페이지 헤더 (딥그린) ── */}
+      {/* ── 페이지 헤더 (베이지 톤) ── */}
       <div style={{
-        background: '#1E3A2F',
-        padding: 'clamp(28px, 4vw, 44px) clamp(20px, 5vw, 60px)',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 16,
+        background: '#EDE6DC',
+        padding: 'clamp(36px, 5vw, 52px) clamp(24px, 5vw, 48px) clamp(28px, 4vw, 40px)',
+        borderBottom: '1px solid #DDD5C8',
       }}>
-        <div>
-          <p style={{ fontSize: 10, fontWeight: 700, letterSpacing: '3px', color: '#1D4229', textTransform: 'uppercase', marginBottom: 8 }}>
-            Speaker Lineup · 2026
-          </p>
-          <h1 style={{
-            fontFamily: 'var(--font-display, serif)',
-            fontSize: 'clamp(24px, 3.5vw, 40px)', fontWeight: 900,
-            color: '#fff', letterSpacing: '-0.03em', lineHeight: 1.15,
-          }}>
-            강사 라인업
-          </h1>
-        </div>
-        <div style={{
-          fontSize: 'clamp(36px, 6vw, 64px)', fontWeight: 900,
-          color: 'rgba(255,255,255,0.07)', letterSpacing: '-3px', lineHeight: 1,
-          whiteSpace: 'nowrap', flexShrink: 0,
+        <p style={{
+          fontSize: 12, fontWeight: 600, letterSpacing: '2px',
+          color: '#9C8570', textTransform: 'uppercase', marginBottom: 10,
         }}>
-          {total.toLocaleString()}
+          Speaker Lineup
+        </p>
+        <h1 style={{
+          fontFamily: 'var(--font-display, serif)',
+          fontSize: 'clamp(26px, 4vw, 34px)', fontWeight: 800,
+          color: '#1F1007', letterSpacing: '-1px', marginBottom: 8,
+        }}>
+          강사 라인업
+        </h1>
+        <p style={{ fontSize: 15, color: '#7A6A5A', fontWeight: 400 }}>
+          검증된 전문 강사진과 최선화닷컴을 통해 연결하세요
+        </p>
+        <div style={{ display: 'flex', gap: 32, marginTop: 24 }}>
+          {[
+            { num: total.toLocaleString(), label: '등록 강사' },
+            { num: '28', label: '강연 분야' },
+            { num: '1,200+', label: '누적 강연' },
+          ].map(({ num, label }) => (
+            <div key={label}>
+              <div style={{
+                fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 800,
+                color: '#2C6B5A', letterSpacing: '-1px',
+              }}>
+                {num}
+              </div>
+              <div style={{ fontSize: 12, color: '#9C8570', fontWeight: 500, marginTop: 2 }}>
+                {label}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* ── 콘텐츠 ── */}
-      <div style={{ padding: 'clamp(24px, 3vw, 40px) clamp(20px, 5vw, 60px) 80px' }}>
+      <div style={{ padding: 'clamp(24px, 3vw, 32px) clamp(24px, 5vw, 48px) 80px' }}>
         <SpeakerList
           speakers={speakers}
           total={total}
