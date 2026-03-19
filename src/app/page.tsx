@@ -6,7 +6,6 @@ import Link from 'next/link'
 import HeroTicker from './HeroTicker'
 import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
-import SpeakerCarousel from './SpeakerCarousel'
 import RevealOnScroll from '@/components/RevealOnScroll'
 import FeaturedSection from './FeaturedSection'
 
@@ -338,31 +337,6 @@ export default async function HomePage() {
           <TrustStats stats={TRUST_STATS.map((s, i) => ({ ...s, highlight: i === 2 }))} />
         </section>
 
-        {/* ── 이달의 강사 캐러셀 (is_best=true 강사가 있을 때만) ── */}
-        {bestSpeakers.length > 0 && (
-          <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="best-speakers">
-            <div className="section-hd" style={{
-              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-              padding: '28px var(--space-page) 22px',
-              borderBottom: '1px solid var(--color-border)',
-            }}>
-              <h2 style={{
-                fontFamily: 'var(--font-display)', fontWeight: 900,
-                fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
-              }}>
-                에디터 픽{' '}
-                <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
-                  Editor's Pick
-                </span>
-              </h2>
-              <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
-            </div>
-            <div style={{ padding: 'clamp(24px, 3vw, 36px) var(--space-page) 0' }}>
-              <SpeakerCarousel speakers={bestSpeakers} />
-            </div>
-          </section>
-        )}
-
         {/* ── SPEAKERS ── */}
         <section className="reveal" style={{ borderBottom: '1px solid var(--color-border)' }} id="speakers">
           <div className="section-hd" style={{
@@ -426,7 +400,7 @@ export default async function HomePage() {
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-ochre)', marginBottom: '12px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 700, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--color-green)', marginBottom: '12px' }}>
                       {hero.type === 'issue' ? '인사이트' : hero.type === 'report' ? '현장 스토리' : '에디터 픽'}
                     </div>
                     <div style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 'clamp(18px, 2.5vw, 26px)', letterSpacing: '-0.02em', lineHeight: 1.3, marginBottom: '10px', color: 'var(--color-bg)' }}>
@@ -600,7 +574,7 @@ export default async function HomePage() {
                     borderBottom: i < arr.length - 1 ? '1px solid var(--color-border)' : 'none',
                     alignItems: 'flex-start',
                   }}>
-                    <span style={{ fontFamily: 'var(--font-english)', fontSize: '15px', color: 'var(--color-ochre)', paddingTop: '1px' }}>{step}</span>
+                    <span style={{ fontFamily: 'var(--font-english)', fontSize: '15px', color: 'var(--color-green)', paddingTop: '1px' }}>{step}</span>
                     <div>
                       <span style={{ fontSize: '13px', fontWeight: 500, letterSpacing: '-0.01em', display: 'block', lineHeight: 1.5 }}>{title}</span>
                       <small style={{ display: 'block', fontSize: '12px', fontWeight: 300, color: 'var(--color-muted)', marginTop: '2px' }}>{desc}</small>

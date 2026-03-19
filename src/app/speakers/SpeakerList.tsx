@@ -115,28 +115,30 @@ export default function SpeakerList({
 
         .spk-card-img {
           position: relative; width: 100%;
-          height: 180px; overflow: hidden;
+          aspect-ratio: 1 / 1; overflow: hidden;
           background: #ede8e0;
         }
         .spk-card-placeholder {
           position: absolute; inset: 0;
           display: flex; align-items: center; justify-content: center;
-          font-size: 36px; font-weight: 900;
-          color: #c4bdb4;
+          font-size: clamp(32px, 4vw, 48px); font-weight: 900;
+          color: #b8b0a8;
           font-family: var(--font-display, serif);
+          background: #ede8e0;
         }
-        .spk-card-body { padding: 12px 14px 14px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
-        .spk-card-name { font-size: 15px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.02em; }
-        .spk-card-title { font-size: 12px; color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .spk-card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .spk-card-name { font-size: 17px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.02em; line-height: 1.2; }
+        .spk-card-title { font-size: 13px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
         .spk-card-bio {
-          font-size: 12px; color: #888; line-height: 1.55; margin-top: 4px;
-          display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+          font-size: 13px; color: #666; line-height: 1.6; margin-top: 6px;
+          display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
         }
-        .spk-card-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; }
+        .spk-card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
         .spk-card-tag {
-          font-size: 10px; font-weight: 500;
-          padding: 2px 8px; background: #f5f2ed;
-          color: #666; white-space: nowrap;
+          font-size: 11px; font-weight: 600;
+          padding: 3px 10px;
+          background: #1D4229; color: #fff;
+          border-radius: 20px; white-space: nowrap;
         }
 
         /* 페이지네이션 */
@@ -253,7 +255,7 @@ export default function SpeakerList({
                       )}
                       {catFields.length > 0 && (
                         <div className="spk-card-tags">
-                          {catFields.slice(0, 3).map(f => (
+                          {catFields.slice(0, 2).map(f => (
                             <span key={f} className="spk-card-tag">{fieldMap[f]}</span>
                           ))}
                         </div>
