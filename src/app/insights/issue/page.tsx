@@ -4,8 +4,8 @@ import InsightCard from '@/components/insights/InsightCard'
 import type { Insight } from '@/types'
 
 export const metadata: Metadata = {
-  title: '오늘의 이슈',
-  description: '최선화닷컴이 큐레이션하는 오늘의 이슈 — 강연으로 연결되는 트렌드',
+  title: '트렌드 브리핑',
+  description: '최선화닷컴이 큐레이션하는 트렌드 브리핑 — 강연으로 연결되는 트렌드',
 }
 
 async function getIssues(): Promise<Insight[]> {

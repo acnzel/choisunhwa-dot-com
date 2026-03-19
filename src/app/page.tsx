@@ -269,7 +269,7 @@ export default async function HomePage() {
 
               <div className="hero-actions hero-cta" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
                 <Link href="/matching?step=1" className="btn-fill-green">매칭 시작하기 →</Link>
-                <Link href="/speakers" className="btn-ghost-ink">연사 라인업 보기 →</Link>
+                <Link href="/speakers" className="btn-ghost-ink">강사 라인업 보기 →</Link>
               </div>
             </div>
 
@@ -346,9 +346,9 @@ export default async function HomePage() {
                 fontFamily: 'var(--font-display)', fontWeight: 900,
                 fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
               }}>
-                이달의 강사{' '}
+                에디터 추천 강사{' '}
                 <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
-                  Speaker of the Month
+                  Editor's Pick
                 </span>
               </h2>
               <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
@@ -370,7 +370,7 @@ export default async function HomePage() {
               fontFamily: 'var(--font-display)', fontWeight: 900,
               fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
             }}>
-              연사 라인업{' '}
+              강사 라인업{' '}
               <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
                 Speaker Lineup
               </span>

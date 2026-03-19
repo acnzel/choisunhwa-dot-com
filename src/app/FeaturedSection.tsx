@@ -29,9 +29,9 @@ export default function FeaturedSection({ items }: Props) {
           fontFamily: 'var(--font-display)', fontWeight: 900,
           fontSize: 'clamp(26px, 3vw, 44px)', letterSpacing: '-0.03em', lineHeight: 1,
         }}>
-          이달의 강사{' '}
+          에디터 추천 강사{' '}
           <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
-            Featured Speakers
+            Editor's Pick
           </span>
         </h2>
         <Link href="/insights/featured" className="see-all-link">전체 보기 →</Link>

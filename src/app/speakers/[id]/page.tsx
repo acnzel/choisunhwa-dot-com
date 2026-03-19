@@ -133,7 +133,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
           fontSize: '11px', color: 'var(--color-muted)',
         }}>
           <Link href="/speakers" className="breadcrumb-link" style={{ color: 'var(--color-muted)' }}>
-            ← 연사 라인업
+            ← 강사 라인업
           </Link>
           <span>·</span>
           <span>{speaker.name}</span>

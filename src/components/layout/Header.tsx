@@ -10,14 +10,14 @@ type SubItem = { href: string; label: string }
 type NavItem  = { href: string; label: string; submenu?: SubItem[] }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/speakers', label: '연사 라인업' },
+  { href: '/speakers', label: '강사 라인업' },
   {
     href: '/insights',
     label: '강연 인사이트',
     submenu: [
-      { href: '/insights/issue',     label: '오늘의 이슈' },
+      { href: '/insights/issue',     label: '트렌드 브리핑' },
       { href: '/insights/report',    label: '강연 현장' },
-      { href: '/insights/featured',  label: '이달의 강사' },
+      { href: '/insights/featured',  label: '에디터 추천 강사' },
     ],
   },
   { href: '/matching?step=1', label: '강사 매칭 신청' },

@@ -6,8 +6,8 @@ import FeaturedSpeakerCard from '@/components/featured/FeaturedSpeakerCard'
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: '이달의 강사',
-  description: '최선화닷컴이 직접 엄선한 이달의 추천 강사를 만나보세요.',
+  title: '에디터 추천 강사',
+  description: '최선화닷컴 에디터가 직접 엄선한 추천 강사를 만나보세요.',
 }
 
 async function getFeaturedSpeakers(): Promise<FeaturedSpeakerItem[]> {
@@ -48,13 +48,13 @@ export default async function FeaturedSpeakersPage() {
             fontSize: 'clamp(24px, 3vw, 40px)',
             letterSpacing: '-0.03em', lineHeight: 1,
           }}>
-            이달의 강사
+            에디터 추천 강사
           </h2>
           <p style={{
             fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)',
             marginTop: '8px', lineHeight: 1.6,
           }}>
-            최선화닷컴이 직접 엄선한 이달의 추천 강사입니다.
+            최선화닷컴 에디터가 직접 엄선한 추천 강사입니다.
           </p>
         </div>
         <span style={{
@@ -74,7 +74,7 @@ export default async function FeaturedSpeakersPage() {
             fontSize: '14px', color: 'var(--color-muted)',
             letterSpacing: '0.04em',
           }}>
-            아직 등록된 이달의 강사가 없습니다.
+            아직 등록된 에디터 추천 강사가 없습니다.
           </p>
         </div>
       )}

@@ -3,9 +3,9 @@ import Link from 'next/link'
 import type { Insight } from '@/types'
 
 const TYPE_LABEL: Record<string, string> = {
-  issue:  '오늘의 이슈',
+  issue:  '트렌드 브리핑',
   report: '강연 현장',
-  pick:   '이 강사 어때요?',
+  pick:   '에디터 추천 강사',
 }
 const STATUS_LABEL: Record<string, string> = {
   draft:     '임시저장',
@@ -37,7 +37,7 @@ export default async function InsightsAdminPage() {
         <div>
           <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1a1a2e' }}>인사이트 관리</h1>
           <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-            오늘의 이슈 · 강연 현장 · 이 강사 어때요?
+            트렌드 브리핑 · 강연 현장 · 에디터 추천 강사
           </p>
         </div>
         <Link

@@ -62,7 +62,7 @@ export default function Footer() {
           <div className="footer-right">
             <nav className="footer-nav">
               {[
-                { href: '/speakers', label: '연사 라인업' },
+                { href: '/speakers', label: '강사 라인업' },
                 { href: '/matching?step=1', label: '강사 매칭 신청' },
                 { href: '/inquiry/status', label: '문의 현황' },
                 { href: '/support/about', label: '최선화닷컴 이야기' },

@@ -4,9 +4,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 const TABS = [
-  { href: '/insights/issue',    label: '오늘의 이슈' },
+  { href: '/insights/issue',    label: '트렌드 브리핑' },
   { href: '/insights/report',   label: '강연 현장' },
-  { href: '/insights/featured', label: '이달의 강사' },
+  { href: '/insights/featured', label: '에디터 추천 강사' },
 ]
 
 export default function InsightsTabs() {
