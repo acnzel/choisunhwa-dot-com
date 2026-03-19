@@ -211,15 +211,29 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 {speaker.name}
               </h1>
 
-              {/* 직함 + 소속 — 크고 진하게, 하나만 표시 */}
+              {/* 직함 + 소속 */}
               <p style={{
                 fontFamily: 'var(--font-body)', fontSize: 'clamp(15px, 1.8vw, 18px)',
                 fontWeight: 500, color: 'var(--color-ink)',
-                marginBottom: '24px', lineHeight: 1.5,
+                marginBottom: speaker.bio_short ? '14px' : '24px', lineHeight: 1.5,
                 letterSpacing: '-0.01em',
               }}>
                 {[speaker.title, speaker.company].filter(Boolean).join(' · ')}
               </p>
+
+              {/* 강사 소개글 (bio_short) */}
+              {speaker.bio_short && (
+                <p style={{
+                  fontFamily: 'var(--font-body)', fontSize: 'clamp(13px, 1.4vw, 15px)',
+                  fontWeight: 400, color: 'var(--color-subtle)',
+                  marginBottom: '24px', lineHeight: 1.75,
+                  paddingLeft: '14px',
+                  borderLeft: '3px solid var(--color-green)',
+                  wordBreak: 'keep-all',
+                }}>
+                  {speaker.bio_short}
+                </p>
+              )}
 
               {/* CTA 버튼 */}
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
@@ -247,12 +261,12 @@ export default async function SpeakerDetailPage({ params }: Props) {
           {/* ── 메인 콘텐츠 ── */}
           <main style={{ borderRight: '1px solid var(--color-border)' }}>
 
-            {/* 강사 소개 */}
+            {/* 강연 주제 (bio_full 텍스트) */}
             {hasContent.bio && (
-              <DetailSection title="강사 소개">
+              <DetailSection title="강연 주제">
                 <p style={{
-                  fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 300,
-                  color: 'var(--color-subtle)', lineHeight: 1.9,
+                  fontFamily: 'var(--font-body)', fontSize: '15px', fontWeight: 400,
+                  color: 'var(--color-ink)', lineHeight: 1.9,
                   whiteSpace: 'pre-line',
                   wordBreak: 'keep-all',
                   overflowWrap: 'break-word',
@@ -265,20 +279,20 @@ export default async function SpeakerDetailPage({ params }: Props) {
             {/* 약력 */}
             {hasContent.careers && (
               <DetailSection title="약력">
-                <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                   {careers.map((career, idx) => (
-                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
+                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '14px' }}>
                       {career.year && (
                         <span style={{
                           fontFamily: 'var(--font-english)', fontWeight: 700,
                           fontSize: '11px', letterSpacing: '0.06em',
                           color: 'var(--color-muted)', whiteSpace: 'nowrap',
-                          width: '52px', flexShrink: 0, paddingTop: '2px',
+                          width: '52px', flexShrink: 0, paddingTop: '3px',
                         }}>
                           {career.year}
                         </span>
                       )}
-                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>
+                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>
                         {career.content}
                       </span>
                     </li>
@@ -290,34 +304,34 @@ export default async function SpeakerDetailPage({ params }: Props) {
             {/* 학력 */}
             {hasContent.education && (
               <DetailSection title="학력">
-                <ul style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <ul style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {education.map((edu, idx) => (
-                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '13px' }}>
+                    <li key={idx} style={{ display: 'flex', gap: '16px', fontSize: '14px' }}>
                       {edu.year && (
                         <span style={{
                           fontFamily: 'var(--font-english)', fontWeight: 700,
                           fontSize: '11px', letterSpacing: '0.06em',
                           color: 'var(--color-muted)', whiteSpace: 'nowrap',
-                          width: '52px', flexShrink: 0, paddingTop: '2px',
+                          width: '52px', flexShrink: 0, paddingTop: '3px',
                         }}>
                           {edu.year}
                         </span>
                       )}
-                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{edu.content}</span>
+                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontWeight: 400 }}>{edu.content}</span>
                     </li>
                   ))}
                 </ul>
               </DetailSection>
             )}
 
-            {/* 강연 주제 */}
+            {/* 강연 커리큘럼 */}
             {hasContent.lectureTopics && (
-              <DetailSection title="강연 주제">
+              <DetailSection title="강연 커리큘럼">
                 <ul style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {lectureTopics.map((topic, idx) => (
                     <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
                       <span style={{ color: 'var(--color-green)', flexShrink: 0, lineHeight: 1.8 }}>›</span>
-                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{topic}</span>
+                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontSize: '14px', fontWeight: 400 }}>{topic}</span>
                     </li>
                   ))}
                 </ul>
@@ -331,7 +345,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
                   {books.map((book, idx) => (
                     <li key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '13px' }}>
                       <span style={{ color: 'var(--color-ochre)', flexShrink: 0, lineHeight: 1.8 }}>―</span>
-                      <span style={{ color: 'var(--color-subtle)', lineHeight: 1.7 }}>{book}</span>
+                      <span style={{ color: 'var(--color-ink)', lineHeight: 1.75, fontSize: '14px', fontWeight: 400 }}>{book}</span>
                     </li>
                   ))}
                 </ul>
@@ -532,10 +546,15 @@ function DetailSection({
       style={{ borderBottom: '1px solid var(--color-border)', padding: 'clamp(24px, 4vw, 40px) var(--space-page)' }}
     >
       <h2 style={{
-        fontFamily: 'var(--font-english)', fontWeight: 700,
-        fontSize: '10px', letterSpacing: '0.14em', textTransform: 'uppercase',
-        color: 'var(--color-muted)', marginBottom: '20px',
+        display: 'flex', alignItems: 'center', gap: '10px',
+        fontFamily: 'var(--font-display)', fontWeight: 900,
+        fontSize: '16px', letterSpacing: '-0.01em',
+        color: 'var(--color-ink)', marginBottom: '20px',
       }}>
+        <span style={{
+          display: 'inline-block', width: '4px', height: '16px',
+          background: 'var(--color-green)', borderRadius: '2px', flexShrink: 0,
+        }} />
         {title}
       </h2>
       {children}
