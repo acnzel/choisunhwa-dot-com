@@ -1,81 +1,76 @@
 /**
- * PATCH  /api/speaker-applications/[id]  — 승인/거절/메모 (어드민)
- * DELETE /api/speaker-applications/[id]  — 삭제 (어드민)
+ * PATCH /api/speaker-applications/[id]  — 승인(approve) or 반려(reject)
  */
+
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 
-type Params = { params: Promise<{ id: string }> }
-
-// ── PATCH ─────────────────────────────────────────────────────
-export async function PATCH(req: NextRequest, { params }: Params) {
-  const { id } = await params
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: '인증 필요' }, { status: 401 })
 
+  const { id } = await params
   const body = await req.json()
-  const { status, admin_note } = body
+  const { action, admin_note } = body // action: 'approve' | 'reject'
 
-  if (status && !['pending', 'approved', 'rejected'].includes(status)) {
-    return NextResponse.json({ error: '유효하지 않은 상태값' }, { status: 400 })
+  if (!['approve', 'reject'].includes(action)) {
+    return NextResponse.json({ error: 'action은 approve 또는 reject이어야 합니다' }, { status: 400 })
   }
-
-  const patch: Record<string, unknown> = {}
-  if (status !== undefined) {
-    patch.status = status
-    patch.reviewed_at = new Date().toISOString()
-    patch.reviewed_by = user.id
-  }
-  if (admin_note !== undefined) patch.admin_note = admin_note
 
   const admin = createAdminClient()
 
-  // 승인 시 speakers 테이블에도 복사
-  if (status === 'approved') {
-    const { data: app } = await admin
-      .from('speaker_applications')
-      .select('*')
-      .eq('id', id)
-      .single()
+  // 현재 신청서 조회
+  const { data: app, error: fetchErr } = await admin
+    .from('speaker_applications')
+    .select('*')
+    .eq('id', id)
+    .single()
 
-    if (app) {
-      await admin.from('speakers').insert({
+  if (fetchErr || !app) return NextResponse.json({ error: '신청서를 찾을 수 없습니다' }, { status: 404 })
+
+  const newStatus = action === 'approve' ? 'approved' : 'rejected'
+
+  // 상태 업데이트
+  const { error: updateErr } = await admin
+    .from('speaker_applications')
+    .update({
+      status: newStatus,
+      admin_note: admin_note || null,
+      reviewed_at: new Date().toISOString(),
+    })
+    .eq('id', id)
+
+  if (updateErr) return NextResponse.json({ error: updateErr.message }, { status: 500 })
+
+  // 승인 시 speakers 테이블에 자동 등록
+  if (action === 'approve') {
+    const { error: insertErr } = await admin
+      .from('speakers')
+      .insert({
         name: app.name,
         title: app.title,
         company: app.company,
-        fields: app.fields ?? [],
         bio_short: app.bio_short,
-        bio_full: app.bio_full,
-        photo_url: app.photo_url,
-        media_links: app.youtube_url ? [app.youtube_url] : [],
-        is_visible: false, // 어드민이 최종 검토 후 is_visible=true로 변경
-        sort_order: 9999,
+        bio_full: app.bio_full || null,
+        fields: app.fields || [],
+        photo_url: app.photo_url || null,
+        is_visible: true,
+        is_best: false,
+        is_trending: false,
       })
+
+    if (insertErr) {
+      return NextResponse.json({
+        warning: `상태는 변경되었으나 speakers 등록 실패: ${insertErr.message}`,
+        status: newStatus,
+      }, { status: 207 })
     }
   }
 
-  const { data, error } = await admin
-    .from('speaker_applications')
-    .update(patch)
-    .eq('id', id)
-    .select()
-    .single()
-
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data })
-}
-
-// ── DELETE ────────────────────────────────────────────────────
-export async function DELETE(req: NextRequest, { params }: Params) {
-  const { id } = await params
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '인증 필요' }, { status: 401 })
-
-  const admin = createAdminClient()
-  const { error } = await admin.from('speaker_applications').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ success: true })
+  return NextResponse.json({ status: newStatus, message: action === 'approve' ? '승인 완료. 연사 라인업에 등록되었습니다.' : '반려 처리되었습니다.' })
 }

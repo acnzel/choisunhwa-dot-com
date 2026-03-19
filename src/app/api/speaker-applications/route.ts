@@ -1,12 +1,13 @@
 /**
- * GET  /api/speaker-applications  — 목록 (어드민)
- * POST /api/speaker-applications  — 신청 (공개, 인증 불필요)
+ * GET  /api/speaker-applications   — 어드민 전용: 신청 목록
+ * POST /api/speaker-applications   — 공개: 강사 등록 신청 제출
  */
-import { NextRequest, NextResponse } from 'next/server'
-import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
 
-// ── GET (어드민) ──────────────────────────────────────────────
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+
+// ── GET — 어드민 목록 (인증 필요) ─────────────────────────────
 export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -18,50 +19,53 @@ export async function GET(req: NextRequest) {
   const offset = parseInt(searchParams.get('offset') ?? '0', 10)
 
   const admin = createAdminClient()
-  let q = admin
+  const query = admin
     .from('speaker_applications')
     .select('*', { count: 'exact' })
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
-  if (status !== 'all') q = q.eq('status', status)
+  if (status !== 'all') query.eq('status', status)
 
-  const { data, error, count } = await q
+  const { data, count, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data, meta: { total: count ?? 0, limit, offset } })
+
+  return NextResponse.json({ data, total: count ?? 0, limit, offset })
 }
 
-// ── POST (공개) ───────────────────────────────────────────────
+// ── POST — 공개 신청 제출 ────────────────────────────────────
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { name, email, phone, title, company, fields,
-          bio_short, bio_full, lecture_topics, career,
-          education, photo_url, youtube_url, fee_range } = body
+  const {
+    name, email, title, company, fields = [],
+    bio_short, bio_full, lecture_topics, career, education,
+    photo_url, youtube_url, fee_range,
+  } = body
 
-  if (!name?.trim() || !email?.trim()) {
-    return NextResponse.json({ error: '이름과 이메일은 필수입니다' }, { status: 400 })
-  }
-
-  // 이메일 형식 검증
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    return NextResponse.json({ error: '이메일 형식이 올바르지 않습니다' }, { status: 400 })
-  }
+  if (!name || name.length < 2)  return NextResponse.json({ error: '이름을 입력해주세요' }, { status: 400 })
+  if (!email || !email.includes('@')) return NextResponse.json({ error: '이메일 형식이 올바르지 않습니다' }, { status: 400 })
+  if (!title)    return NextResponse.json({ error: '직함을 입력해주세요' }, { status: 400 })
+  if (!company)  return NextResponse.json({ error: '소속을 입력해주세요' }, { status: 400 })
+  if (!bio_short) return NextResponse.json({ error: '강사 소개를 입력해주세요' }, { status: 400 })
 
   const admin = createAdminClient()
   const { data, error } = await admin
     .from('speaker_applications')
     .insert({
-      name: name.trim(),
-      email: email.trim().toLowerCase(),
-      phone, title, company,
-      fields: Array.isArray(fields) ? fields : [],
-      bio_short, bio_full, lecture_topics,
-      career, education, photo_url, youtube_url, fee_range,
+      name, email, title, company, fields,
+      bio_short, bio_full: bio_full || null,
+      lecture_topics: lecture_topics || null,
+      career: career || null,
+      education: education || null,
+      photo_url: photo_url || null,
+      youtube_url: youtube_url || null,
+      fee_range: fee_range || null,
       status: 'pending',
     })
-    .select('id, name, email, status')
+    .select('id, name, created_at')
     .single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ data, message: '신청이 완료되었습니다. 검토 후 연락드리겠습니다.' }, { status: 201 })
+
+  return NextResponse.json({ data, message: '신청이 접수되었습니다' }, { status: 201 })
 }

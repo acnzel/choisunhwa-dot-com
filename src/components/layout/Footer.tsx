@@ -64,6 +64,7 @@ export default function Footer() {
               {[
                 { href: '/speakers', label: '강사 라인업' },
                 { href: '/matching?step=1', label: '강사 매칭 신청' },
+                { href: '/speakers/apply', label: '강사 등록 신청' },
                 { href: '/inquiry/status', label: '문의 현황' },
                 { href: '/support/about', label: '최선화닷컴 이야기' },
               ].map(({ href, label }) => (
