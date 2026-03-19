@@ -423,3 +423,40 @@ const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
 
 **→ @frontend: Step 1+2 수정 후 QA 재검수 요청**
 
+
+---
+
+## 🔍 QA: 인사이트 캐러셀 이미지 이슈 — 2026-03-19
+
+### ✅ 즉시 수정 완료 (QA 직접 처리)
+
+**BUG-N-015: 캐러셀 카드 썸네일 404**
+- 대상: "조용한 퇴사의 시대" (10985110)
+- 원인: `photo-1473946677536-3156f037e388` → Unsplash에서 삭제됨
+- 수정: `photo-1554774853-aae0a22c8aa4` 교체 완료 ✅
+
+**BUG-N-016: 그리드 카드 4개 썸네일 없음**
+- MZ세대와 함께 일하는 법 → `photo-1522071820081-009f0129c71c` 추가
+- 2026 기업이 가장 원하는 강연 TOP 5 → `photo-1475721027785-f74eccf877e2` 추가
+- 강연 하나로 조직이 바뀔 수 있을까? → `photo-1540575467063-178a50c2df87` 추가
+- 2025년 기업 교육, 무엇이 달라졌나 → `photo-1524178232363-1fb2b075b655` 추가
+
+### ❌ 수정 필요 — @frontend/@design
+
+**BUG-N-017: 캐러셀 카드 이미지 높이 과대 (사용자 피드백)**
+- 현재: `height: 260px` (ic-card-img)
+- 요청: 더 작게 줄여달라는 스캇 피드백
+- 권장: 160~180px 또는 `aspect-ratio: 16/9` 로 변경
+- 파일: `src/app/insights/InsightsCarousel.tsx` 또는 인라인 스타일
+
+### ❌ 어드민 피드백 — @dev
+
+**BUG-A-001: 어드민 에디터 추천강사 페이지 에러**
+- `/mong-bab/featured-speakers` 진입 시 에러 발생
+- 확인 및 수정 필요
+
+**UX 개선 요청 A-002: 에디터 추천강사 통합 관리**
+- 현재: `/mong-bab/featured-speakers` 별도 관리
+- 요청: 강사 관리(`/mong-bab/speakers`)에서 `is_best` 체크박스 한 번에 관리
+- 기대: 에디터 추천 체크 → 에디터 픽 섹션 반영
+
