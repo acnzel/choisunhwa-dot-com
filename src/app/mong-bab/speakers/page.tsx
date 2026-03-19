@@ -12,7 +12,7 @@ async function getSpeakers(): Promise<Speaker[]> {
   const supabase = createAdminClient()
   const { data } = await supabase
     .from('speakers')
-    .select('*')
+    .select('id, name, title, company, photo_url, fields, is_visible, is_best, is_trending, sort_order')
     .order('sort_order', { ascending: true })
   return (data as Speaker[]) ?? []
 }

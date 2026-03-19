@@ -19,12 +19,15 @@ type VisibilityFilter = 'all' | 'visible' | 'hidden'
 type BestFilter = 'all' | 'best' | 'normal'
 type TrendFilter = 'all' | 'trending' | 'normal'
 
+const ADMIN_PAGE_SIZE = 50
+
 export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
   const [search, setSearch] = useState('')
   const [visFilter, setVisFilter] = useState<VisibilityFilter>('all')
   const [bestFilter, setBestFilter] = useState<BestFilter>('all')
   const [trendFilter, setTrendFilter] = useState<TrendFilter>('all')
   const [featuredIds, setFeaturedIds] = useState<Set<string>>(new Set())
+  const [currentPage, setCurrentPage] = useState(1)
 
   // 에디터 픽 목록 로드
   const loadFeatured = useCallback(async () => {
@@ -48,6 +51,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
   }
 
   const filtered = useMemo(() => {
+    setCurrentPage(1)
     const q = search.trim().toLowerCase()
     return speakers.filter((s) => {
       const matchSearch =
@@ -75,6 +79,12 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
       return matchSearch && matchVis && matchBest && matchTrend
     })
   }, [speakers, search, visFilter, bestFilter, trendFilter])
+
+  const totalPages = Math.ceil(filtered.length / ADMIN_PAGE_SIZE)
+  const paginated = filtered.slice(
+    (currentPage - 1) * ADMIN_PAGE_SIZE,
+    currentPage * ADMIN_PAGE_SIZE,
+  )
 
   return (
     <>
@@ -186,6 +196,11 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
         {filtered.length === speakers.length
           ? `전체 ${speakers.length}명`
           : `${filtered.length}명 검색됨 / 전체 ${speakers.length}명`}
+        {totalPages > 1 && (
+          <span className="ml-2 text-gray-300">
+            ({(currentPage - 1) * ADMIN_PAGE_SIZE + 1}–{Math.min(currentPage * ADMIN_PAGE_SIZE, filtered.length)})
+          </span>
+        )}
       </p>
 
       {/* ── 테이블 ── */}
@@ -214,7 +229,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
                   </td>
                 </tr>
               ) : (
-                filtered.map((s) => (
+                paginated.map((s) => (
                   <ClickableRow key={s.id} href={`/mong-bab/speakers/${s.id}`}>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
@@ -269,6 +284,48 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
           </table>
         </div>
       </div>
+
+      {/* ── 페이지네이션 ── */}
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center gap-1.5 mt-5">
+          <button
+            onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+            disabled={currentPage === 1}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >‹</button>
+
+          {Array.from({ length: totalPages }, (_, i) => i + 1)
+            .filter(p => p === 1 || p === totalPages || Math.abs(p - currentPage) <= 2)
+            .reduce<(number | '…')[]>((acc, p, i, arr) => {
+              if (i > 0 && p - (arr[i - 1] as number) > 1) acc.push('…')
+              acc.push(p)
+              return acc
+            }, [])
+            .map((p, i) =>
+              p === '…' ? (
+                <span key={`e${i}`} className="w-8 h-8 flex items-center justify-center text-gray-300 text-sm">…</span>
+              ) : (
+                <button
+                  key={p}
+                  onClick={() => setCurrentPage(p as number)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${
+                    currentPage === p
+                      ? 'bg-[#1a1a2e] text-white'
+                      : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {p}
+                </button>
+              )
+            )}
+
+          <button
+            onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+            disabled={currentPage === totalPages}
+            className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 text-sm hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          >›</button>
+        </div>
+      )}
     </>
   )
 }
