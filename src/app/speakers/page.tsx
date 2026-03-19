@@ -68,62 +68,62 @@ export default async function SpeakersPage({
   return (
     <div style={{ minHeight: '100vh', background: '#F7F3EE', paddingTop: 'var(--nav-height)' }}>
 
-      {/* ── 페이지 헤더 (베이지 톤) ── */}
+      {/* ── 페이지 헤더 ── */}
       <div style={{
         background: '#EDE6DC',
-        padding: 'clamp(36px, 5vw, 52px) clamp(24px, 5vw, 48px) clamp(28px, 4vw, 40px)',
         borderBottom: '1px solid #DDD5C8',
+        padding: '52px clamp(20px, 4vw, 48px) 40px',
       }}>
-        <p style={{
-          fontSize: 12, fontWeight: 600, letterSpacing: '2px',
-          color: '#9C8570', textTransform: 'uppercase', marginBottom: 10,
-        }}>
-          Speaker Lineup
-        </p>
-        <h1 style={{
-          fontFamily: 'var(--font-display, serif)',
-          fontSize: 'clamp(26px, 4vw, 34px)', fontWeight: 800,
-          color: '#1F1007', letterSpacing: '-1px', marginBottom: 8,
-        }}>
-          강사 라인업
-        </h1>
-        <p style={{ fontSize: 15, color: '#7A6A5A', fontWeight: 400 }}>
-          검증된 전문 강사진과 최선화닷컴을 통해 연결하세요
-        </p>
-        <div style={{ display: 'flex', gap: 32, marginTop: 24 }}>
-          {[
-            { num: total.toLocaleString(), label: '등록 강사' },
-            { num: '28', label: '강연 분야' },
-            { num: '1,200+', label: '누적 강연' },
-          ].map(({ num, label }) => (
-            <div key={label}>
-              <div style={{
-                fontSize: 'clamp(20px, 2.5vw, 26px)', fontWeight: 800,
-                color: '#2C6B5A', letterSpacing: '-1px',
-              }}>
-                {num}
+        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
+          <p style={{
+            fontSize: 12, fontWeight: 600, letterSpacing: '2px',
+            color: '#9C8570', textTransform: 'uppercase', marginBottom: 10,
+          }}>
+            Speaker Lineup
+          </p>
+          <h1 style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: 'clamp(26px, 3.5vw, 34px)', fontWeight: 800,
+            color: '#1F1007', letterSpacing: '-1px', marginBottom: 8,
+          }}>
+            강사 라인업
+          </h1>
+          <p style={{ fontSize: 15, color: '#7A6A5A', fontWeight: 400 }}>
+            검증된 전문 강사진과 최선화닷컴을 통해 연결하세요
+          </p>
+          <div style={{ display: 'flex', gap: 32, marginTop: 24 }}>
+            {[
+              { num: total.toLocaleString(), label: '등록 강사' },
+              { num: String(Object.keys(FIELD_MAP).length), label: '강연 분야' },
+              { num: '1,200+', label: '누적 강연' },
+            ].map(({ num, label }) => (
+              <div key={label}>
+                <div style={{
+                  fontSize: 'clamp(20px, 2.2vw, 26px)', fontWeight: 800,
+                  color: '#2C6B5A', letterSpacing: '-1px',
+                }}>
+                  {num}
+                </div>
+                <div style={{ fontSize: 12, color: '#9C8570', fontWeight: 500, marginTop: 2 }}>
+                  {label}
+                </div>
               </div>
-              <div style={{ fontSize: 12, color: '#9C8570', fontWeight: 500, marginTop: 2 }}>
-                {label}
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* ── 콘텐츠 ── */}
-      <div style={{ padding: 'clamp(24px, 3vw, 32px) clamp(24px, 5vw, 48px) 80px' }}>
-        <SpeakerList
-          speakers={speakers}
-          total={total}
-          page={page}
-          totalPages={totalPages}
-          pageSize={PAGE_SIZE}
-          currentField={field}
-          currentQ={q}
-          fieldMap={FIELD_MAP}
-        />
-      </div>
+      {/* ── SpeakerList (검색바 + 본문 포함) ── */}
+      <SpeakerList
+        speakers={speakers}
+        total={total}
+        page={page}
+        totalPages={totalPages}
+        pageSize={PAGE_SIZE}
+        currentField={field}
+        currentQ={q}
+        fieldMap={FIELD_MAP}
+      />
     </div>
   )
 }
