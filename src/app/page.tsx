@@ -255,7 +255,7 @@ export default async function HomePage() {
                 fontSize: 'clamp(40px, 6vw, 88px)',
                 lineHeight: 1.12, letterSpacing: '-0.03em', marginBottom: '28px',
               }}>
-                <span className="hero-line-1" style={{ display: 'block' }}>사람이 바뀌는 강연,</span>
+                <span className="hero-line-1" style={{ display: 'block' }}>사람이 바꾸는 강연,</span>
                 <span className="hero-line-2" style={{ color: 'var(--color-rust)', fontWeight: 400, display: 'block' }}>여기서 시작됩니다.</span>
               </h1>
 

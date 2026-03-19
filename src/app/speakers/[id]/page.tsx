@@ -558,37 +558,23 @@ function DetailSection({
   children: React.ReactNode
   className?: string
 }) {
-  const SECTION_ICONS: Record<string, string> = {
-    '강연 주제':     '✦',
-    '약력':         '◈',
-    '학력':         '◈',
-    '강연 커리큘럼': '▸',
-    '저서':         '◉',
-    '참고영상':      '▶',
-    '보유 커리큘럼': '▸',
-  }
-  const icon = SECTION_ICONS[title] ?? '◆'
-
   return (
     <section
       className={className}
       style={{ borderBottom: '1px solid var(--color-border)', padding: 'clamp(24px, 4vw, 40px) var(--space-page)' }}
     >
       <h2 style={{
-        display: 'flex', alignItems: 'center', gap: '8px',
         fontFamily: 'var(--font-display)', fontWeight: 900,
         fontSize: '18px', letterSpacing: '-0.02em',
         color: 'var(--color-ink)', marginBottom: '22px',
+        lineHeight: 1.3,
       }}>
         <span style={{
-          fontSize: '14px',
-          color: 'var(--color-green)',
-          flexShrink: 0,
-          lineHeight: 1,
+          background: 'linear-gradient(transparent 45%, #FFE500 45%)',
+          paddingBottom: '2px',
         }}>
-          {icon}
+          {title}
         </span>
-        {title}
       </h2>
       {children}
     </section>
