@@ -129,17 +129,17 @@ export default function SpeakerList({
           background: #ede8e0;
         }
         .spk-card-body { padding: 14px 16px 16px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .spk-card-name { font-size: 17px; font-weight: 800; color: #1a1a1a; letter-spacing: -0.02em; line-height: 1.2; }
-        .spk-card-title { font-size: 13px; color: #888; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+        .spk-card-name { font-size: 18px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.02em; line-height: 1.2; }
+        .spk-card-title { font-size: 14px; font-weight: 400; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
         .spk-card-bio {
           font-size: 14px; color: #666; line-height: 1.6; margin-top: 6px;
           display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
         }
         .spk-card-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
         .spk-card-tag {
-          font-size: 11px; font-weight: 600;
+          font-size: 12px; font-weight: 400;
           padding: 3px 10px;
-          background: #1D4229; color: #fff;
+          background: #F2EDDF; color: #444;
           border-radius: 20px; white-space: nowrap;
         }
 
