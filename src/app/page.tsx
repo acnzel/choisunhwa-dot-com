@@ -19,7 +19,7 @@ async function getData() {
       .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
       .eq('is_visible', true)
       .order('sort_order', { ascending: true })
-      .limit(30),
+      .limit(60),
     supabase
       .from('insights')
       .select('id, type, title, summary, published_at, home_featured')
