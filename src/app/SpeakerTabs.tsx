@@ -111,10 +111,12 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
           background: var(--color-bg);
           position: relative;
           overflow: hidden;
-          transition: background 0.15s ease;
+          border-radius: 16px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+          transition: background 0.15s ease, box-shadow 0.2s ease, transform 0.2s ease;
           min-height: 160px;
         }
-        .sp-card:hover { background: #f5f1ea; }
+        .sp-card:hover { background: #f5f1ea; box-shadow: 0 6px 20px rgba(0,0,0,0.13); transform: translateY(-2px); }
 
         /* 좌측 컬러바 */
         .sp-card-bar {
@@ -325,10 +327,11 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
                       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px', marginTop: '2px' }}>
                         {visibleFields.map((f) => (
                           <span key={f} style={{
-                            fontSize: '9px', fontWeight: 600, letterSpacing: '0.04em',
-                            padding: '2px 6px',
-                            border: `1px solid ${accentColor}40`,
-                            color: accentColor,
+                            fontSize: '12px', fontWeight: 400,
+                            padding: '3px 10px',
+                            background: '#F2EDDF',
+                            color: '#444',
+                            borderRadius: '20px',
                             whiteSpace: 'nowrap',
                           }}>
                             {fieldMap[f]}
