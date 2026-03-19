@@ -90,9 +90,8 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
         .sp-card-grid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
-          gap: 1px;
-          background: var(--color-border);
-          min-height: 322px; /* 2행 확보 (160px × 2 + 1px gap) */
+          gap: 20px;
+          min-height: 340px;
         }
         @media (max-width: 860px) {
           .sp-card-grid { grid-template-columns: repeat(2, 1fr); }
@@ -217,20 +216,21 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
       `}</style>
 
       {/* 서브 탭 */}
-      <nav style={{ display: 'flex', borderBottom: border, padding: '0 var(--space-page)', overflowX: 'auto', scrollbarWidth: 'none' }}>
+      <nav style={{ display: 'flex', gap: '32px', borderBottom: border, padding: '0 var(--space-page)', overflowX: 'auto', scrollbarWidth: 'none' }}>
         {TABS.map((tab, i) => (
           <button
             key={tab}
             onClick={() => { setActiveTab(i); setFilterField(null) }}
             className="sub-tab-btn"
             style={{
-              fontSize: '11px', fontWeight: 600,
-              letterSpacing: '0.08em', textTransform: 'uppercase',
-              color: activeTab === i ? 'var(--color-ink)' : 'var(--color-muted)',
-              padding: '12px 0', marginRight: '24px', flexShrink: 0,
-              borderBottom: activeTab === i ? '2px solid var(--color-ink)' : '2px solid transparent',
+              fontSize: '15px', fontWeight: 600,
+              color: activeTab === i ? '#1D4229' : '#666',
+              padding: '14px 0', flexShrink: 0,
+              borderBottom: activeTab === i ? '2px solid #1D4229' : '2px solid transparent',
               transition: 'color 0.2s',
             }}
+            onMouseEnter={e => { if (activeTab !== i) (e.currentTarget as HTMLButtonElement).style.color = '#1D4229' }}
+            onMouseLeave={e => { if (activeTab !== i) (e.currentTarget as HTMLButtonElement).style.color = '#666' }}
           >
             {tab}
           </button>
@@ -261,7 +261,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
 
       {/* 카드 그리드 */}
       <div
-        style={{ borderTop: border }}
+        style={{ padding: '20px var(--space-page) 0' }}
         onMouseEnter={() => setPaused(true)}
         onMouseLeave={() => setPaused(false)}
       >
