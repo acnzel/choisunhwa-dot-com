@@ -597,3 +597,31 @@ cheil.com 레이아웃 특징:
 - `팀장` → `FIELD_ALIASES['팀장'] = '리더십'` → 리더십 강사 필터
 - `MZ` → `HR`, `조직문화` → `HR`, `번아웃` → `심리` (전체 BUG-N-014 alias 포함)
 - InsightCarousel.tsx 불필요 (page 내 구현으로 통합)
+
+---
+
+## QA 재검수 — commit 8cb6779 (2025-03-19)
+
+### N-017 — ⚠️ Dead Code
+
+| 항목 | 상태 |
+|------|------|
+| InsightCarousel height 170px 코드 수정 | ✅ 코드 정확 |
+| 실제 화면 반영 | ❌ InsightCarousel 현재 미사용 (dead code) |
+
+**원인:** LAYOUT-001에서 issue/page.tsx를 3열 정적 그리드로 재설계하면서 InsightCarousel import 제거됨.
+**권고:** InsightCarousel.tsx 삭제 또는 재사용 여부 @dev 결정 필요.
+
+### A-001 — 코드 PASS / 브라우저 테스트 보류
+
+| 항목 | 상태 |
+|------|------|
+| 에러 메시지 상세 노출 | ✅ |
+| item.speaker null 가드 | ✅ |
+| console.error 로깅 | ✅ |
+| DB 고아 레코드 | ✅ 없음 (5건 모두 유효) |
+| 브라우저 에러 재현 | ⏸ 어드민 자격증명 필요 |
+
+### A-002 — 완료 확인
+
+`/mong-bab/speakers` 테이블에 ⭐ 에디터픽 토글 이미 구현됨. 스캇에게 전달 완료.
