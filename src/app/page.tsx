@@ -108,7 +108,10 @@ export default async function HomePage() {
   const { speakers, insightItems, bestSpeakers, trendingSpeakers, featuredItems, totalSpeakerCount } = await getData()
 
   // F-4: featured_speakers가 있으면 "지금 뜨는" 탭에 연동 (Speaker[] 형태로 변환)
-  const featuredAsSpeakers: Speaker[] = featuredItems.map(f => ({
+  // speaker가 null인 경우(비노출 처리된 강사) 제외
+  const featuredAsSpeakers: Speaker[] = featuredItems
+    .filter(f => f.speaker != null)
+    .map(f => ({
     ...f.speaker,
     bio_short: f.speaker.bio_short ?? '',
     is_visible: true,
@@ -384,7 +387,7 @@ export default async function HomePage() {
         </section>
 
         {/* ── 이달의 강사 — home_visible=true 항목만 노출 ── */}
-        <FeaturedSection items={featuredItems.filter(f => f.home_visible)} />
+        <FeaturedSection items={featuredItems.filter(f => f.home_visible && f.speaker != null)} />
 
         {/* ── F-D/E: INSIGHT — 데이터 있을 때만 렌더링 ── */}
         {showInsight && (
