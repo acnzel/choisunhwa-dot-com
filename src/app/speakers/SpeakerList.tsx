@@ -102,13 +102,15 @@ export default function SpeakerList({
         .spk-card {
           background: #fff;
           border: 1px solid #e8e4de;
+          border-radius: 16px;
+          overflow: hidden;
           text-decoration: none; color: inherit;
           display: flex; flex-direction: column;
           transition: box-shadow .2s, transform .2s;
         }
         .spk-card:hover {
-          box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-          transform: translateY(-2px);
+          box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+          transform: translateY(-3px);
         }
         .spk-card:hover .spk-card-img img { transform: scale(1.04); }
         .spk-card-img img { transition: transform .4s ease; }
