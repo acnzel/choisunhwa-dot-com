@@ -219,7 +219,7 @@ export default async function SpeakerDetailPage({ params }: Props) {
               )}
 
               {/* CTA 버튼 */}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center', marginBottom: '20px' }}>
                 <Link
                   href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
                   style={{
@@ -234,6 +234,24 @@ export default async function SpeakerDetailPage({ params }: Props) {
                 </Link>
                 <ShareButton />
               </div>
+
+              {/* 강연 분야 태그 — 헤더 하단 */}
+              {speaker.fields.some(f => !f.startsWith('~') && FIELD_MAP[f]) && (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+                  {speaker.fields
+                    .filter(f => !f.startsWith('~') && FIELD_MAP[f])
+                    .map((f) => (
+                      <span key={f} style={{
+                        fontSize: '10px', fontWeight: 600,
+                        padding: '4px 10px',
+                        background: 'var(--color-surface)', border: '1px solid var(--color-border)',
+                        color: 'var(--color-subtle)',
+                      }}>
+                        {FIELD_MAP[f]}
+                      </span>
+                    ))}
+                </div>
+              )}
             </div>
           </div>
         </header>
@@ -398,68 +416,8 @@ export default async function SpeakerDetailPage({ params }: Props) {
           >
             <div style={{ position: 'sticky', top: 'calc(var(--nav-height) + 24px)' }}>
 
-              {/* 섭외 문의 카드 */}
-              <div style={{ padding: 'clamp(20px, 3vw, 32px)', borderBottom: '1px solid var(--color-border)' }}>
-                <p style={{
-                  fontFamily: 'var(--font-english)', fontWeight: 700,
-                  fontSize: '10px', letterSpacing: '0.12em', color: 'var(--color-muted)',
-                  textTransform: 'uppercase', marginBottom: '10px',
-                }}>
-                  REQUEST
-                </p>
-                <h3 style={{
-                  fontFamily: 'var(--font-display)', fontWeight: 900,
-                  fontSize: 'clamp(16px, 2vw, 20px)', letterSpacing: '-0.02em',
-                  color: 'var(--color-ink)', marginBottom: '6px', lineHeight: 1.2,
-                }}>
-                  {speaker.name} 강사 섭외
-                </h3>
-                <p style={{ fontSize: '12px', color: 'var(--color-muted)', marginBottom: '20px', lineHeight: 1.6 }}>
-                  문의 후 1~2 영업일 내에<br />담당자가 연락드립니다.
-                </p>
-                <Link
-                  href={`/inquiry/lecture?speaker=${encodeURIComponent(speaker.name)}`}
-                  style={{
-                    display: 'block', textAlign: 'center',
-                    padding: '12px 0',
-                    background: 'var(--color-green)', color: 'var(--color-bg)',
-                    fontSize: '12px', fontWeight: 700, letterSpacing: '0.08em',
-                    fontFamily: 'var(--font-body)',
-                    textDecoration: 'none',
-                  }}
-                >
-                  섭외 문의하기 →
-                </Link>
-              </div>
-
-              {/* 분야 — 카테고리(SPEAKER_FIELDS) 표시, 강연분야 raw값 제외 */}
-              {speaker.fields.some(f => !f.startsWith('~') && FIELD_MAP[f]) && (
-                <div style={{ padding: 'clamp(16px, 2.5vw, 24px)' }}>
-                  <p style={{
-                    fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em',
-                    textTransform: 'uppercase', color: 'var(--color-muted)', marginBottom: '10px',
-                  }}>
-                    강연 분야
-                  </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                    {speaker.fields
-                      .filter(f => !f.startsWith('~') && FIELD_MAP[f])
-                      .map((f) => (
-                        <span key={f} style={{
-                          fontSize: '10px', fontWeight: 600,
-                          padding: '4px 10px',
-                          background: 'var(--color-surface)', border: '1px solid var(--color-border)',
-                          color: 'var(--color-subtle)',
-                        }}>
-                          {FIELD_MAP[f]}
-                        </span>
-                      ))}
-                  </div>
-                </div>
-              )}
-
               {/* 매칭으로 다른 강사 보기 */}
-              <div style={{ padding: 'clamp(16px, 2.5vw, 24px)', borderTop: '1px solid var(--color-border)' }}>
+              <div style={{ padding: 'clamp(20px, 3vw, 32px)' }}>
                 <p style={{ fontSize: '11px', color: 'var(--color-muted)', lineHeight: 1.7, marginBottom: '12px' }}>
                   다른 조건으로 강사를 찾고 싶으신가요?
                 </p>
@@ -506,8 +464,8 @@ function DetailSection({
         lineHeight: 1.3,
       }}>
         <span style={{
-          background: 'linear-gradient(transparent 45%, #FFE500 45%)',
-          paddingBottom: '2px',
+          borderBottom: '3px solid var(--color-green)',
+          paddingBottom: '3px',
         }}>
           {title}
         </span>
