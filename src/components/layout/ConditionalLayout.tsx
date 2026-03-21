@@ -19,8 +19,8 @@ export default function ConditionalLayout({ children }: { children: React.ReactN
   return (
     <>
       <Header />
-      {/* fixed 헤더 높이만큼 padding-top으로 보정 (단, 홈 페이지는 자체 처리) */}
-      <main className="flex-1" style={{ paddingTop: pathname === '/' ? 0 : 'var(--nav-height)' }}>
+      {/* 각 페이지가 자체적으로 paddingTop: var(--nav-height)을 관리함 → 여기선 0 */}
+      <main className="flex-1" style={{ paddingTop: 0 }}>
         {children}
       </main>
       <Footer />
