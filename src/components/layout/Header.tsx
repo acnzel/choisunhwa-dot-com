@@ -69,7 +69,7 @@ export default function Header() {
     setHoverItem(href)
   }
   const onNavMouseLeave = () => {
-    hoverTimeout.current = setTimeout(() => setHoverItem(null), 300)
+    hoverTimeout.current = setTimeout(() => setHoverItem(null), 500)
   }
 
   async function handleLogout() {
@@ -191,8 +191,9 @@ export default function Header() {
                 key={href}
                 style={{
                   position: 'relative',
-                  /* 모든 아이템 동일 padding → alignItems:center 수직 정렬 통일 */
-                  paddingTop: '8px', paddingBottom: '8px',
+                  /* alignSelf:stretch → 헤더 전체 높이 = hover dead zone 제거 */
+                  alignSelf: 'stretch',
+                  display: 'flex', alignItems: 'center',
                 }}
                 onMouseEnter={() => hasSubmenu ? onNavMouseEnter(href) : undefined}
                 onMouseLeave={() => hasSubmenu ? onNavMouseLeave() : undefined}
