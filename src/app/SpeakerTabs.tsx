@@ -55,25 +55,6 @@ function SpeakerAvatar({ photoUrl, name }: { photoUrl: string | null; name: stri
   )
 }
 
-const FIELD_COLORS: Record<string, string> = {
-  leadership:       '#2c3e6b',
-  org_culture:      '#4a5e3a',
-  motivation:       '#c4724a',
-  self_development: '#c4724a',
-  marketing:        '#c49a2a',
-  sales:            '#c49a2a',
-  communication:    '#4a5e3a',
-  ai_tech:          '#2c3e6b',
-  hr:               '#c49a2a',
-  finance:          '#2c3e6b',
-}
-
-function getFieldColor(fields: string[]): string {
-  for (const f of fields) {
-    if (FIELD_COLORS[f]) return FIELD_COLORS[f]
-  }
-  return '#2B4238'
-}
 
 export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] }: Props) {
   const searchParams = useSearchParams()
@@ -157,13 +138,6 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
           min-height: 160px;
         }
         .sp-card:hover { background: #f5f1ea; box-shadow: 0 0 0 1px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.12); transform: translateY(-2px); }
-
-        /* 좌측 컬러바 */
-        .sp-card-bar {
-          width: 3px;
-          flex-shrink: 0;
-          align-self: stretch;
-        }
 
         /* 사진 영역 */
         .sp-card-photo {
@@ -313,14 +287,11 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
           <div className="sp-card-grid">
             {paged.map((speaker, i) => {
               const globalIndex = page * PAGE_SIZE + i
-              const accentColor = getFieldColor(speaker.fields ?? [])
               const visibleFields = (speaker.fields ?? []).filter(f => fieldMap[f]).slice(0, 1)
               const subText = [speaker.title, speaker.company].filter(Boolean).join(' · ')
 
               return (
                 <Link key={speaker.id} href={`/speakers/${speaker.id}`} className="sp-card">
-                  <div className="sp-card-bar" style={{ background: accentColor }} />
-
                   <div className="sp-card-photo">
                     <SpeakerAvatar photoUrl={speaker.photo_url ?? null} name={speaker.name} />
                   </div>
