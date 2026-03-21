@@ -160,29 +160,30 @@ function WizardContent() {
           .select-grid { grid-template-columns: repeat(2, 1fr); }
           .select-grid-fluid { grid-template-columns: 1fr 1fr; }
         }
-        /* PC: 버튼 인라인 (카드 아래) */
-        .wizard-nav {
+        /* Sticky 하단 바 — 항상 fixed */
+        .wizard-sticky-bar {
+          position: fixed;
+          bottom: 0; left: 0; right: 0;
+          background: #FDFAF6;
+          border-top: 1px solid #E0D8CE;
+          box-shadow: 0 -4px 20px rgba(44,26,14,0.08);
+          padding: 16px 40px;
           display: flex;
-          justify-content: space-between;
           align-items: center;
-          margin-top: 32px;
-          padding-top: 24px;
-          border-top: 1px solid var(--color-border);
+          justify-content: space-between;
+          z-index: 50;
         }
-        /* 모바일: sticky 하단 바 */
-        @media (max-width: 640px) {
-          .wizard-nav {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            margin-top: 0;
-            padding: 16px var(--space-page);
-            background: var(--color-bg);
-            border-top: 1px solid var(--color-border);
-            z-index: 50;
-          }
-          .mobile-nav-spacer {
-            height: 72px !important;
-          }
+        @media (max-width: 600px) {
+          .wizard-sticky-bar { padding: 14px 20px; }
+        }
+        .wizard-sticky-status {
+          font-family: var(--font-body);
+          font-size: 13px;
+          color: #9C8570;
+        }
+        .wizard-sticky-status.selected {
+          color: #2C6B5A;
+          font-weight: 600;
         }
         /* 잘 모르겠어요 버튼 */
         .btn-skip-consult {
@@ -302,7 +303,7 @@ function WizardContent() {
 
         {/* ── 메인 콘텐츠 ── */}
         <div style={{
-          flex: 1, padding: 'clamp(28px, 4vw, 44px) var(--space-page) 48px',
+          flex: 1, padding: 'clamp(28px, 4vw, 44px) var(--space-page) 100px',
           maxWidth: '760px', width: '100%', margin: '0 auto',
         }}>
           <div className="wizard-slide" key={step}>
@@ -377,52 +378,79 @@ function WizardContent() {
               </div>
             )}
 
-            {/* ── 버튼: 카드 바로 아래 (PC 인라인 / 모바일 fixed) ── */}
-            <div className="wizard-nav">
-              {step > 1 ? (
-                <button
-                  type="button"
-                  onClick={goPrev}
-                  style={{
-                    fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 500,
-                    color: 'var(--color-subtle)', background: 'none', border: 'none',
-                    cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px',
-                  }}
-                >
-                  ← 이전
-                </button>
-              ) : (
-                <div />
-              )}
-
-              <button
-                type="button"
-                onClick={goNext}
-                disabled={!canNext || navigating}
-                style={{
-                  fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 700,
-                  letterSpacing: '0.06em',
-                  color: 'var(--color-bg)',
-                  background: canNext && !navigating ? 'var(--color-green)' : 'var(--color-border)',
-                  border: 'none', padding: '12px 36px',
-                  cursor: canNext && !navigating ? 'pointer' : 'not-allowed',
-                  transition: 'background 0.2s, opacity 0.2s',
-                  display: 'inline-flex', alignItems: 'center', gap: '10px',
-                  pointerEvents: navigating ? 'none' : 'auto',
-                  opacity: navigating ? 0.7 : 1,
-                }}
-              >
-                {navigating && step === TOTAL_STEPS
-                  ? <><span className="btn-spinner" />분석 중…</>
-                  : step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'
-                }
-              </button>
-            </div>
+            {/* 기존 인라인 버튼 영역 제거됨 → sticky 하단 바로 이동 */}
           </div>
         </div>
 
-        {/* 모바일 fixed bar 여백 확보 */}
-        <div style={{ height: '0' }} aria-hidden className="mobile-nav-spacer" />
+        {/* ── Sticky 하단 바 ── */}
+        <div className="wizard-sticky-bar">
+          {/* 왼쪽: 이전 버튼 (step 2+) or 선택 안내 */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16, flex: 1, minWidth: 0 }}>
+            {step > 1 && (
+              <button
+                type="button"
+                onClick={goPrev}
+                style={{
+                  fontFamily: 'var(--font-body)', fontSize: '13px', fontWeight: 500,
+                  color: '#9C8570', background: 'none', border: 'none',
+                  cursor: 'pointer', flexShrink: 0,
+                  display: 'flex', alignItems: 'center', gap: 4,
+                }}
+              >
+                ← 이전
+              </button>
+            )}
+            {/* 선택 상태 텍스트 */}
+            {step === 1 && (
+              <span className={`wizard-sticky-status${selectedFields.length > 0 ? ' selected' : ''}`}>
+                {selectedFields.length === 0
+                  ? '강연 분야를 최대 2개 선택해주세요'
+                  : `${selectedFields.map(id => WIZARD_FIELDS.find(f => f.id === id)?.label ?? '').join(', ')} 선택됨 (${selectedFields.length}/2)`
+                }
+              </span>
+            )}
+            {step === 2 && (
+              <span className={`wizard-sticky-status${selectedTopics.length > 0 ? ' selected' : ''}`}>
+                {selectedTopics.length === 0
+                  ? '강연 주제를 최대 2개 선택해주세요'
+                  : `${selectedTopics.length}개 선택됨`
+                }
+              </span>
+            )}
+            {step === 3 && (
+              <span className={`wizard-sticky-status${selectedTargets.length > 0 ? ' selected' : ''}`}>
+                {selectedTargets.length === 0
+                  ? '강연 대상을 선택해주세요'
+                  : `${selectedTargets.length}개 선택됨`
+                }
+              </span>
+            )}
+          </div>
+
+          {/* 오른쪽: 다음/추천 버튼 */}
+          <button
+            type="button"
+            onClick={goNext}
+            disabled={!canNext || navigating}
+            style={{
+              fontFamily: 'var(--font-body)', fontSize: '14px', fontWeight: 700,
+              letterSpacing: '0.04em',
+              color: '#fff',
+              background: canNext && !navigating ? '#2C6B5A' : '#DDD5C8',
+              border: 'none', padding: '12px 32px',
+              borderRadius: 8,
+              cursor: canNext && !navigating ? 'pointer' : 'not-allowed',
+              transition: 'background 0.2s',
+              display: 'inline-flex', alignItems: 'center', gap: 8,
+              flexShrink: 0,
+            }}
+          >
+            {navigating && step === TOTAL_STEPS
+              ? <><span className="btn-spinner" />분석 중…</>
+              : step === TOTAL_STEPS ? '강사 추천 받기 →' : '다음 →'
+            }
+          </button>
+        </div>
       </div>
     </>
   )
