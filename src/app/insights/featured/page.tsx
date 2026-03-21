@@ -24,7 +24,7 @@ async function getFeaturedSpeakers(): Promise<FeaturedSpeakerItem[]> {
       .order('sort_order', { ascending: true })
 
     if (error) return []
-    return (data as unknown as FeaturedSpeakerItem[]) ?? []
+    return ((data as unknown as FeaturedSpeakerItem[]) ?? []).filter(item => item.speaker != null)
   } catch {
     return []
   }
