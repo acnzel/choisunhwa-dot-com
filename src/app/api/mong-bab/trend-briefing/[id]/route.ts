@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
-import { createClient } from '@/lib/supabase/server'
+
+// 미들웨어에서 admin 인증 완료 후 도달 — 별도 인증 불필요
 
 // PATCH: 게시 (draft → published)
 export async function PATCH(
@@ -8,20 +9,12 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const admin = createAdminClient()
+
   const { error } = await admin
     .from('insights')
-    .update({
-      status: 'published',
-      published_at: new Date().toISOString(),
-    })
+    .update({ status: 'published', published_at: new Date().toISOString() })
     .eq('id', id)
-    .eq('auto_generated', true)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
@@ -33,17 +26,12 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params
-
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-
   const admin = createAdminClient()
+
   const { error } = await admin
     .from('insights')
     .delete()
     .eq('id', id)
-    .eq('auto_generated', true)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })

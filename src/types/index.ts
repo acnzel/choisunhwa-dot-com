@@ -200,6 +200,7 @@ export type InsightStatus = 'draft' | 'pending' | 'published'
 // type별 meta 구조
 export interface InsightMetaIssue {
   related_speaker_ids?: string[]
+  tags?: string[]  // 자동 생성 아티클 태그
 }
 
 export interface InsightMetaReport {
@@ -233,6 +234,10 @@ export interface Insight {
   published_at: string | null
   home_featured: boolean
   meta: InsightMeta
+  // migration 013: 트렌드 브리핑 자동화 컬럼
+  source_url: string | null
+  source_name: string | null
+  auto_generated: boolean
   created_at: string
   updated_at: string
 }

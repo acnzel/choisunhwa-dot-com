@@ -12,7 +12,7 @@ export default function ManualTrigger() {
     setLoading(true)
     setResult(null)
     try {
-      const res = await fetch('/api/cron/trend-briefing', { method: 'POST' })
+      const res = await fetch('/api/mong-bab/trend-briefing/run', { method: 'POST' })
       const data = await res.json()
       if (data.ok) {
         setResult(`✅ 완료 — 수집 ${data.collected}건 / 저장 ${data.saved}건`)

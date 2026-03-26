@@ -4,6 +4,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import InsightDetail from '@/components/insights/InsightDetail'
 import type { Insight } from '@/types'
 
+export const dynamic = 'force-dynamic'
+
 interface Props {
   params: Promise<{ id: string }>
 }
