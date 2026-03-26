@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { href: '/mong-bab/featured-speakers',    label: '에디터 픽',  icon: '⭐' },
   { href: '/mong-bab/lectures',  label: '강연 관리', icon: '📋' },
   { href: '/mong-bab/insights',  label: '인사이트 관리', icon: '✍️' },
+  { href: '/mong-bab/trend-briefing/pending', label: '트렌드 브리핑', icon: '🤖' },
   { href: '/mong-bab/inquiries', label: '문의 관리', icon: '💬' },
   { href: '/mong-bab/members',   label: '회원 관리', icon: '👥' },
   { href: '/mong-bab/support',   label: 'FAQ/공지',  icon: '📢' },

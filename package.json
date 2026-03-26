@@ -29,9 +29,11 @@
     "@tiptap/react": "^2.27.2",
     "@tiptap/starter-kit": "^2.27.2",
     "next": "16.1.6",
+    "openai": "^6.33.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.2",
+    "rss-parser": "^3.13.0",
     "sharp": "^0.34.5",
     "tailwindcss": "^4"
   },
