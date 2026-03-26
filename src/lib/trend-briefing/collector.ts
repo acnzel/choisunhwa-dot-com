@@ -13,28 +13,17 @@ const parser = new Parser({
   headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TrendBriefingBot/1.0)' },
 })
 
+function gnews(query: string): string {
+  return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`
+}
+
 // Google News RSS — 키워드별 검색
 const RSS_SOURCES = [
-  {
-    name: 'Google News',
-    url: 'https://news.google.com/rss/search?q=리더십+조직문화+HR&hl=ko&gl=KR&ceid=KR:ko',
-  },
-  {
-    name: 'Google News',
-    url: 'https://news.google.com/rss/search?q=기업교육+강연+트렌드&hl=ko&gl=KR&ceid=KR:ko',
-  },
-  {
-    name: 'Google News',
-    url: 'https://news.google.com/rss/search?q=경영전략+조직문화+성과관리&hl=ko&gl=KR&ceid=KR:ko',
-  },
-  {
-    name: 'Google News',
-    url: 'https://news.google.com/rss/search?q=MZ세대+세대갈등+직장+워크라이프&hl=ko&gl=KR&ceid=KR:ko',
-  },
-  {
-    name: 'Google News',
-    url: 'https://news.google.com/rss/search?q=동기부여+번아웃+심리적안전감&hl=ko&gl=KR&ceid=KR:ko',
-  },
+  { name: 'Google News', url: gnews('리더십 조직문화 HR') },
+  { name: 'Google News', url: gnews('기업교육 강연 트렌드') },
+  { name: 'Google News', url: gnews('경영전략 조직 성과관리') },
+  { name: 'Google News', url: gnews('MZ세대 세대갈등 직장') },
+  { name: 'Google News', url: gnews('동기부여 번아웃 심리적안전감') },
 ]
 
 const KEYWORDS = [

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import PendingList from './PendingList'
+import ManualTrigger from './ManualTrigger'
 
 export const dynamic = 'force-dynamic'
 
@@ -38,14 +39,7 @@ export default async function TrendBriefingPendingPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          {/* 수동 트리거 (로컬/테스트용) */}
-          <Link
-            href="/api/cron/trend-briefing"
-            target="_blank"
-            className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 text-gray-600 transition-colors"
-          >
-            수동 수집 실행
-          </Link>
+          <ManualTrigger />
           <Link
             href="/mong-bab/insights"
             className="px-4 py-2 text-sm font-medium bg-[#1a1a2e] text-white rounded-xl hover:bg-[#16213e] transition-colors"
