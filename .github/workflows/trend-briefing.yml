@@ -1,0 +1,23 @@
+name: Trend Briefing Cron
+
+on:
+  schedule:
+    - cron: '0 1 * * *'  # UTC 01:00 = KST 10:00
+  workflow_dispatch:       # 수동 실행 가능
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Run Trend Briefing Pipeline
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            https://choisunhwa-dot-com.vercel.app/api/cron/trend-briefing)
+          echo "HTTP Status: $response"
+          if [ "$response" != "200" ]; then
+            echo "Pipeline failed with status $response"
+            exit 1
+          fi
+          echo "Pipeline completed successfully"
