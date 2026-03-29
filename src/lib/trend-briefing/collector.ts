@@ -16,12 +16,16 @@ const parser = new Parser({
   },
 })
 
+function naver(query: string): string {
+  return `https://search.naver.com/rss.nhn?where=news&query=${encodeURIComponent(query)}`
+}
+
 // 클라우드 환경에서 안정적으로 작동하는 RSS 소스
 // (Google News RSS는 클라우드 IP 차단으로 제외)
 const RSS_SOURCES = [
-  { name: '네이버 뉴스', url: 'https://search.naver.com/rss.nhn?where=news&query=리더십+조직문화+HR' },
-  { name: '네이버 뉴스', url: 'https://search.naver.com/rss.nhn?where=news&query=기업교육+강연+트렌드' },
-  { name: '네이버 뉴스', url: 'https://search.naver.com/rss.nhn?where=news&query=동기부여+번아웃+직장' },
+  { name: '네이버 뉴스', url: naver('리더십 조직문화 HR') },
+  { name: '네이버 뉴스', url: naver('기업교육 강연 트렌드') },
+  { name: '네이버 뉴스', url: naver('동기부여 번아웃 직장') },
   { name: '매일경제', url: 'https://www.mk.co.kr/rss/30100041/' },
   { name: '한국경제', url: 'https://www.hankyung.com/feed/economy' },
 ]
