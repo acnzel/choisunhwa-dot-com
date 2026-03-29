@@ -9,21 +9,21 @@ export interface RawArticle {
 }
 
 const parser = new Parser({
-  timeout: 10_000,
-  headers: { 'User-Agent': 'Mozilla/5.0 (compatible; TrendBriefingBot/1.0)' },
+  timeout: 15_000,
+  headers: {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+    'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+  },
 })
 
-function gnews(query: string): string {
-  return `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=ko&gl=KR&ceid=KR:ko`
-}
-
-// Google News RSS — 키워드별 검색
+// 클라우드 환경에서 안정적으로 작동하는 RSS 소스
+// (Google News RSS는 클라우드 IP 차단으로 제외)
 const RSS_SOURCES = [
-  { name: 'Google News', url: gnews('리더십 조직문화 HR') },
-  { name: 'Google News', url: gnews('기업교육 강연 트렌드') },
-  { name: 'Google News', url: gnews('경영전략 조직 성과관리') },
-  { name: 'Google News', url: gnews('MZ세대 세대갈등 직장') },
-  { name: 'Google News', url: gnews('동기부여 번아웃 심리적안전감') },
+  { name: '네이버 뉴스', url: 'https://search.naver.com/rss.nhn?where=news&query=리더십+조직문화+HR' },
+  { name: '네이버 뉴스', url: 'https://search.naver.com/rss.nhn?where=news&query=기업교육+강연+트렌드' },
+  { name: '네이버 뉴스', url: 'https://search.naver.com/rss.nhn?where=news&query=동기부여+번아웃+직장' },
+  { name: '매일경제', url: 'https://www.mk.co.kr/rss/30100041/' },
+  { name: '한국경제', url: 'https://www.hankyung.com/feed/economy' },
 ]
 
 const KEYWORDS = [
@@ -33,7 +33,7 @@ const KEYWORDS = [
   '워크숍', '자기계발', '창의', '혁신', '디지털전환',
 ]
 
-function isRecent(date: Date, hoursBack = 48): boolean {
+function isRecent(date: Date, hoursBack = 72): boolean {
   return Date.now() - date.getTime() < hoursBack * 60 * 60 * 1000
 }
 
@@ -46,10 +46,11 @@ export async function collectArticles(maxArticles = 4): Promise<RawArticle[]> {
   const seen = new Set<string>()
   const candidates: RawArticle[] = []
 
-  await Promise.allSettled(
+  const results = await Promise.allSettled(
     RSS_SOURCES.map(async ({ name, url }) => {
       try {
         const feed = await parser.parseURL(url)
+        const fetched: RawArticle[] = []
         for (const item of feed.items ?? []) {
           const link = item.link ?? item.guid ?? ''
           if (!link || seen.has(link)) continue
@@ -64,13 +65,22 @@ export async function collectArticles(maxArticles = 4): Promise<RawArticle[]> {
           if (!hasKeyword(combined)) continue
 
           seen.add(link)
-          candidates.push({ title, link, pubDate, content, source: name })
+          fetched.push({ title, link, pubDate, content, source: name })
         }
+        console.log(`[collector] ${name}: ${fetched.length}건 수집`)
+        return fetched
       } catch (err) {
-        console.warn(`RSS fetch failed: ${url}`, err)
+        console.warn(`[collector] RSS fetch failed: ${url}`, err)
+        return []
       }
     })
   )
+
+  for (const result of results) {
+    if (result.status === 'fulfilled') {
+      candidates.push(...result.value)
+    }
+  }
 
   // 최신순 정렬 후 상위 maxArticles 반환
   candidates.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())

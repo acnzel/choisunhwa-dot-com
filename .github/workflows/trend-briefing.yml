@@ -10,14 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
       - name: Run Trend Briefing Pipeline
-        run: |
-          response=$(curl -s -o /dev/null -w "%{http_code}" -X GET \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
-            https://choisunhwa-dot-com.vercel.app/api/cron/trend-briefing)
-          echo "HTTP Status: $response"
-          if [ "$response" != "200" ]; then
-            echo "Pipeline failed with status $response"
-            exit 1
-          fi
-          echo "Pipeline completed successfully"
+        run: npx tsx scripts/run-pipeline.ts
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
