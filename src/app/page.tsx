@@ -4,6 +4,7 @@ import type { Speaker, Insight, FeaturedSpeakerItem } from '@/types'
 import { buildFieldMap } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
+import HeroSpeakerRoller from './HeroSpeakerRoller'
 import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import RevealOnScroll from '@/components/RevealOnScroll'
@@ -276,47 +277,15 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* 우: 피처드 강사 카드 — 데스크탑에서만 노출 */}
+            {/* 우: 피처드 강사 롤링 카드 — 데스크탑에서만 노출 */}
             <div className="hero-right-panel">
-              {(() => {
-                const featured = bestSpeakers[0] ?? speakers[0]
-                if (!featured) return null
-                return (
-                  <Link href={`/speakers/${featured.id}`} className="hero-speaker-card">
-                    {/* 사진 */}
-                    <div className="hero-speaker-photo">
-                      {featured.photo_url ? (
-                        <img
-                          src={featured.photo_url}
-                          alt={featured.name}
-                          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <div style={{
-                          position: 'absolute', inset: 0,
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          fontFamily: 'var(--font-english)', fontSize: '72px',
-                          color: 'var(--color-border)',
-                        }}>
-                          {featured.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    {/* 정보 */}
-                    <div className="hero-speaker-info">
-                      <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-muted)' }}>
-                        Featured Speaker
-                      </span>
-                      <span style={{ fontFamily: 'var(--font-display)', fontWeight: 900, fontSize: '18px', letterSpacing: '-0.02em', color: 'var(--color-ink)', lineHeight: 1.2 }}>
-                        {featured.name}
-                      </span>
-                      <span style={{ fontSize: '11px', fontWeight: 300, color: 'var(--color-subtle)' }}>
-                        {[featured.company, featured.title].filter(Boolean).join(' · ')}
-                      </span>
-                    </div>
-                  </Link>
-                )
-              })()}
+              <HeroSpeakerRoller
+                speakers={
+                  bestSpeakers.length > 0
+                    ? bestSpeakers
+                    : speakers.slice(0, 8)
+                }
+              />
             </div>
           </div>
 
