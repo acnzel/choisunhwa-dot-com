@@ -15,8 +15,7 @@ export default function ManualTrigger() {
       const res = await fetch('/api/mong-bab/trend-briefing/run', { method: 'POST' })
       const data = await res.json()
       if (data.ok) {
-        setResult(`✅ 완료 — 수집 ${data.collected}건 / 저장 ${data.saved}건`)
-        router.refresh()
+        setResult(`✅ 실행 시작됨 — 1~2분 후 새로고침하세요`)
       } else {
         setResult(`❌ 오류: ${data.error ?? '알 수 없음'}`)
       }
