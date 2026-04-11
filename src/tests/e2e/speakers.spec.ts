@@ -16,10 +16,10 @@ test.describe('강사 소개 리스트', () => {
   })
 
   test('강사 카드가 하나 이상 렌더링된다', async ({ page }) => {
-    // 강사 데이터가 있는 경우
-    const cards = page.locator('[data-testid="speaker-card"]').or(
-      page.getByRole('article')
-    )
+    // 리디자인 후 (2026-03): spk-card-new 클래스 사용
+    // 이전: data-testid="speaker-card" / role="article"
+    // 현재: <a class="spk-card-new" href="/speakers/UUID">
+    const cards = page.locator('a.spk-card-new')
     // 빈 상태 메시지도 허용
     const isEmpty = await page.getByText(/등록된 강사|강사가 없/i).isVisible().catch(() => false)
     if (!isEmpty) {
@@ -50,12 +50,15 @@ test.describe('강사 상세 페이지', () => {
 })
 
 test.describe('강연 커리큘럼', () => {
+  // /lectures는 2026-03 이후 /insights/issue로 리다이렉트됨 (라우트 삭제)
+  // "강연 커리큘럼" → "강연 인사이트" 로 메뉴 구조 변경
   test.beforeEach(async ({ page }) => {
     await page.goto('/lectures')
   })
 
-  test('강연 목록 페이지가 정상적으로 로드된다', async ({ page }) => {
-    await expect(page).toHaveURL(/lectures/)
+  test('강연 목록(/lectures)은 인사이트 페이지로 리다이렉트된다', async ({ page }) => {
+    // /lectures 라우트 삭제됨 → /insights/issue 로 리다이렉트
+    await expect(page).toHaveURL(/insights\/issue/)
   })
 })
 
@@ -121,8 +124,9 @@ test.describe('내비게이션', () => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await page.goto('/')
     await page.waitForLoadState('networkidle')
-    // nav는 aria-label="주요 메뉴"로 구현됨
-    const nav = page.locator('nav[aria-label="주요 메뉴"]')
+    // 리디자인 후 (2026-03): aria-label 제거됨
+    // nav는 <nav class="hidden md:flex"> 형태 — header 내부 nav로 셀렉팅
+    const nav = page.locator('header nav')
     await expect(nav).toBeVisible()
   })
 
