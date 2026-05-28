@@ -41,7 +41,7 @@
 | T-014 | @dev | insights seed: 이 강사 어때요(서은국) + 오늘의 이슈 샘플 | 2026-05-18 | pick 1건 + published issue 15건 확인 |
 | T-015 | @dev | insights seed: 강연 스토리 3건 | 2026-05-18 | report 3건 확인 |
 | T-006 | @frontend/@backend | Google OAuth 버튼 + callback route 코드 반영 | 2026-05-29 | `/api/auth/callback`, `GoogleLoginButton` 존재. 운영 Provider 설정은 T-019로 분리 |
-| T-017 | @backend | `/api/admin/**` 권한 보호 재점검/보강 | 2026-05-29 | middleware matcher 보강 + 모든 admin route `requireAdmin()` 확인 + 유닛 테스트 추가 |
+| T-017 | @backend | `/api/admin/**` 권한 보호 재점검/보강 | 2026-05-29 | middleware matcher + legacy admin write API `requireAdmin()` 적용 + 유닛 테스트 추가 |
 
 ---
 
@@ -60,7 +60,9 @@
   - /api/admin/:path* middleware matcher 추가
   - /api/mong-bab/:path*도 admin API로 분류되도록 보강
   - src/app/api/admin/** route.ts 18개 모두 requireAdmin() 호출 확인
-  - npm test: 33/33 PASS
+  - legacy admin write API requireAdmin() 적용: featured-speakers POST/DELETE/PATCH, insights POST/PATCH/DELETE, upload POST, speaker-applications GET/PATCH
+  - 비관리자 403 유닛 테스트 추가
+  - npm test -- --run: 36/36 PASS
   - npx eslint src/middleware.ts src/tests/unit/admin-auth.test.ts: PASS
 ```
 

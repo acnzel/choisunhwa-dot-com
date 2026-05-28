@@ -9,7 +9,7 @@
  *   crop:   '16:9' | '1:1' | 'none' (default: 'none')
  */
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/auth'
 import sharp from 'sharp'
 
 const ALLOWED_BUCKETS = ['insights', 'speakers', 'lectures'] as const
@@ -22,13 +22,8 @@ const CROP_RATIOS: Record<string, [number, number]> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const supabase = await createClient()
-
-    // 어드민 인증 확인
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) {
-      return NextResponse.json({ error: '인증이 필요합니다' }, { status: 401 })
-    }
+    const { error } = await requireAdmin()
+    if (error) return error
 
     const formData = await req.formData()
     const file = formData.get('file') as File | null
