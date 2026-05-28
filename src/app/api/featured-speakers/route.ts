@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { requireAdmin } from '@/lib/auth'
 
 // 강사 조인 컬럼
 const SPEAKER_COLS = 'id, name, title, company, photo_url, bio_short, fields'
@@ -54,9 +55,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST ─────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '인증 필요' }, { status: 401 })
+  const { error } = await requireAdmin()
+  if (error) return error
 
   const body = await req.json()
   const {
@@ -90,9 +90,8 @@ export async function POST(req: NextRequest) {
 
 // ── DELETE ?speaker_id=xxx — 강사 ID로 에디터 픽 해제 ────────
 export async function DELETE(req: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return NextResponse.json({ error: '인증 필요' }, { status: 401 })
+  const { error } = await requireAdmin()
+  if (error) return error
 
   const speaker_id = req.nextUrl.searchParams.get('speaker_id')
   if (!speaker_id) return NextResponse.json({ error: 'speaker_id 필요' }, { status: 400 })

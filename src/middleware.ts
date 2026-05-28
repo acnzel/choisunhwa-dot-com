@@ -1,6 +1,25 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+export function isPathnameAtOrBelow(pathname: string, basePath: string) {
+  return pathname === basePath || pathname.startsWith(`${basePath}/`)
+}
+
+export function getAdminRouteKind(pathname: string): 'page' | 'api' | null {
+  if (
+    isPathnameAtOrBelow(pathname, '/api/admin') ||
+    isPathnameAtOrBelow(pathname, '/api/mong-bab')
+  ) {
+    return 'api'
+  }
+
+  if (isPathnameAtOrBelow(pathname, '/mong-bab')) {
+    return 'page'
+  }
+
+  return null
+}
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -26,18 +45,16 @@ export async function middleware(request: NextRequest) {
   )
 
   const pathname = request.nextUrl.pathname
-  const isAdminRoute = pathname.startsWith('/mong-bab')
+  const adminRouteKind = getAdminRouteKind(pathname)
   const isAdminLoginRoute = pathname === '/mong-bab/login'
 
-  const isApiRoute = pathname.startsWith('/api/')
-
   // 어드민 라우트 보호
-  if (isAdminRoute && !isAdminLoginRoute) {
+  if (adminRouteKind && !isAdminLoginRoute) {
     const { data: { user } } = await supabase.auth.getUser()
 
     // 1. 비로그인
     if (!user) {
-      if (isApiRoute) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      if (adminRouteKind === 'api') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/mong-bab/login'
       return NextResponse.redirect(redirectUrl)
@@ -51,7 +68,7 @@ export async function middleware(request: NextRequest) {
       .single()
 
     if (!profile || profile.role !== 'admin') {
-      if (isApiRoute) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+      if (adminRouteKind === 'api') return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
       const redirectUrl = request.nextUrl.clone()
       redirectUrl.pathname = '/'
       redirectUrl.searchParams.set('error', 'unauthorized')
@@ -65,6 +82,7 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/mong-bab/:path*',
+    '/api/admin/:path*',
     '/api/mong-bab/:path*',
   ],
 }
