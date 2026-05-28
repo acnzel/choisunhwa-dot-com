@@ -10,7 +10,6 @@
 |----|---------|----------|------|--------|--------|
 | T-016 | P0 | @dev | lint 실패 47 errors 정리 | — | @dev |
 | T-018 | P1 | @dev | GitHub 이슈 상태 정리 (#1~#22) | T-016, T-017 | @dev |
-| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | — | @dev |
 
 ---
 
@@ -18,6 +17,7 @@
 
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
+| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 코드 경로 수정 완료. Supabase Dashboard/Google Console 운영값은 Scott 확인 필요 |
 | T-004 | P0 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-02-25 | 확인 필요: 코드상 재배포 트리거 커밋은 있으나 실제 env/배포 상태 미검증 |
 | T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 확인 후 재개 |
 
@@ -64,6 +64,15 @@
   - 비관리자 403 유닛 테스트 추가
   - npm test -- --run: 36/36 PASS
   - npx eslint src/middleware.ts src/tests/unit/admin-auth.test.ts: PASS
+
+[2026-05-29] @backend T-019 진행
+  - /auth/login Google 버튼이 없는 /api/auth/google로 POST하던 문제 수정: GoogleLoginButton 재사용
+  - /api/auth/callback: exchangeCodeForSession + profiles upsert 확인
+  - DB trigger handle_new_user(): auth.users 생성 시 profiles row 생성 확인
+  - docs/google-oauth-ops.md 운영 체크리스트 추가
+  - npm test -- --run: 36/36 PASS
+  - npx eslint src/app/auth/login/page.tsx src/components/auth/GoogleLoginButton.tsx: PASS
+  - 남은 확인: Scott이 Supabase Google Provider enabled, Client ID/Secret, redirect allow list, Google Console redirect URI 확인 필요
 ```
 
 ---
