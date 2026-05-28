@@ -8,11 +8,9 @@
 
 | ID | 우선순위 | assignee | 제목 | 의존성 | 등록자 |
 |----|---------|----------|------|--------|--------|
-| T-006 | P1 | @backend | Google OAuth `/api/auth/google` 라우트 추가 | T-004 | @frontend |
-| T-008 | P0 | Scott | Supabase migration 007+008+011 적용 (insights + trgm + featured_speakers) | — | @dev |
-| T-013 | P1 | @dev | 이달의 강사 B-3: seed 5명 (migration 011 적용 후) | T-008 | @dev |
-| T-014 | P1 | @dev | insights seed: 이 강사 어때요(서은국) + 오늘의 이슈 샘플 (migration 007 후) | T-008 | @dev |
-| T-015 | P1 | @dev | insights seed: 강연 스토리 3건 (migration 007 후) | T-008 | @dev |
+| T-016 | P0 | @dev | lint 실패 47 errors 정리 | — | @dev |
+| T-018 | P1 | @dev | GitHub 이슈 상태 정리 (#1~#22) | T-016, T-017 | @dev |
+| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | — | @dev |
 
 ---
 
@@ -20,8 +18,8 @@
 
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
-| T-004 | P0 | @dev | Vercel 환경변수 설정 + 재배포 트리거 | 2026-02-25 | 블로커: Vercel 로그인 필요 + 실제 키값 필요 |
-| T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 해결 후 재개 |
+| T-004 | P0 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-02-25 | 확인 필요: 코드상 재배포 트리거 커밋은 있으나 실제 env/배포 상태 미검증 |
+| T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 확인 후 재개 |
 
 ---
 
@@ -38,6 +36,33 @@
 | T-010 | @frontend | FeaturedSection 홈 연동 | 2026-03-18 | graceful fallback 포함 |
 | T-011 | @frontend | SpeakerTabs "지금 뜨는" featured 연동 | 2026-03-18 | featured → trendingForTabs |
 | T-012 | @frontend | 어드민 /mong-bab/featured-speakers | 2026-03-18 | CRUD + sort_order + 노출 토글 |
+| T-008 | Scott | Supabase migration 007+008+011 적용 (insights + trgm + featured_speakers) | 2026-05-18 | DB 테이블 확인 완료 |
+| T-013 | @dev | 이달의 강사 B-3: seed 5명 | 2026-05-18 | featured_speakers 5명 확인 |
+| T-014 | @dev | insights seed: 이 강사 어때요(서은국) + 오늘의 이슈 샘플 | 2026-05-18 | pick 1건 + published issue 15건 확인 |
+| T-015 | @dev | insights seed: 강연 스토리 3건 | 2026-05-18 | report 3건 확인 |
+| T-006 | @frontend/@backend | Google OAuth 버튼 + callback route 코드 반영 | 2026-05-29 | `/api/auth/callback`, `GoogleLoginButton` 존재. 운영 Provider 설정은 T-019로 분리 |
+| T-017 | @backend | `/api/admin/**` 권한 보호 재점검/보강 | 2026-05-29 | middleware matcher 보강 + 모든 admin route `requireAdmin()` 확인 + 유닛 테스트 추가 |
+
+---
+
+## 🧪 최신 상태 체크 로그
+
+```
+[2026-05-29] @dev 상태 재점검
+  - main 1242715 == origin/main
+  - 열린 PR: 0개
+  - npm test: 30/30 PASS
+  - npm run lint: FAIL (47 errors / 19 warnings)
+  - GitHub issue: #1~#22 중 다수 open. 코드 완료 상태와 이슈 상태 불일치
+  - STATUS.md 최신화 완료
+
+[2026-05-29] @backend T-017 완료
+  - /api/admin/:path* middleware matcher 추가
+  - /api/mong-bab/:path*도 admin API로 분류되도록 보강
+  - src/app/api/admin/** route.ts 18개 모두 requireAdmin() 호출 확인
+  - npm test: 33/33 PASS
+  - npx eslint src/middleware.ts src/tests/unit/admin-auth.test.ts: PASS
+```
 
 ---
 
