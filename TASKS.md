@@ -16,7 +16,6 @@
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
 | T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 코드 경로 수정 완료. Supabase Dashboard/Google Console 운영값은 Scott 확인 필요 |
-| T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 완료. E2E 재개 요청 전송 |
 
 ---
 
@@ -42,6 +41,7 @@
 | T-016 | @dev | lint 실패 47 errors 정리 | 2026-06-06 | `npm run lint`: 0 errors / 19 warnings, exit 0. `npm test -- --run`: 36/36 PASS |
 | T-018 | @dev | GitHub 이슈 상태 정리 (#1~#22) | 2026-06-06 | closed #1~#4, #6~#15, #18, #20, #22. open #5, #16, #17, #19, #21 |
 | T-004 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-06-06 | Vercel check success on 48002cc, 운영 스모크 PASS, QA 인계 |
+| T-003 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-06-06 | 운영 Playwright E2E 66 passed / 2 skipped. `networkidle` 의존 제거로 speakers E2E 안정화 |
 
 ---
 
@@ -100,6 +100,19 @@
   - `/api/cron/trend-briefing`: 무인증 401 확인 → CRON_SECRET 적용 상태로 판단
   - GitHub commit status: 48002cc Vercel success 확인
   - T-004 done 처리, QA에게 E2E 재개 요청
+
+[2026-06-06] @qa T-003 운영 E2E 완료
+  - 최초 운영 E2E: 60 passed / 2 skipped / 6 failed
+  - 실패 원인: 기능 장애가 아니라 chromium desktop에서 `page.waitForLoadState('networkidle')`가 장기 요청 때문에 timeout
+  - 수정: speakers E2E를 사용자 가시 DOM 기준 대기로 변경 (`domcontentloaded` + 강사 상세 링크 렌더링)
+  - 회귀 확인: `npx playwright test src/tests/e2e/speakers.spec.ts --project=chromium` PASS 12/12
+  - 최종 운영 E2E: `PLAYWRIGHT_BASE_URL=https://choisunhwa-dot-com.vercel.app npm run test:e2e` PASS 66/66, skipped 2
+  - lint: PASS (0 errors / 19 warnings)
+
+[2026-06-06] @dev PR #25 리뷰
+  - 코드 리뷰: `networkidle` 제거와 DOM 기준 대기 전환 승인
+  - Gemini 리뷰 코멘트 반영: `expectSpeakerResultsVisible` 중복 href 조회 제거
+  - 재검증: speakers chromium E2E 12/12 PASS, lint 0 errors / 19 warnings
 ```
 
 ---
