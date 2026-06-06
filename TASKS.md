@@ -91,6 +91,14 @@
   - npm run lint: PASS (0 errors / 19 warnings)
   - npm test -- --run: 36/36 PASS
   - 남은 작업: Vercel Dashboard env 확인 + git push 기반 자동 배포 확인
+
+[2026-06-06] @dev T-004 자동 배포 트리거/운영 스모크
+  - 커밋/push: 4af0792 `fix: clear deployment blockers` → origin/main
+  - Vercel CLI 사용 안 함. git push 기반 자동 배포만 사용
+  - 운영 `/`, `/api/speakers?limit=1`, `/api/featured-speakers?limit=1`, `/auth/login`, `/mong-bab/dashboard` 확인
+  - `/auth/login`: 이전 `/api/auth/google` POST 폼 제거된 최신 배포 반영 확인
+  - `/api/cron/trend-briefing`: 무인증 401 확인 → CRON_SECRET 적용 상태로 판단
+  - 남은 작업: Dashboard에서 비공개 env 전체 값 직접 확인 후 T-004 done 처리
 ```
 
 ---

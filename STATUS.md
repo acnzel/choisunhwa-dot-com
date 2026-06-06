@@ -101,7 +101,7 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 
 | 우선순위 | 항목 | 담당 | 상태 | 메모 |
 |----------|------|------|------|------|
-| P0 | Vercel 환경변수/최신 배포 확인 | @dev/Scott | 🟡 확인 필요 | Dashboard에서 env 9개 확인 후 git push 자동 배포 상태 확인 필요 |
+| P0 | Vercel 환경변수/최신 배포 확인 | @dev/Scott | 🟡 부분 확인 | `4af0792` push 후 운영 최신 배포 반영 확인. Dashboard 비공개 env 전체 값 직접 확인 필요 |
 | P0 | E2E 전체 재실행 | @qa | 🟡 대기 | env/배포 확인 후 실행 |
 | P1 | Google OAuth 운영 설정 | @backend/Scott | 🟡 Scott 확인 필요 | 코드 경로/프로필 생성 확인, Supabase Provider/Google Console 운영값 확인 필요 |
 | P2 | STATUS/TASKS 운영 규칙 정리 | @dev | 🟡 필요 | 상태판과 GitHub issue를 한 기준으로 맞춰야 함 |
@@ -137,7 +137,7 @@ GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
 
 ## 다음 액션
 
-1. @dev/Scott: Vercel Dashboard에서 `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`, `RESEND_API_KEY`, `EMAIL_FROM`, `ANTHROPIC_API_KEY`, `CRON_SECRET`, `GITHUB_ACTIONS_TOKEN` 확인
+1. @dev/Scott: Vercel Dashboard에서 `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `EMAIL_FROM`, `ANTHROPIC_API_KEY`, `GITHUB_ACTIONS_TOKEN` 값 직접 확인
 2. Scott: `docs/google-oauth-ops.md` 기준 운영 Google OAuth Provider/Google Console 설정 확인
 3. @qa: 배포/env 확인 후 E2E 전체 실행
 
