@@ -1,6 +1,6 @@
 # 최선화닷컴 — 작업 현황판
 
-> 기준: 2026-06-06 17:27 KST / heartbeat 정리 기준
+> 기준: 2026-06-06 18:08 KST / QA 운영 E2E 완료 기준
 > 배포는 Vercel CLI 금지. `git push origin main` 자동 배포만 사용.
 
 ---
@@ -9,11 +9,10 @@
 
 MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인사이트, 추천 강사, 트렌드 브리핑 자동화까지 `main`에 반영되어 있다.
 
-현재 남은 핵심은 운영 안정화다.
+운영 배포 기준 E2E 전체 재검증은 통과했다. 현재 남은 핵심은 Google OAuth 운영 설정 확인이다.
 
 1. Google OAuth 운영 설정/검증
-2. E2E 전체 재검증
-3. GitHub 이슈 잔여 항목 운영/QA 검증
+2. GitHub 이슈 잔여 항목 운영/QA 검증
 
 ---
 
@@ -27,7 +26,8 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 | 유닛 테스트 | ✅ | `npm test -- --run` → 36/36 통과 |
 | lint | ✅ | `npm run lint` → 0 errors / 19 warnings, exit 0 |
 | production build | ✅ | `npm run build` → 통과. Next middleware deprecation warning만 잔존 |
-| GitHub issue 정리 | ✅ | 완료 구현 이슈 close. open: #5, #16, #17, #19, #21 |
+| 운영 E2E | ✅ | `PLAYWRIGHT_BASE_URL=https://choisunhwa-dot-com.vercel.app npm run test:e2e` → 66 passed / 2 skipped |
+| GitHub issue 정리 | ✅ | 완료 구현 이슈 close. #16/#17 운영 E2E 통과 확인. 잔여 open: #5, #19, #21 |
 | GitHub CLI | ⚠️ | 로컬 `gh` 미로그인. GitHub connector로 확인 |
 | GitHub Actions | ⚠️ | `gh` 미로그인으로 run 상태 직접 확인 불가 |
 
@@ -102,7 +102,7 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 | 우선순위 | 항목 | 담당 | 상태 | 메모 |
 |----------|------|------|------|------|
 | P0 | Vercel 환경변수/최신 배포 확인 | @dev | ✅ 완료 | `48002cc` Vercel success, 운영 스모크 PASS |
-| P0 | E2E 전체 재실행 | @qa | 🟡 진행 요청 | T-004 완료 후 QA 인계 |
+| P0 | E2E 전체 재실행 | @qa | ✅ 완료 | 운영 Playwright E2E 66 passed / 2 skipped |
 | P1 | Google OAuth 운영 설정 | @backend/Scott | 🟡 Scott 확인 필요 | 코드 경로/프로필 생성 확인, Supabase Provider/Google Console 운영값 확인 필요 |
 | P2 | STATUS/TASKS 운영 규칙 정리 | @dev | 🟡 필요 | 상태판과 GitHub issue를 한 기준으로 맞춰야 함 |
 
@@ -112,7 +112,8 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 
 GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
 
-- open: `#5` Auth 운영 검증 잔여, `#16` E2E 문의 플로우, `#17` E2E 탐색 플로우, `#19` 어드민/OAuth E2E, `#21` Google OAuth 운영 설정
+- open 잔여 권장: `#5` Auth 운영 검증 잔여, `#19` 어드민/OAuth E2E, `#21` Google OAuth 운영 설정
+- QA 완료 확인: `#16` E2E 문의 플로우, `#17` E2E 탐색 플로우는 운영 E2E 통과
 - closed: 코드/현황판 기준 구현 완료 이슈 `#1`~`#4`, `#6`~`#15`, `#18`, `#20`, `#22`
 - 열린 PR은 없음
 
@@ -137,9 +138,9 @@ GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
 
 ## 다음 액션
 
-1. @qa: 운영 배포 기준 E2E 전체 실행
-2. Scott: `docs/google-oauth-ops.md` 기준 운영 Google OAuth Provider/Google Console 설정 확인
+1. Scott: `docs/google-oauth-ops.md` 기준 운영 Google OAuth Provider/Google Console 설정 확인
+2. @dev: #16/#17 이슈 종료 및 QA 안정화 PR 병합
 
 ---
 
-_최종 업데이트: 2026-06-06 17:27 KST | 업데이트 담당: @dev_cshdotcom_bot_
+_최종 업데이트: 2026-06-06 18:08 KST | 업데이트 담당: @qa_cshdotcom_bot_

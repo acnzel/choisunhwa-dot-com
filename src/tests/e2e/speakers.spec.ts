@@ -3,7 +3,30 @@
  * QA: 한큐
  */
 
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+const SPEAKER_DETAIL_HREF_PATTERN =
+  '^/speakers/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
+
+async function getSpeakerDetailHrefs(page: Page): Promise<string[]> {
+  return page.locator('a[href^="/speakers/"]').evaluateAll((links, pattern) => {
+    const hrefPattern = new RegExp(pattern)
+    return links
+      .map((link) => link.getAttribute('href'))
+      .filter((href): href is string => Boolean(href && hrefPattern.test(href)))
+  }, SPEAKER_DETAIL_HREF_PATTERN)
+}
+
+async function expectSpeakerResultsVisible(page: Page): Promise<string[]> {
+  await expect(page.getByRole('heading', { name: /강사/i })).toBeVisible()
+
+  await expect.poll(
+    () => getSpeakerDetailHrefs(page).then((hrefs) => hrefs.length),
+    { timeout: 10000 }
+  ).toBeGreaterThan(0)
+
+  return getSpeakerDetailHrefs(page)
+}
 
 test.describe('강사 소개 리스트', () => {
   test.beforeEach(async ({ page }) => {
@@ -77,37 +100,17 @@ test.describe('BUG-N-014: 인사이트 태그 → 강사 필터 alias 라우팅'
 
   for (const { tag, expectedField } of aliasCases) {
     test(`"${tag}" 태그 → ${expectedField} 강사 목록 1명 이상 표시`, async ({ page }) => {
-      await page.goto(`/speakers?category=${encodeURIComponent(tag)}`)
-      await page.waitForLoadState('networkidle')
+      await page.goto(`/speakers?category=${encodeURIComponent(tag)}`, { waitUntil: 'domcontentloaded' })
 
-      // SpeakerList 카드는 <Link href="/speakers/[uuid]"> (= <a>) 구조
-      // UUID 형식 href (/speakers/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx) 로 정확히 매칭
-      const speakerCardLinks = await page.$$('a[href]')
-      let count = 0
-      for (const el of speakerCardLinks) {
-        const href = await el.getAttribute('href')
-        if (href && /^\/speakers\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(href)) {
-          count++
-        }
-      }
-
-      expect(count).toBeGreaterThan(0)
+      const speakerHrefs = await expectSpeakerResultsVisible(page)
+      expect(speakerHrefs.length).toBeGreaterThan(0)
     })
   }
 
   test('같은 alias 그룹은 동일 강사 세트 반환 — MZ세대=조직문화(HR)', async ({ page }) => {
     async function getSpeakerHrefs(tag: string): Promise<string[]> {
-      await page.goto(`/speakers?category=${encodeURIComponent(tag)}`)
-      await page.waitForLoadState('networkidle')
-      const all = await page.$$('a[href]')
-      const hrefs: string[] = []
-      for (const el of all) {
-        const href = await el.getAttribute('href')
-        if (href && /^\/speakers\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(href)) {
-          hrefs.push(href)
-        }
-      }
-      return hrefs
+      await page.goto(`/speakers?category=${encodeURIComponent(tag)}`, { waitUntil: 'domcontentloaded' })
+      return expectSpeakerResultsVisible(page)
     }
 
     const mzHrefs  = await getSpeakerHrefs('MZ세대')
@@ -122,8 +125,7 @@ test.describe('BUG-N-014: 인사이트 태그 → 강사 필터 alias 라우팅'
 test.describe('내비게이션', () => {
   test('헤더 네비게이션이 데스크탑에서 표시된다', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
     // 리디자인 후 (2026-03): aria-label 제거됨
     // nav는 <nav class="hidden md:flex"> 형태 — header 내부 nav로 셀렉팅
     const nav = page.locator('header nav')
@@ -132,8 +134,7 @@ test.describe('내비게이션', () => {
 
   test('홈 페이지에서 강사 섹션 링크가 동작한다', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
-    await page.goto('/')
-    await page.waitForLoadState('networkidle')
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
     const speakersLink = page.getByRole('link', { name: /강사/i }).first()
     if (await speakersLink.isVisible()) {
       await speakersLink.click()
