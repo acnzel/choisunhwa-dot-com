@@ -1,6 +1,6 @@
 # 최선화닷컴 — 작업 현황판
 
-> 기준: 2026-06-06 18:08 KST / QA 운영 E2E 완료 기준
+> 기준: 2026-06-06 21:36 KST / QA 운영 E2E PR 리뷰 기준
 > 배포는 Vercel CLI 금지. `git push origin main` 자동 배포만 사용.
 
 ---
@@ -115,7 +115,7 @@ GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
 - open 잔여 권장: `#5` Auth 운영 검증 잔여, `#19` 어드민/OAuth E2E, `#21` Google OAuth 운영 설정
 - QA 완료 확인: `#16` E2E 문의 플로우, `#17` E2E 탐색 플로우는 운영 E2E 통과
 - closed: 코드/현황판 기준 구현 완료 이슈 `#1`~`#4`, `#6`~`#15`, `#18`, `#20`, `#22`
-- 열린 PR은 없음
+- 최근 PR: `#25` T-003 E2E 안정화 리뷰 완료
 
 이슈 상태는 이제 코드 완료분과 운영/QA 잔여분을 분리한 상태다.
 
@@ -139,8 +139,8 @@ GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
 ## 다음 액션
 
 1. Scott: `docs/google-oauth-ops.md` 기준 운영 Google OAuth Provider/Google Console 설정 확인
-2. @dev: #16/#17 이슈 종료 및 QA 안정화 PR 병합
+2. @dev: #16/#17 이슈 종료
 
 ---
 
-_최종 업데이트: 2026-06-06 18:08 KST | 업데이트 담당: @qa_cshdotcom_bot_
+_최종 업데이트: 2026-06-06 21:36 KST | 업데이트 담당: @dev_cshdotcom_bot_

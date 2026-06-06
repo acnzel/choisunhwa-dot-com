@@ -20,12 +20,16 @@ async function getSpeakerDetailHrefs(page: Page): Promise<string[]> {
 async function expectSpeakerResultsVisible(page: Page): Promise<string[]> {
   await expect(page.getByRole('heading', { name: /강사/i })).toBeVisible()
 
+  let hrefs: string[] = []
   await expect.poll(
-    () => getSpeakerDetailHrefs(page).then((hrefs) => hrefs.length),
+    async () => {
+      hrefs = await getSpeakerDetailHrefs(page)
+      return hrefs.length
+    },
     { timeout: 10000 }
   ).toBeGreaterThan(0)
 
-  return getSpeakerDetailHrefs(page)
+  return hrefs
 }
 
 test.describe('강사 소개 리스트', () => {

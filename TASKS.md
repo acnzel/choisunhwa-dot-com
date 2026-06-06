@@ -108,6 +108,11 @@
   - 회귀 확인: `npx playwright test src/tests/e2e/speakers.spec.ts --project=chromium` PASS 12/12
   - 최종 운영 E2E: `PLAYWRIGHT_BASE_URL=https://choisunhwa-dot-com.vercel.app npm run test:e2e` PASS 66/66, skipped 2
   - lint: PASS (0 errors / 19 warnings)
+
+[2026-06-06] @dev PR #25 리뷰
+  - 코드 리뷰: `networkidle` 제거와 DOM 기준 대기 전환 승인
+  - Gemini 리뷰 코멘트 반영: `expectSpeakerResultsVisible` 중복 href 조회 제거
+  - 재검증: speakers chromium E2E 12/12 PASS, lint 0 errors / 19 warnings
 ```
 
 ---
