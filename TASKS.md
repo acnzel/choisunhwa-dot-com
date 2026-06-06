@@ -15,7 +15,7 @@
 
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
-| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 코드 경로 수정 완료. Supabase Dashboard/Google Console 운영값은 Scott 확인 필요 |
+| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | Supabase Google Provider redirect 확인(302 → accounts.google.com). 남은 확인: 실제 Google 로그인 완료 + profiles 생성 |
 
 ---
 
@@ -115,6 +115,11 @@
   - 재검증: speakers chromium E2E 12/12 PASS, lint 0 errors / 19 warnings
   - PR #25 squash merge 완료: main `209ffd5`
   - GitHub #16/#17 completed로 close
+
+[2026-06-06] @dev T-019 부분 확인
+  - Supabase Auth Google authorize endpoint 확인: 302 → accounts.google.com
+  - 의미: Provider enabled + Client ID 설정은 동작
+  - 남은 확인: 실제 Google 계정 로그인 완료, callback session 교환, profiles row 생성
 ```
 
 ---
