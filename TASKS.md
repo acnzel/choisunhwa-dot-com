@@ -16,8 +16,7 @@
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
 | T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 코드 경로 수정 완료. Supabase Dashboard/Google Console 운영값은 Scott 확인 필요 |
-| T-004 | P0 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-02-25 | Dashboard 확인 필요 env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SITE_URL, RESEND_API_KEY, EMAIL_FROM, ANTHROPIC_API_KEY, CRON_SECRET, GITHUB_ACTIONS_TOKEN. Vercel CLI 금지 |
-| T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 확인 후 재개 |
+| T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 완료. E2E 재개 요청 전송 |
 
 ---
 
@@ -42,6 +41,7 @@
 | T-017 | @backend | `/api/admin/**` 권한 보호 재점검/보강 | 2026-05-29 | middleware matcher + legacy admin write API `requireAdmin()` 적용 + 유닛 테스트 추가 |
 | T-016 | @dev | lint 실패 47 errors 정리 | 2026-06-06 | `npm run lint`: 0 errors / 19 warnings, exit 0. `npm test -- --run`: 36/36 PASS |
 | T-018 | @dev | GitHub 이슈 상태 정리 (#1~#22) | 2026-06-06 | closed #1~#4, #6~#15, #18, #20, #22. open #5, #16, #17, #19, #21 |
+| T-004 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-06-06 | Vercel check success on 48002cc, 운영 스모크 PASS, QA 인계 |
 
 ---
 
@@ -98,7 +98,8 @@
   - 운영 `/`, `/api/speakers?limit=1`, `/api/featured-speakers?limit=1`, `/auth/login`, `/mong-bab/dashboard` 확인
   - `/auth/login`: 이전 `/api/auth/google` POST 폼 제거된 최신 배포 반영 확인
   - `/api/cron/trend-briefing`: 무인증 401 확인 → CRON_SECRET 적용 상태로 판단
-  - 남은 작업: Dashboard에서 비공개 env 전체 값 직접 확인 후 T-004 done 처리
+  - GitHub commit status: 48002cc Vercel success 확인
+  - T-004 done 처리, QA에게 E2E 재개 요청
 ```
 
 ---
