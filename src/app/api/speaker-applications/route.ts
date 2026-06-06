@@ -9,8 +9,8 @@ import { requireAdmin } from '@/lib/auth'
 
 // ── GET — 어드민 목록 ────────────────────────────────────────
 export async function GET(req: NextRequest) {
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const { searchParams } = req.nextUrl
   const status = searchParams.get('status') ?? 'pending'
@@ -26,8 +26,8 @@ export async function GET(req: NextRequest) {
 
   if (status !== 'all') query.eq('status', status)
 
-  const { data, count, error } = await query
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  const { data, count, error: dbError } = await query
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
 
   return NextResponse.json({ data, total: count ?? 0, limit, offset })
 }

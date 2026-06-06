@@ -30,8 +30,8 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // ── PATCH ────────────────────────────────────────────────────
 export async function PATCH(req: NextRequest, { params }: Params) {
   const { id } = await params
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const body = await req.json()
   const admin = createAdminClient()
@@ -41,22 +41,22 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     body.published_at = new Date().toISOString()
   }
 
-  const { data, error } = await admin
+  const { data, error: dbError } = await admin
     .from('insights')
     .update(body)
     .eq('id', id)
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ data })
 }
 
 // ── DELETE ───────────────────────────────────────────────────
 export async function DELETE(_req: NextRequest, { params }: Params) {
   const { id } = await params
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   // report 타입은 images 삭제 시 Storage도 정리
   const admin = createAdminClient()
@@ -84,7 +84,7 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
     }
   }
 
-  const { error } = await admin.from('insights').delete().eq('id', id)
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  const { error: dbError } = await admin.from('insights').delete().eq('id', id)
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }

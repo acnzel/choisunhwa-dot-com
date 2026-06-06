@@ -240,7 +240,7 @@ export default function FeaturedSpeakersAdminPage() {
           border: '2px dashed #e5e7eb', borderRadius: '12px',
         }}>
           <p style={{ fontSize: '14px', color: '#9ca3af' }}>등록된 에디터 픽가 없습니다.</p>
-          <p style={{ fontSize: '13px', color: '#d1d5db', marginTop: '6px' }}>위의 "강사 추가" 버튼을 눌러 시작하세요.</p>
+          <p style={{ fontSize: '13px', color: '#d1d5db', marginTop: '6px' }}>위의 &quot;강사 추가&quot; 버튼을 눌러 시작하세요.</p>
         </div>
       )}
 

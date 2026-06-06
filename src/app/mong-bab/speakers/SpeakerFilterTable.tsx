@@ -39,6 +39,8 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
     } catch { /* 무시 */ }
   }, [])
 
+  // Initial admin-only badge hydration is tied to mounted client state.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadFeatured() }, [loadFeatured])
 
   function handleFeaturedToggle(speakerId: string, newValue: boolean) {
@@ -50,8 +52,11 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
     })
   }
 
-  const filtered = useMemo(() => {
+  function resetPage() {
     setCurrentPage(1)
+  }
+
+  const filtered = useMemo(() => {
     const q = search.trim().toLowerCase()
     return speakers.filter((s) => {
       const matchSearch =
@@ -103,12 +108,12 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
             type="text"
             placeholder="이름, 소속, 직함으로 검색"
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => { setSearch(e.target.value); resetPage() }}
             className="w-full pl-10 pr-9 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#1a1a2e] focus:ring-2 focus:ring-[#1a1a2e]/8 bg-gray-50 placeholder:text-gray-300 transition-colors"
           />
           {search && (
             <button
-              onClick={() => setSearch('')}
+              onClick={() => { setSearch(''); resetPage() }}
               className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 text-xs transition-colors"
               aria-label="검색어 지우기"
             >
@@ -126,7 +131,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
               {(['all', 'visible', 'hidden'] as const).map((v, idx) => (
                 <button
                   key={v}
-                  onClick={() => setVisFilter(v)}
+                  onClick={() => { setVisFilter(v); resetPage() }}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${idx > 0 ? 'border-l border-gray-200' : ''} ${
                     visFilter === v
                       ? 'bg-[#1a1a2e] text-white'
@@ -146,7 +151,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
               {(['all', 'best', 'normal'] as const).map((v, idx) => (
                 <button
                   key={v}
-                  onClick={() => setBestFilter(v)}
+                  onClick={() => { setBestFilter(v); resetPage() }}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${idx > 0 ? 'border-l border-gray-200' : ''} ${
                     bestFilter === v
                       ? 'bg-[#1a1a2e] text-white'
@@ -166,7 +171,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
               {(['all', 'trending', 'normal'] as const).map((v, idx) => (
                 <button
                   key={v}
-                  onClick={() => setTrendFilter(v)}
+                  onClick={() => { setTrendFilter(v); resetPage() }}
                   className={`px-3 py-1.5 text-xs font-medium transition-colors ${idx > 0 ? 'border-l border-gray-200' : ''} ${
                     trendFilter === v
                       ? 'bg-orange-600 text-white'
@@ -182,7 +187,7 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
           {/* 리셋 버튼 — 필터 활성화 시에만 노출 */}
           {(search || visFilter !== 'all' || bestFilter !== 'all' || trendFilter !== 'all') && (
             <button
-              onClick={() => { setSearch(''); setVisFilter('all'); setBestFilter('all'); setTrendFilter('all') }}
+              onClick={() => { setSearch(''); setVisFilter('all'); setBestFilter('all'); setTrendFilter('all'); resetPage() }}
               className="ml-auto text-xs text-gray-400 hover:text-gray-600 underline underline-offset-2 transition-colors"
             >
               필터 초기화

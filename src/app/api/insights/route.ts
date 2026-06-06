@@ -40,8 +40,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST ─────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const body = await req.json()
   const {
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient()
-  const { data, error } = await admin
+  const { data, error: dbError } = await admin
     .from('insights')
     .insert({
       type, title, thumbnail_url, summary,
@@ -66,6 +66,6 @@ export async function POST(req: NextRequest) {
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ data }, { status: 201 })
 }

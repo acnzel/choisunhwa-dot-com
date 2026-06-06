@@ -48,6 +48,8 @@ export default function SpeakerApplicationsPage() {
     setLoading(false)
   }, [filter])
 
+  // Initial/admin filter fetch is the side effect this screen synchronizes.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { load() }, [load])
 
   async function handleAction(id: string, status: 'approved' | 'rejected') {
@@ -202,7 +204,7 @@ export default function SpeakerApplicationsPage() {
               </tbody>
             </table>
 
-            {selected.bio_short && <p style={{ fontSize: 14, marginBottom: 12, fontStyle: 'italic', color: 'var(--color-subtle)' }}>"{selected.bio_short}"</p>}
+            {selected.bio_short && <p style={{ fontSize: 14, marginBottom: 12, fontStyle: 'italic', color: 'var(--color-subtle)' }}>&quot;{selected.bio_short}&quot;</p>}
             {selected.bio_full && <p style={{ fontSize: 13, lineHeight: 1.8, marginBottom: 12, color: 'var(--color-subtle)' }}>{selected.bio_full}</p>}
             {selected.lecture_topics && (
               <div style={{ marginBottom: 12 }}>

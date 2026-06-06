@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
@@ -78,25 +78,22 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE)
   const paged = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
 
-  const goNext = useCallback(() => {
+  function goNext() {
     setPage((p) => (p + 1) % Math.max(1, totalPages))
-  }, [totalPages])
+  }
 
-  const goPrev = useCallback(() => {
+  function goPrev() {
     setPage((p) => (p - 1 + Math.max(1, totalPages)) % Math.max(1, totalPages))
-  }, [totalPages])
-
-  // 탭/필터 변경 시 페이지 초기화
-  useEffect(() => {
-    setPage(0)
-  }, [activeTab, filterField])
+  }
 
   // 자동 롤링
   useEffect(() => {
     if (paused || totalPages <= 1) return
-    timerRef.current = setInterval(goNext, AUTO_MS)
+    timerRef.current = setInterval(() => {
+      setPage((p) => (p + 1) % Math.max(1, totalPages))
+    }, AUTO_MS)
     return () => { if (timerRef.current) clearInterval(timerRef.current) }
-  }, [paused, totalPages, goNext])
+  }, [paused, totalPages])
 
   const allFields = Array.from(new Set(speakers.flatMap((s) => s.fields ?? []))).filter(f => fieldMap[f])
   const border = '1px solid var(--color-border)'
@@ -234,7 +231,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
         {TABS.map((tab, i) => (
           <button
             key={tab}
-            onClick={() => { setActiveTab(i); setFilterField(null) }}
+            onClick={() => { setActiveTab(i); setFilterField(null); setPage(0) }}
             className="sub-tab-btn"
             style={{
               fontSize: '15px', fontWeight: 600,
@@ -257,7 +254,7 @@ export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] 
           {[{ value: null, label: '전체' }, ...allFields.map((f) => ({ value: f, label: fieldMap[f] ?? f }))].map(({ value, label }) => (
             <button
               key={label}
-              onClick={() => setFilterField(value)}
+              onClick={() => { setFilterField(value); setPage(0) }}
               style={{
                 fontSize: '10px', fontWeight: 600, letterSpacing: '0.07em', textTransform: 'uppercase',
                 border, padding: '4px 12px',

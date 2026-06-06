@@ -8,8 +8,6 @@
 
 | ID | 우선순위 | assignee | 제목 | 의존성 | 등록자 |
 |----|---------|----------|------|--------|--------|
-| T-016 | P0 | @dev | lint 실패 47 errors 정리 | — | @dev |
-| T-018 | P1 | @dev | GitHub 이슈 상태 정리 (#1~#22) | T-016, T-017 | @dev |
 
 ---
 
@@ -18,7 +16,7 @@
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
 | T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 코드 경로 수정 완료. Supabase Dashboard/Google Console 운영값은 Scott 확인 필요 |
-| T-004 | P0 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-02-25 | 확인 필요: 코드상 재배포 트리거 커밋은 있으나 실제 env/배포 상태 미검증 |
+| T-004 | P0 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-02-25 | Dashboard 확인 필요 env: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, NEXT_PUBLIC_SITE_URL, RESEND_API_KEY, EMAIL_FROM, ANTHROPIC_API_KEY, CRON_SECRET, GITHUB_ACTIONS_TOKEN. Vercel CLI 금지 |
 | T-003 | P0 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-02-25 | T-004 확인 후 재개 |
 
 ---
@@ -42,6 +40,8 @@
 | T-015 | @dev | insights seed: 강연 스토리 3건 | 2026-05-18 | report 3건 확인 |
 | T-006 | @frontend/@backend | Google OAuth 버튼 + callback route 코드 반영 | 2026-05-29 | `/api/auth/callback`, `GoogleLoginButton` 존재. 운영 Provider 설정은 T-019로 분리 |
 | T-017 | @backend | `/api/admin/**` 권한 보호 재점검/보강 | 2026-05-29 | middleware matcher + legacy admin write API `requireAdmin()` 적용 + 유닛 테스트 추가 |
+| T-016 | @dev | lint 실패 47 errors 정리 | 2026-06-06 | `npm run lint`: 0 errors / 19 warnings, exit 0. `npm test -- --run`: 36/36 PASS |
+| T-018 | @dev | GitHub 이슈 상태 정리 (#1~#22) | 2026-06-06 | closed #1~#4, #6~#15, #18, #20, #22. open #5, #16, #17, #19, #21 |
 
 ---
 
@@ -73,6 +73,24 @@
   - npm test -- --run: 36/36 PASS
   - npx eslint src/app/auth/login/page.tsx src/components/auth/GoogleLoginButton.tsx: PASS
   - 남은 확인: Scott이 Supabase Google Provider enabled, Client ID/Secret, redirect allow list, Google Console redirect URI 확인 필요
+
+[2026-06-06] @dev T-016/T-018 완료
+  - npm run lint: PASS (0 errors / 19 warnings)
+  - npm test -- --run: 36/36 PASS
+  - GitHub issue 정리: 완료 구현 이슈 close, open #5/#16/#17/#19/#21 유지
+  - STATUS.md 최신화 완료
+
+[2026-06-06] @dev T-004 사전 점검
+  - 코드상 Vercel 필요 env 재산출 완료
+  - `.env.example`에 ANTHROPIC_API_KEY, CRON_SECRET, GITHUB_ACTIONS_TOKEN 누락 보완
+  - 실제 Vercel Dashboard 설정/재배포는 여전히 직접 확인 필요
+
+[2026-06-06] @dev T-004 배포 전 로컬 게이트 확인
+  - npm run build: 최초 실패 원인 수정 후 PASS
+  - 수정: API route 내 requireAdmin()의 error와 Supabase error 중복 선언 제거
+  - npm run lint: PASS (0 errors / 19 warnings)
+  - npm test -- --run: 36/36 PASS
+  - 남은 작업: Vercel Dashboard env 확인 + git push 기반 자동 배포 확인
 ```
 
 ---

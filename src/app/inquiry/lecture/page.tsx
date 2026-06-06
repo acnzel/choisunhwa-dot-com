@@ -19,7 +19,7 @@ export default async function LectureInquiryPage({ searchParams }: Props) {
   const { data: { user } } = await supabase.auth.getUser()
 
   let defaultName = ''
-  let defaultEmail = user?.email ?? ''
+  const defaultEmail = user?.email ?? ''
 
   if (user) {
     const { data: profile } = await supabase

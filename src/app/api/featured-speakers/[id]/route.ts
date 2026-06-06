@@ -13,8 +13,8 @@ type Params = { params: Promise<{ id: string }> }
 // ── PATCH ─────────────────────────────────────────────────────
 export async function PATCH(req: NextRequest, { params }: Params) {
   const { id } = await params
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const body = await req.json()
 
@@ -30,14 +30,14 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   }
 
   const admin = createAdminClient()
-  const { data, error } = await admin
+  const { data, error: dbError } = await admin
     .from('featured_speakers')
     .update(patch)
     .eq('id', id)
     .select(`id, intro, tags, is_visible, home_visible, start_date, end_date, sort_order, speaker:speaker_id (${SPEAKER_COLS})`)
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   if (!data) return NextResponse.json({ error: '항목 없음' }, { status: 404 })
   return NextResponse.json({ data })
 }
@@ -45,15 +45,15 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 // ── DELETE ────────────────────────────────────────────────────
 export async function DELETE(req: NextRequest, { params }: Params) {
   const { id } = await params
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const admin = createAdminClient()
-  const { error } = await admin
+  const { error: dbError } = await admin
     .from('featured_speakers')
     .delete()
     .eq('id', id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }

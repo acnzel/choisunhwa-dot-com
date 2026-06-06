@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const NAV_ITEMS = [
   { href: '/mong-bab/dashboard', label: '대시보드', icon: '📊' },
@@ -18,40 +18,28 @@ const NAV_ITEMS = [
   { href: '/mong-bab/support',   label: 'FAQ/공지',  icon: '📢' },
 ]
 
-export default function AdminSidebar() {
-  const pathname = usePathname()
-  const router   = useRouter()
-  const [open, setOpen] = useState(false)
+interface NavContentProps {
+  pathname: string
+  onClose: () => void
+  onSignOut: () => void
+}
 
-  // 라우트 변경 시 모바일 메뉴 자동 닫기
-  useEffect(() => { setOpen(false) }, [pathname])
-
-  async function handleSignOut() {
-    const supabase = createClient()
-    await supabase.auth.signOut()
-    router.push('/mong-bab/login')
-  }
-
-  if (pathname === '/mong-bab/login') return null
-
-  const currentNav = NAV_ITEMS.find(n => pathname.startsWith(n.href))
-
-  const NavContent = () => (
+function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
+  return (
     <>
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
         <div>
           <Link
             href="/mong-bab/dashboard"
             className="text-base font-bold text-[#1a1a2e]"
-            onClick={() => setOpen(false)}
+            onClick={onClose}
           >
             어드민
           </Link>
           <p className="text-xs text-gray-400 mt-0.5">최선화닷컴</p>
         </div>
-        {/* 모바일 닫기 버튼 */}
         <button
-          onClick={() => setOpen(false)}
+          onClick={onClose}
           className="md:hidden p-1 text-gray-400 hover:text-gray-600"
           aria-label="메뉴 닫기"
         >
@@ -68,6 +56,7 @@ export default function AdminSidebar() {
             <Link
               key={href}
               href={href}
+              onClick={onClose}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-colors ${
                 active
                   ? 'bg-[#1a1a2e] text-white'
@@ -83,13 +72,14 @@ export default function AdminSidebar() {
 
       <div className="p-3 border-t border-gray-100">
         <button
-          onClick={handleSignOut}
+          onClick={onSignOut}
           className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
         >
           <span>🚪</span> 로그아웃
         </button>
         <Link
           href="/"
+          onClick={onClose}
           className="flex items-center gap-2 px-3 py-2 text-xs text-gray-400 hover:text-gray-600 transition-colors"
         >
           ← 사이트로 돌아가기
@@ -97,12 +87,28 @@ export default function AdminSidebar() {
       </div>
     </>
   )
+}
+
+export default function AdminSidebar() {
+  const pathname = usePathname()
+  const router   = useRouter()
+  const [open, setOpen] = useState(false)
+
+  async function handleSignOut() {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    router.push('/mong-bab/login')
+  }
+
+  if (pathname === '/mong-bab/login') return null
+
+  const currentNav = NAV_ITEMS.find(n => pathname.startsWith(n.href))
 
   return (
     <>
       {/* ── 데스크탑 사이드바 ── */}
       <aside className="hidden md:flex w-56 bg-white border-r border-gray-100 flex-col shrink-0 min-h-screen">
-        <NavContent />
+        <NavContent pathname={pathname} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
       </aside>
 
       {/* ── 모바일 상단 헤더 바 ── */}
@@ -140,7 +146,7 @@ export default function AdminSidebar() {
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <NavContent />
+        <NavContent pathname={pathname} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
       </aside>
     </>
   )

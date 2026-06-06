@@ -55,8 +55,8 @@ export async function GET(req: NextRequest) {
 
 // ── POST ─────────────────────────────────────────────────────
 export async function POST(req: NextRequest) {
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const body = await req.json()
   const {
@@ -78,30 +78,30 @@ export async function POST(req: NextRequest) {
   }
 
   const admin = createAdminClient()
-  const { data, error } = await admin
+  const { data, error: dbError } = await admin
     .from('featured_speakers')
     .insert({ speaker_id, intro, tags, is_visible, home_visible, start_date, end_date, sort_order })
     .select(`id, intro, tags, is_visible, home_visible, start_date, end_date, sort_order, speaker:speaker_id (${SPEAKER_COLS})`)
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ data }, { status: 201 })
 }
 
 // ── DELETE ?speaker_id=xxx — 강사 ID로 에디터 픽 해제 ────────
 export async function DELETE(req: NextRequest) {
-  const { error } = await requireAdmin()
-  if (error) return error
+  const { error: authError } = await requireAdmin()
+  if (authError) return authError
 
   const speaker_id = req.nextUrl.searchParams.get('speaker_id')
   if (!speaker_id) return NextResponse.json({ error: 'speaker_id 필요' }, { status: 400 })
 
   const admin = createAdminClient()
-  const { error } = await admin
+  const { error: dbError } = await admin
     .from('featured_speakers')
     .delete()
     .eq('speaker_id', speaker_id)
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

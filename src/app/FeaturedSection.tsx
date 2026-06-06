@@ -31,7 +31,7 @@ export default function FeaturedSection({ items }: Props) {
         }}>
           에디터 픽{' '}
           <span style={{ fontFamily: 'var(--font-body)', fontWeight: 300, fontSize: '13px', color: 'var(--color-muted)', marginLeft: '8px' }}>
-            Editor's Pick
+            Editor&apos;s Pick
           </span>
         </h2>
         <Link href="/insights/featured" className="see-all-link">전체 보기 →</Link>
