@@ -39,7 +39,7 @@
 | T-006 | @frontend/@backend | Google OAuth 버튼 + callback route 코드 반영 | 2026-05-29 | `/api/auth/callback`, `GoogleLoginButton` 존재. 운영 Provider 설정은 T-019로 분리 |
 | T-017 | @backend | `/api/admin/**` 권한 보호 재점검/보강 | 2026-05-29 | middleware matcher + legacy admin write API `requireAdmin()` 적용 + 유닛 테스트 추가 |
 | T-016 | @dev | lint 실패 47 errors 정리 | 2026-06-06 | `npm run lint`: 0 errors / 19 warnings, exit 0. `npm test -- --run`: 36/36 PASS |
-| T-018 | @dev | GitHub 이슈 상태 정리 (#1~#22) | 2026-06-06 | closed #1~#4, #6~#15, #18, #20, #22. open #5, #16, #17, #19, #21 |
+| T-018 | @dev | GitHub 이슈 상태 정리 (#1~#22) | 2026-06-06 | closed #1~#4, #6~#18, #20, #22. open #5, #19, #21 |
 | T-004 | @dev | Vercel 환경변수 설정 + 최신 배포 상태 확인 | 2026-06-06 | Vercel check success on 48002cc, 운영 스모크 PASS, QA 인계 |
 | T-003 | @qa | E2E 전체 실행 + 버그 리포트 | 2026-06-06 | 운영 Playwright E2E 66 passed / 2 skipped. `networkidle` 의존 제거로 speakers E2E 안정화 |
 
@@ -113,6 +113,8 @@
   - 코드 리뷰: `networkidle` 제거와 DOM 기준 대기 전환 승인
   - Gemini 리뷰 코멘트 반영: `expectSpeakerResultsVisible` 중복 href 조회 제거
   - 재검증: speakers chromium E2E 12/12 PASS, lint 0 errors / 19 warnings
+  - PR #25 squash merge 완료: main `209ffd5`
+  - GitHub #16/#17 completed로 close
 ```
 
 ---

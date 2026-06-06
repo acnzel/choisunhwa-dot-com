@@ -1,6 +1,6 @@
 # 최선화닷컴 — 작업 현황판
 
-> 기준: 2026-06-06 21:36 KST / QA 운영 E2E PR 리뷰 기준
+> 기준: 2026-06-06 21:40 KST / T-003 운영 E2E 병합 완료 기준
 > 배포는 Vercel CLI 금지. `git push origin main` 자동 배포만 사용.
 
 ---
@@ -12,7 +12,6 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 운영 배포 기준 E2E 전체 재검증은 통과했다. 현재 남은 핵심은 Google OAuth 운영 설정 확인이다.
 
 1. Google OAuth 운영 설정/검증
-2. GitHub 이슈 잔여 항목 운영/QA 검증
 
 ---
 
@@ -27,7 +26,7 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 | lint | ✅ | `npm run lint` → 0 errors / 19 warnings, exit 0 |
 | production build | ✅ | `npm run build` → 통과. Next middleware deprecation warning만 잔존 |
 | 운영 E2E | ✅ | `PLAYWRIGHT_BASE_URL=https://choisunhwa-dot-com.vercel.app npm run test:e2e` → 66 passed / 2 skipped |
-| GitHub issue 정리 | ✅ | 완료 구현 이슈 close. #16/#17 운영 E2E 통과 확인. 잔여 open: #5, #19, #21 |
+| GitHub issue 정리 | ✅ | 완료 구현/QA 이슈 close. 잔여 open: #5, #19, #21 |
 | GitHub CLI | ⚠️ | 로컬 `gh` 미로그인. GitHub connector로 확인 |
 | GitHub Actions | ⚠️ | `gh` 미로그인으로 run 상태 직접 확인 불가 |
 
@@ -110,12 +109,12 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 
 ## GitHub 이슈 상태 메모
 
-GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
+GitHub connector 기준 열린 이슈는 OAuth 운영 설정/검증만 남겼다.
 
 - open 잔여 권장: `#5` Auth 운영 검증 잔여, `#19` 어드민/OAuth E2E, `#21` Google OAuth 운영 설정
-- QA 완료 확인: `#16` E2E 문의 플로우, `#17` E2E 탐색 플로우는 운영 E2E 통과
-- closed: 코드/현황판 기준 구현 완료 이슈 `#1`~`#4`, `#6`~`#15`, `#18`, `#20`, `#22`
-- 최근 PR: `#25` T-003 E2E 안정화 리뷰 완료
+- QA 완료 확인: `#16` E2E 문의 플로우, `#17` E2E 탐색 플로우는 운영 E2E 통과 후 close
+- closed: 코드/현황판 기준 구현 완료 이슈 `#1`~`#4`, `#6`~`#18`, `#20`, `#22`
+- 최근 PR: `#25` T-003 E2E 안정화 리뷰 및 squash merge 완료
 
 이슈 상태는 이제 코드 완료분과 운영/QA 잔여분을 분리한 상태다.
 
@@ -139,8 +138,7 @@ GitHub connector 기준 열린 이슈는 운영 설정/QA 검증만 남겼다.
 ## 다음 액션
 
 1. Scott: `docs/google-oauth-ops.md` 기준 운영 Google OAuth Provider/Google Console 설정 확인
-2. @dev: #16/#17 이슈 종료
 
 ---
 
-_최종 업데이트: 2026-06-06 21:36 KST | 업데이트 담당: @dev_cshdotcom_bot_
+_최종 업데이트: 2026-06-06 21:40 KST | 업데이트 담당: @dev_cshdotcom_bot_
