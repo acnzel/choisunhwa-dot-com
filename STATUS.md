@@ -102,7 +102,7 @@ MVP 기능은 대부분 구현 완료. 공개 사이트, 어드민, 매칭, 인�
 |----------|------|------|------|------|
 | P0 | Vercel 환경변수/최신 배포 확인 | @dev | ✅ 완료 | `48002cc` Vercel success, 운영 스모크 PASS |
 | P0 | E2E 전체 재실행 | @qa | ✅ 완료 | 운영 Playwright E2E 66 passed / 2 skipped |
-| P1 | Google OAuth 운영 설정 | @backend/Scott | 🟡 부분 확인 | 운영 Google 버튼 → accounts.google.com 이동 확인. 실제 로그인 완료 + profiles 생성 확인 필요 |
+| P1 | Google OAuth 운영 설정 | @backend/Scott | 🟡 부분 확인 | 기존 google/admin profile 확인. 현 배포 기준 실제 로그인 재수행 + last_login_at 갱신 확인 필요 |
 | P2 | STATUS/TASKS 운영 규칙 정리 | @dev | 🟡 필요 | 상태판과 GitHub issue를 한 기준으로 맞춰야 함 |
 
 ---

@@ -15,7 +15,7 @@
 
 | ID | 우선순위 | assignee | 제목 | 시작일 | 메모 |
 |----|---------|----------|------|--------|------|
-| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 운영 Google 버튼 클릭 → accounts.google.com 이동 확인. 남은 확인: 실제 Google 로그인 완료 + profiles 생성 |
+| T-019 | P1 | @backend/Scott | Google OAuth 운영 설정 검증 (Supabase Provider + Client ID/Secret + profiles) | 2026-05-29 | 운영 Google 버튼 클릭 정상, 기존 google/admin profile 확인. 남은 확인: 현 배포 기준 실제 Google 로그인 완료 |
 
 ---
 
@@ -126,6 +126,12 @@
   - 결과: accounts.google.com 로그인 화면으로 이동
   - 의미: 운영 프론트 버튼 + Supabase OAuth 시작 경로 정상
   - 남은 확인: 실제 Google 계정 로그인 완료, `/api/auth/callback` session 교환, profiles row 생성
+
+[2026-06-07] @dev T-019 profiles 확인
+  - `profiles`에서 provider=google + last_login_at 존재 row 확인: 2건
+  - 최신 google profile: status=active, role=admin, last_login_at=2026-03-26T14:48:39.052Z
+  - 의미: profiles의 google/admin 데이터 구조는 존재
+  - 남은 확인: 현재 운영 배포 기준으로 실제 Google 로그인 재수행 후 last_login_at 갱신 확인
 ```
 
 ---
