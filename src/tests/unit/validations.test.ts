@@ -10,6 +10,7 @@ import { describe, it, expect } from 'vitest'
 import {
   SignupSchema,
   InquiryFormSchema,
+  MemoSchema,
   SpeakerSchema,
   LectureSchema,
 } from '@/lib/validations'
@@ -114,6 +115,15 @@ describe('SignupSchema', () => {
 })
 
 // ─── 문의 폼 스키마 ──────────────────────────────────────
+
+describe('MemoSchema', () => {
+  it('content만 있어도 통과한다', () => {
+    const result = MemoSchema.safeParse({
+      content: '강연 문의드립니다. 상세 내용은 추후 협의 부탁드립니다.',
+    })
+    expect(result.success).toBe(true)
+  })
+})
 
 describe('InquiryFormSchema', () => {
   const validBase = {

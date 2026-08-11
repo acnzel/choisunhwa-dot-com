@@ -25,12 +25,25 @@ export async function POST(request: NextRequest, { params }: Params) {
   }
 
   const supabase = createAdminClient()
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('name')
+    .eq('id', user!.id)
+    .maybeSingle()
+
+  const adminName =
+    parsed.data.admin_name?.trim() ||
+    profile?.name?.trim() ||
+    user!.user_metadata?.name?.trim() ||
+    user!.email?.split('@')[0] ||
+    '어드민'
+
   const { data, error: dbError } = await supabase
     .from('inquiry_memos')
     .insert({
       inquiry_id: id,
       admin_id: user!.id,
-      admin_name: parsed.data.admin_name,
+      admin_name: adminName,
       content: parsed.data.content,
     })
     .select()

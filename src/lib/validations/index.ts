@@ -106,7 +106,7 @@ export type NoticeInput = z.infer<typeof NoticeSchema>
 // ─── 메모 (어드민) ───────────────────────────────────────
 export const MemoSchema = z.object({
   content: z.string().min(1).max(1000),
-  admin_name: z.string().min(1).max(50),
+  admin_name: z.string().max(50).optional(),
 })
 
 export type MemoInput = z.infer<typeof MemoSchema>
