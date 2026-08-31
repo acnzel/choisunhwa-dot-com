@@ -6,6 +6,7 @@ export interface ProcessedArticle {
   summary: string
   content_html: string
   tags: string[]
+  image_query: string
   source_url: string
   source_name: string
 }
@@ -93,8 +94,12 @@ export async function summarizeArticle(article: RawArticle): Promise<ProcessedAr
                 items: { type: 'string' },
                 description: `다음 중 관련도 높은 1~3개: ${VALID_TAGS.join(', ')}`,
               },
+              image_query: {
+                type: 'string',
+                description: '이 아티클 분위기와 어울리는 스톡 사진을 검색하기 위한 영어 키워드 2~4단어 (예: "team meeting office", "young entrepreneur laptop")',
+              },
             },
-            required: ['title', 'summary', 'content_html', 'tags'],
+            required: ['title', 'summary', 'content_html', 'tags', 'image_query'],
           },
         },
       ],
@@ -114,6 +119,7 @@ export async function summarizeArticle(article: RawArticle): Promise<ProcessedAr
       summary: string
       content_html: string
       tags: string[]
+      image_query: string
     }
 
     return {
@@ -123,6 +129,7 @@ export async function summarizeArticle(article: RawArticle): Promise<ProcessedAr
       tags: Array.isArray(parsed.tags)
         ? parsed.tags.filter((t: string) => VALID_TAGS.includes(t)).slice(0, 3)
         : [],
+      image_query: parsed.image_query.trim() || article.title,
       source_url: article.link,
       source_name: article.source,
     }
