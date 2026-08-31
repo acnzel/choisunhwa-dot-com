@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   description: '최선화닷컴이 큐레이션하는 인사이트 — 강연으로 연결되는 트렌드',
 }
 
+export const revalidate = 60
+
 const CAROUSEL_COUNT = 4
 
 async function getIssues(): Promise<Insight[]> {
