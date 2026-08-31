@@ -1,6 +1,29 @@
 import { createClient } from '@supabase/supabase-js'
 import { collectArticles } from './collector'
 import { summarizeArticle } from './summarizer'
+import { fetchArticleImage } from './image'
+
+// content_html 중간(H2 소제목들의 가운데 지점)에 <img>를 삽입한다.
+// H2가 2개 미만이면 문단 중간에 삽입한다.
+function insertImageMidway(html: string, imageUrl: string, alt: string): string {
+  const imgTag = `<img src="${imageUrl}" alt="${alt.replace(/"/g, '&quot;')}" style="width:100%;height:auto;border-radius:12px;margin:24px 0;display:block;" loading="lazy" />`
+
+  const h2Matches = [...html.matchAll(/<h2[^>]*>/g)]
+  if (h2Matches.length >= 2) {
+    const mid = h2Matches[Math.floor(h2Matches.length / 2)]
+    const idx = mid.index!
+    return html.slice(0, idx) + imgTag + html.slice(idx)
+  }
+
+  const paragraphEnds = [...html.matchAll(/<\/p>/g)]
+  if (paragraphEnds.length > 0) {
+    const mid = paragraphEnds[Math.floor(paragraphEnds.length / 2)]
+    const idx = mid.index! + mid[0].length
+    return html.slice(0, idx) + imgTag + html.slice(idx)
+  }
+
+  return html + imgTag
+}
 
 export interface PipelineResult {
   collected: number
@@ -44,11 +67,17 @@ export async function runPipeline(): Promise<PipelineResult> {
       if (!processed) { results.errors.push(`요약 실패: ${article.title}`); continue }
       results.summarized++
 
+      const imageUrl = await fetchArticleImage(processed.image_query)
+      const contentHtml = imageUrl
+        ? insertImageMidway(processed.content_html, imageUrl, processed.title)
+        : processed.content_html
+
       const { error } = await supabase.from('insights').insert({
         type: 'issue',
         title: processed.title,
         summary: processed.summary,
-        content_html: processed.content_html,
+        content_html: contentHtml,
+        thumbnail_url: imageUrl,
         status: 'draft',
         source_url: processed.source_url,
         source_name: processed.source_name,
