@@ -68,7 +68,7 @@ export default function LoginForm() {
       <div>
         <div className="flex items-center justify-between mb-1.5">
           <label className="text-sm font-medium text-gray-700">비밀번호</label>
-          <Link href="/auth/forgot-password" className="text-xs text-gray-400 hover:text-gray-600">
+          <Link href="/auth/forgot-password" prefetch={false} className="text-xs text-gray-400 hover:text-gray-600">
             비밀번호 찾기
           </Link>
         </div>
