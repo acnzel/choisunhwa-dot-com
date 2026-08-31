@@ -14,7 +14,7 @@ async function getPending() {
   const supabase = createAdminClient()
   const { data } = await supabase
     .from('insights')
-    .select('id, title, summary, content_html, source_name, source_url, created_at, meta')
+    .select('id, title, summary, source_name, source_url, created_at, meta')
     .eq('auto_generated', true)
     .eq('status', 'draft')
     .order('created_at', { ascending: false })
