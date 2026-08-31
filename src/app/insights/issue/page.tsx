@@ -83,32 +83,9 @@ export default async function IssuePage() {
         {/* ── 캐러셀 (헤더 포함) ── */}
         <InsightCarousel items={carouselItems} totalCount={items.length} />
 
-        {/* ── 구분선 ── */}
-        <hr style={{
-          border: 'none', borderTop: '1px solid var(--color-border)',
-          margin: 'clamp(40px, 6vw, 64px) var(--space-page) 0',
-        }} />
-
-        {/* ── 전체 아티클 그리드 ── */}
+        {/* ── 전체 아티클 그리드 — 캐러셀과 같은 컬렉션이라 구분선 없이 자연스럽게 이어짐 ── */}
         {gridItems.length > 0 && (
-          <div style={{ padding: '0 var(--space-page)', marginTop: 'clamp(36px, 5vw, 52px)' }}>
-
-            {/* 섹션 헤더 */}
-            <div style={{
-              display: 'flex', alignItems: 'baseline', justifyContent: 'space-between',
-              marginBottom: 'clamp(24px, 4vw, 40px)',
-            }}>
-              <h2 style={{
-                fontFamily: 'var(--font-display)', fontWeight: 400,
-                fontSize: 'clamp(20px, 3vw, 26px)', letterSpacing: '-0.5px',
-                color: 'var(--color-ink)',
-              }}>
-                전체 아티클
-              </h2>
-              <span style={{ fontSize: 13, color: 'var(--color-muted)' }}>
-                총 {items.length}건 · 최신 {CAROUSEL_COUNT}개 제외
-              </span>
-            </div>
+          <div style={{ padding: '0 var(--space-page)', marginTop: 'clamp(32px, 4vw, 44px)' }}>
 
             {/* 3열 그리드 */}
             <div
