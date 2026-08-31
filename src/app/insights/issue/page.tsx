@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export const revalidate = 60
 
-const CAROUSEL_COUNT = 4
+const CAROUSEL_COUNT = 12
 
 async function getIssues(): Promise<Insight[]> {
   try {
