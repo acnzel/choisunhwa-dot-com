@@ -18,18 +18,32 @@ const STATUS_COLOR: Record<string, string> = {
   published: '#10b981',
 }
 
-async function getInsights(): Promise<Insight[]> {
+type TypeFilter = 'all' | 'issue' | 'report' | 'pick'
+
+async function getInsights(type: TypeFilter): Promise<Insight[]> {
   const admin = createAdminClient()
-  const { data } = await admin
+  let query = admin
     .from('insights')
     .select('id, type, title, status, home_featured, published_at, created_at')
     .order('created_at', { ascending: false })
     .limit(100)
+
+  if (type !== 'all') query = query.eq('type', type)
+
+  const { data } = await query
   return (data as Insight[]) ?? []
 }
 
-export default async function InsightsAdminPage() {
-  const insights = await getInsights()
+export default async function InsightsAdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ type?: string }>
+}) {
+  const params = await searchParams
+  const rawType = params.type ?? 'all'
+  const currentType: TypeFilter =
+    rawType === 'issue' || rawType === 'report' || rawType === 'pick' ? rawType : 'all'
+  const insights = await getInsights(currentType)
 
   return (
     <div>
@@ -51,17 +65,17 @@ export default async function InsightsAdminPage() {
         </Link>
       </div>
 
-      {/* 필터 탭 - TODO: 클라이언트 컴포넌트로 분리 */}
+      {/* 필터 탭 */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
         {(['all', 'issue', 'report', 'pick'] as const).map(t => (
-          <span key={t} style={{
+          <Link key={t} href={t === 'all' ? '/mong-bab/insights' : `/mong-bab/insights?type=${t}`} style={{
             padding: '4px 14px', borderRadius: 20,
-            background: t === 'all' ? '#1a1a2e' : '#f3f4f6',
-            color: t === 'all' ? '#fff' : '#374151',
-            fontSize: 12, fontWeight: 500, cursor: 'pointer',
+            background: t === currentType ? '#1a1a2e' : '#f3f4f6',
+            color: t === currentType ? '#fff' : '#374151',
+            fontSize: 12, fontWeight: 500, textDecoration: 'none',
           }}>
             {t === 'all' ? '전체' : TYPE_LABEL[t]}
-          </span>
+          </Link>
         ))}
       </div>
 
