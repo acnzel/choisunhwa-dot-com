@@ -65,25 +65,24 @@ export default function InsightCarousel({ items, totalCount, spaceVar = '--space
         .ic-tag:hover { color: var(--color-green); text-decoration: underline; }
       `}</style>
 
-      {/* ── 헤더: Insight. 타이틀 + 화살표 ── */}
+      {/* ── 헤더: 최신 하이라이트 라벨 + 화살표 (그리드와 이어지는 슬림 헤더) ── */}
       <div style={{
-        display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between',
-        borderBottom: '2px solid var(--color-ink)',
-        padding: `clamp(32px,5vw,56px) var(${spaceVar}) 18px`,
+        display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
+        padding: `clamp(28px,4vw,40px) var(${spaceVar}) 0`,
       }}>
-        <h1 style={{
-          fontFamily: 'var(--font-display)', fontWeight: 900,
-          fontSize: 'clamp(56px, 9vw, 100px)',
-          letterSpacing: '-0.04em', lineHeight: 1,
-          color: 'var(--color-ink)',
-        }}>
-          Insight<span style={{ color: 'var(--color-green)' }}>.</span>
-        </h1>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: 8 }}>
-          <span style={{ fontSize: 13, color: 'var(--color-muted)', marginRight: 12 }}>
-            Total {totalCount}
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+          <span style={{
+            fontFamily: 'var(--font-display)', fontWeight: 700,
+            fontSize: 14, color: 'var(--color-ink)',
+          }}>
+            최신 하이라이트
           </span>
+          <span style={{ fontSize: 12, color: 'var(--color-muted)' }}>
+            Total {totalCount} · 최신순
+          </span>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           {(['prev', 'next'] as const).map((dir) => {
             const disabled = dir === 'prev' ? atStart : atEnd
             return (
@@ -93,11 +92,11 @@ export default function InsightCarousel({ items, totalCount, spaceVar = '--space
                 disabled={disabled}
                 aria-label={dir === 'prev' ? '이전' : '다음'}
                 style={{
-                  width: 44, height: 44, borderRadius: '50%', border: 'none',
+                  width: 36, height: 36, borderRadius: '50%', border: '1px solid var(--color-border)',
                   cursor: disabled ? 'default' : 'pointer',
-                  background: disabled ? '#CCCCCC' : 'var(--color-ink)',
-                  color: disabled ? '#999' : '#fff',
-                  fontSize: 17, lineHeight: 1,
+                  background: disabled ? 'transparent' : 'var(--color-ink)',
+                  color: disabled ? 'var(--color-muted)' : '#fff',
+                  fontSize: 15, lineHeight: 1,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   transition: 'background 0.2s',
                   flexShrink: 0,
