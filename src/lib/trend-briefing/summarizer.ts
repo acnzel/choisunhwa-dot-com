@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk'
+import OpenAI from 'openai'
 import type { RawArticle } from './collector'
 
 export interface ProcessedArticle {
@@ -55,26 +55,29 @@ content_html은 실제 HR 전문가가 읽을 수준의 깊이 있는 분석이�
 }
 
 export async function summarizeArticle(article: RawArticle): Promise<ProcessedArticle | null> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = process.env.OPENAI_API_KEY
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY 미설정')
+    console.error('OPENAI_API_KEY 미설정')
     return null
   }
 
-  const client = new Anthropic({ apiKey })
+  const client = new OpenAI({ apiKey })
 
   try {
-    // tool_use 사용 → Anthropic이 JSON 유효성 보장 (파싱 오류 원천 차단)
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 2500,
-      system: SYSTEM_PROMPT,
-      tools: [
-        {
+    // Structured Outputs(strict json_schema) 사용 → 파싱 오류 원천 차단
+    const completion = await client.chat.completions.create({
+      model: 'gpt-5.1',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'user', content: buildUserPrompt(article) },
+      ],
+      response_format: {
+        type: 'json_schema',
+        json_schema: {
           name: 'create_insight',
-          description: '최선화닷컴 인사이트 아티클을 구조화된 형태로 생성합니다.',
-          input_schema: {
-            type: 'object' as const,
+          strict: true,
+          schema: {
+            type: 'object',
             properties: {
               title: {
                 type: 'string',
@@ -95,21 +98,19 @@ export async function summarizeArticle(article: RawArticle): Promise<ProcessedAr
               },
             },
             required: ['title', 'summary', 'content_html', 'tags'],
+            additionalProperties: false,
           },
         },
-      ],
-      tool_choice: { type: 'tool', name: 'create_insight' },
-      messages: [{ role: 'user', content: buildUserPrompt(article) }],
+      },
     })
 
-    // tool_use 결과 추출
-    const toolUse = message.content.find(c => c.type === 'tool_use')
-    if (!toolUse || toolUse.type !== 'tool_use') {
-      console.error('tool_use 응답 없음:', article.title)
+    const raw = completion.choices[0]?.message?.content
+    if (!raw) {
+      console.error('구조화 응답 없음:', article.title)
       return null
     }
 
-    const parsed = toolUse.input as {
+    const parsed = JSON.parse(raw) as {
       title: string
       summary: string
       content_html: string
