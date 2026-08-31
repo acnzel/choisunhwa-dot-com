@@ -1,9 +1,9 @@
 name: Trend Briefing Cron
 
 on:
-  schedule:
-    - cron: '0 1 * * *'  # UTC 01:00 = KST 10:00
-  workflow_dispatch:       # 수동 실행 가능
+  # 정기 실행은 Vercel Cron(vercel.json)이 담당. GitHub의 scheduled workflow는
+  # 저장소에 60일간 push가 없으면 자동 비활성화되는 문제가 있어 schedule 트리거는 제거.
+  workflow_dispatch:       # 수동 실행 / 백업용
 
 jobs:
   run:
