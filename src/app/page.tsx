@@ -14,7 +14,28 @@ const FIELD_MAP = buildFieldMap()
 
 async function getData() {
   const supabase = await createClient()
-  const [{ data: speakers }, { data: insightItems }, { data: bestSpeakers }, { count: totalSpeakerCount }, { data: trendingSpeakers }] = await Promise.all([
+
+  // 이달의 강사 — featured_speakers 테이블 (migration 011 적용 전엔 빈 배열 fallback).
+  // 아래 Promise.all과 병렬 실행하되, 이 쿼리만 실패해도 전체가 끊기지 않도록 자체적으로 흡수한다.
+  const featuredPromise: Promise<FeaturedSpeakerItem[]> = (async () => {
+    try {
+      const { data } = await supabase
+        .from('featured_speakers')
+        .select(`
+          id, intro, tags, is_visible, home_visible,
+          start_date, end_date, sort_order, created_at,
+          speaker:speaker_id ( id, name, title, company, photo_url, bio_short, fields )
+        `)
+        .eq('is_visible', true)
+        .order('sort_order', { ascending: true })
+        .limit(18)
+      return (data as unknown as FeaturedSpeakerItem[]) ?? []
+    } catch {
+      return []
+    }
+  })()
+
+  const [{ data: speakers }, { data: insightItems }, { data: bestSpeakers }, { count: totalSpeakerCount }, { data: trendingSpeakers }, featuredItems] = await Promise.all([
     supabase
       .from('speakers')
       .select('id, name, title, company, photo_url, fields, bio_short, is_visible')
@@ -47,25 +68,8 @@ async function getData() {
       .eq('is_visible', true)
       .order('sort_order', { ascending: true })
       .limit(18),
+    featuredPromise,
   ])
-
-  // 이달의 강사 — featured_speakers 테이블 (migration 011 적용 전엔 빈 배열 fallback)
-  let featuredItems: FeaturedSpeakerItem[] = []
-  try {
-    const { data: featured } = await supabase
-      .from('featured_speakers')
-      .select(`
-        id, intro, tags, is_visible, home_visible,
-        start_date, end_date, sort_order, created_at,
-        speaker:speaker_id ( id, name, title, company, photo_url, bio_short, fields )
-      `)
-      .eq('is_visible', true)
-      .order('sort_order', { ascending: true })
-      .limit(18)
-    featuredItems = (featured as unknown as FeaturedSpeakerItem[]) ?? []
-  } catch {
-    featuredItems = []
-  }
 
   return {
     speakers: (speakers as Speaker[]) ?? [],
