@@ -112,8 +112,8 @@ export default function InsightDetail({ insight }: Props) {
         </div>
       )}
 
-      {/* 썸네일 */}
-      {insight.thumbnail_url && (
+      {/* 썸네일 — 본문(content_html)에 이미 이미지가 있으면 중복이라 생략 */}
+      {insight.thumbnail_url && !insight.content_html?.includes('<img') && (
         <div style={{
           position: 'relative',
           width: '100%',
