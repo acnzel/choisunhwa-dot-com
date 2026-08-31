@@ -7,7 +7,6 @@ interface PendingItem {
   id: string
   title: string
   summary: string
-  content_html: string
   source_name: string
   source_url: string
   created_at: string
@@ -22,8 +21,19 @@ export default function PendingList({ items: initial }: Props) {
   const router = useRouter()
   const [items, setItems] = useState(initial)
   const [preview, setPreview] = useState<PendingItem | null>(null)
+  const [previewHtml, setPreviewHtml] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const [processing, setProcessing] = useState<string | null>(null)
+
+  async function openPreview(item: PendingItem) {
+    setPreview(item)
+    setPreviewHtml(null)
+    const res = await fetch(`/api/mong-bab/trend-briefing/${item.id}`)
+    if (res.ok) {
+      const data = await res.json()
+      setPreviewHtml(data.content_html)
+    }
+  }
 
   async function handlePublish(id: string) {
     setProcessing(id)
@@ -107,7 +117,7 @@ export default function PendingList({ items: initial }: Props) {
                 {/* 액션 버튼 */}
                 <div className="flex flex-col gap-2 flex-shrink-0">
                   <button
-                    onClick={() => setPreview(item)}
+                    onClick={() => openPreview(item)}
                     className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors text-gray-600"
                   >
                     미리보기
@@ -162,10 +172,14 @@ export default function PendingList({ items: initial }: Props) {
               <p className="text-sm text-gray-500 mb-4 pb-4 border-b border-gray-100">
                 {preview.summary}
               </p>
-              <div
-                className="prose prose-sm max-w-none text-gray-700"
-                dangerouslySetInnerHTML={{ __html: preview.content_html }}
-              />
+              {previewHtml === null ? (
+                <p className="text-sm text-gray-400">불러오는 중…</p>
+              ) : (
+                <div
+                  className="prose prose-sm max-w-none text-gray-700"
+                  dangerouslySetInnerHTML={{ __html: previewHtml }}
+                />
+              )}
             </div>
             <div className="sticky bottom-0 bg-gray-50 px-6 py-4 flex gap-3 rounded-b-2xl border-t border-gray-100">
               <button
