@@ -15,7 +15,7 @@ export async function fetchArticleImage(query: string): Promise<string | null> {
 
   try {
     const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&orientation=landscape&per_page=1`
-    const res = await fetch(url, { headers: { Authorization: apiKey } })
+    const res = await fetch(url, { headers: { Authorization: apiKey }, signal: AbortSignal.timeout(10_000) })
     if (!res.ok) {
       console.error('Pexels 검색 실패:', res.status)
       return null

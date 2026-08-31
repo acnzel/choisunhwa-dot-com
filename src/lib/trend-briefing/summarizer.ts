@@ -129,7 +129,7 @@ export async function summarizeArticle(article: RawArticle): Promise<ProcessedAr
       tags: Array.isArray(parsed.tags)
         ? parsed.tags.filter((t: string) => VALID_TAGS.includes(t)).slice(0, 3)
         : [],
-      image_query: parsed.image_query || article.title,
+      image_query: parsed.image_query.trim() || article.title,
       source_url: article.link,
       source_name: article.source,
     }
