@@ -48,7 +48,10 @@ function hasKeyword(text: string): boolean {
   return KEYWORDS.some(kw => lower.includes(kw.toLowerCase()))
 }
 
-export async function collectArticles(maxArticles = 4): Promise<RawArticle[]> {
+// 소스별로 최신 perSource건씩만 뽑아 안배한다 (한 소스가 결과를 독식하지
+// 않도록). 소스 6개 * perSource 1건 = 그날 키워드 매칭 기사가 있는
+// 소스 수만큼(최대 6건), 매칭이 없는 소스는 자연히 빠진다.
+export async function collectArticles(perSource = 1): Promise<RawArticle[]> {
   const seen = new Set<string>()
   const candidates: RawArticle[] = []
 
@@ -73,8 +76,10 @@ export async function collectArticles(maxArticles = 4): Promise<RawArticle[]> {
           seen.add(link)
           fetched.push({ title, link, pubDate, content, source: name })
         }
-        console.log(`[collector] ${name}: ${fetched.length}건 수집`)
-        return fetched
+        fetched.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
+        const picked = fetched.slice(0, perSource)
+        console.log(`[collector] ${name}: ${fetched.length}건 매칭, ${picked.length}건 채택`)
+        return picked
       } catch (err) {
         console.warn(`[collector] RSS fetch failed: ${url}`, err)
         return []
@@ -88,7 +93,6 @@ export async function collectArticles(maxArticles = 4): Promise<RawArticle[]> {
     }
   }
 
-  // 최신순 정렬 후 상위 maxArticles 반환
   candidates.sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime())
-  return candidates.slice(0, maxArticles)
+  return candidates
 }

@@ -41,8 +41,8 @@ export async function runPipeline(): Promise<PipelineResult> {
 
   const results: PipelineResult = { collected: 0, summarized: 0, saved: 0, errors: [] }
 
-  // 1. RSS 수집
-  const articles = await collectArticles(4)
+  // 1. RSS 수집 (소스별 최신 1건씩 안배)
+  const articles = await collectArticles(1)
   results.collected = articles.length
   console.log(`[trend-briefing] 수집: ${articles.length}건`)
 
