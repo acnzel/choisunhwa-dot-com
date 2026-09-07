@@ -8,26 +8,28 @@ export interface RawArticle {
   source: string
 }
 
+// Chrome 등 브라우저를 사칭하는 User-Agent는 일부 언론사(한국경제 등)의
+// Cloudflare 봇 차단에 걸려 403이 난다. UA를 지정하지 않으면(curl 기본
+// UA와 동일한 원리) 오히려 통과된다 — 브라우저 서명을 흉내 내다 실패하는
+// 케이스로 보인다.
 const parser = new Parser({
   timeout: 15_000,
   headers: {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
     'Accept': 'application/rss+xml, application/xml, text/xml, */*',
   },
 })
 
-function naver(query: string): string {
-  return `https://search.naver.com/rss.nhn?where=news&query=${encodeURIComponent(query)}`
-}
-
-// 클라우드 환경에서 안정적으로 작동하는 RSS 소스
-// (Google News RSS는 클라우드 IP 차단으로 제외)
+// 네이버 뉴스 검색 RSS(search.naver.com/rss.nhn)는 네이버가 서비스 자체를
+// 폐지해 전량 404 — 대체 불가로 제거. 아래 7개는 전부 UA 없이 200 확인됨.
+// 이데일리(rss.edaily.co.kr)는 서버 측 TLS 설정 문제로 정상적인 TLS 1.2
+// 핸드셰이크 자체가 실패해(openssl s_client로도 재현됨) 제외.
 const RSS_SOURCES = [
-  { name: '네이버 뉴스', url: naver('리더십 조직문화 HR') },
-  { name: '네이버 뉴스', url: naver('기업교육 강연 트렌드') },
-  { name: '네이버 뉴스', url: naver('동기부여 번아웃 직장') },
   { name: '매일경제', url: 'https://www.mk.co.kr/rss/30100041/' },
   { name: '한국경제', url: 'https://www.hankyung.com/feed/economy' },
+  { name: '동아일보', url: 'https://rss.donga.com/economy.xml' },
+  { name: '연합뉴스', url: 'https://www.yna.co.kr/rss/economy.xml' },
+  { name: '머니투데이', url: 'https://rss.mt.co.kr/mt_news.xml' },
+  { name: '한겨레', url: 'https://www.hani.co.kr/rss/economy' },
 ]
 
 const KEYWORDS = [
