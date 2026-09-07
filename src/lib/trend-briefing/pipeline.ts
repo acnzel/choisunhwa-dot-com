@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { collectArticles } from './collector'
 import { summarizeArticle } from './summarizer'
-import { fetchArticleImage } from './image'
+import { fetchArticleImage, extractPexelsId } from './image'
 
 // content_html 중간(H2 소제목들의 가운데 지점)에 <img>를 삽입한다.
 // H2가 2개 미만이면 문단 중간에 삽입한다.
@@ -60,6 +60,21 @@ export async function runPipeline(): Promise<PipelineResult> {
   const fresh = articles.filter(a => !existingUrls.has(a.link))
   console.log(`[trend-briefing] 중복 제거 후: ${fresh.length}건`)
 
+  // 최근 30일간 이미 쓴 썸네일 이미지는 재사용을 피한다 (주제가 비슷하면
+  // Pexels 검색 결과가 항상 같은 1등 사진으로 수렴하는 문제 대응)
+  const imageSince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  const { data: recentThumbnails } = await supabase
+    .from('insights')
+    .select('thumbnail_url')
+    .not('thumbnail_url', 'is', null)
+    .gte('created_at', imageSince)
+
+  const usedImageIds = new Set(
+    (recentThumbnails ?? [])
+      .map(r => r.thumbnail_url ? extractPexelsId(r.thumbnail_url) : null)
+      .filter((id): id is string => id !== null)
+  )
+
   // 3. AI 요약 + DB 저장
   for (const article of fresh) {
     try {
@@ -67,7 +82,11 @@ export async function runPipeline(): Promise<PipelineResult> {
       if (!processed) { results.errors.push(`요약 실패: ${article.title}`); continue }
       results.summarized++
 
-      const imageUrl = await fetchArticleImage(processed.image_query)
+      const imageUrl = await fetchArticleImage(processed.image_query, usedImageIds)
+      if (imageUrl) {
+        const id = extractPexelsId(imageUrl)
+        if (id) usedImageIds.add(id)
+      }
       const contentHtml = imageUrl
         ? insertImageMidway(processed.content_html, imageUrl, processed.title)
         : processed.content_html
