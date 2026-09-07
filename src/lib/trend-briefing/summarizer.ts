@@ -1,4 +1,4 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { GoogleGenAI, Type } from '@google/genai'
 import type { RawArticle } from './collector'
 
 export interface ProcessedArticle {
@@ -56,65 +56,60 @@ content_html은 실제 HR 전문가가 읽을 수준의 깊이 있는 분석이�
 }
 
 export async function summarizeArticle(article: RawArticle): Promise<ProcessedArticle | null> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
+  const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
-    console.error('ANTHROPIC_API_KEY 미설정')
+    console.error('GEMINI_API_KEY 미설정')
     return null
   }
 
-  const client = new Anthropic({ apiKey })
+  const client = new GoogleGenAI({ apiKey })
 
   try {
-    // tool_use 사용 → Anthropic이 JSON 유효성 보장 (파싱 오류 원천 차단)
-    const message = await client.messages.create({
-      model: 'claude-sonnet-4-5',
-      max_tokens: 2500,
-      system: SYSTEM_PROMPT,
-      tools: [
-        {
-          name: 'create_insight',
-          description: '최선화닷컴 인사이트 아티클을 구조화된 형태로 생성합니다.',
-          input_schema: {
-            type: 'object' as const,
-            properties: {
-              title: {
-                type: 'string',
-                description: '35자 이내 리라이팅 제목 (원문 그대로 금지, 인사이트형 또는 호기심 유발형)',
-              },
-              summary: {
-                type: 'string',
-                description: '이 아티클의 핵심 인사이트 2~3문장 (독자가 얻는 것 중심)',
-              },
-              content_html: {
-                type: 'string',
-                description: 'HTML 본문. H2 소제목 2개 이상, 600자 이상, 수치/연구 인용, 마지막 문단에 "이런 강연이 필요하다면:" 포함',
-              },
-              tags: {
-                type: 'array',
-                items: { type: 'string' },
-                description: `다음 중 관련도 높은 1~3개: ${VALID_TAGS.join(', ')}`,
-              },
-              image_query: {
-                type: 'string',
-                description: '이 아티클 분위기와 어울리는 스톡 사진을 검색하기 위한 영어 키워드 2~4단어 (예: "team meeting office", "young entrepreneur laptop")',
-              },
+    // responseJsonSchema 사용 → JSON 유효성 보장 (파싱 오류 원천 차단)
+    const response = await client.models.generateContent({
+      model: 'gemini-3.6-flash',
+      contents: buildUserPrompt(article),
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        responseMimeType: 'application/json',
+        responseJsonSchema: {
+          type: Type.OBJECT,
+          properties: {
+            title: {
+              type: Type.STRING,
+              description: '35자 이내 리라이팅 제목 (원문 그대로 금지, 인사이트형 또는 호기심 유발형)',
             },
-            required: ['title', 'summary', 'content_html', 'tags', 'image_query'],
+            summary: {
+              type: Type.STRING,
+              description: '이 아티클의 핵심 인사이트 2~3문장 (독자가 얻는 것 중심)',
+            },
+            content_html: {
+              type: Type.STRING,
+              description: 'HTML 본문. H2 소제목 2개 이상, 600자 이상, 수치/연구 인용, 마지막 문단에 "이런 강연이 필요하다면:" 포함',
+            },
+            tags: {
+              type: Type.ARRAY,
+              items: { type: Type.STRING },
+              description: `다음 중 관련도 높은 1~3개: ${VALID_TAGS.join(', ')}`,
+            },
+            image_query: {
+              type: Type.STRING,
+              description: '이 아티클 분위기와 어울리는 스톡 사진을 검색하기 위한 영어 키워드 2~4단어 (예: "team meeting office", "young entrepreneur laptop")',
+            },
           },
+          required: ['title', 'summary', 'content_html', 'tags', 'image_query'],
+          propertyOrdering: ['title', 'summary', 'content_html', 'tags', 'image_query'],
         },
-      ],
-      tool_choice: { type: 'tool', name: 'create_insight' },
-      messages: [{ role: 'user', content: buildUserPrompt(article) }],
+      },
     })
 
-    // tool_use 결과 추출
-    const toolUse = message.content.find(c => c.type === 'tool_use')
-    if (!toolUse || toolUse.type !== 'tool_use') {
-      console.error('tool_use 응답 없음:', article.title)
+    const text = response.text
+    if (!text) {
+      console.error('응답 없음:', article.title)
       return null
     }
 
-    const parsed = toolUse.input as {
+    const parsed = JSON.parse(text) as {
       title: string
       summary: string
       content_html: string
