@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import { Suspense } from 'react'
 import type { Speaker, Insight, FeaturedSpeakerItem } from '@/types'
 import { buildFieldMap } from '@/constants'
@@ -9,6 +9,9 @@ import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import RevealOnScroll from '@/components/RevealOnScroll'
 import { pageMeta } from '@/lib/seo'
+
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
 // FeaturedSection은 홈에서 제거됨 (SpeakerTabs 이달의 강사 탭과 중복)
 
 const FIELD_MAP = buildFieldMap()
@@ -16,7 +19,7 @@ const FIELD_MAP = buildFieldMap()
 export const metadata = pageMeta({ path: '/' })
 
 async function getData() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   // 이달의 강사 — featured_speakers 테이블 (migration 011 적용 전엔 빈 배열 fallback).
   // 아래 Promise.all과 병렬 실행하되, 이 쿼리만 실패해도 전체가 끊기지 않도록 자체적으로 흡수한다.

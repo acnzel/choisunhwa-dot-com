@@ -2,10 +2,18 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Lecture, Speaker } from '@/types'
 import { LECTURE_DURATIONS } from '@/constants'
 import { pageMeta } from '@/lib/seo'
+
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
+
+// 빌드 시 미리 만들지 않고 첫 요청 때 만들어 캐시한다
+export function generateStaticParams() {
+  return []
+}
 
 const DURATION_MAP: Record<string, string> = Object.fromEntries(
   LECTURE_DURATIONS.map((d) => [d.value, d.label])
@@ -31,7 +39,7 @@ interface Props {
 }
 
 async function getLecture(id: string): Promise<LectureWithSpeaker | null> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data } = await supabase
     .from('lectures')
     .select('*, speaker:speakers(*)')
@@ -42,7 +50,7 @@ async function getLecture(id: string): Promise<LectureWithSpeaker | null> {
 }
 
 async function getRelatedLectures(lectureId: string, fields: string[]): Promise<Lecture[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data } = await supabase
     .from('lectures')
     .select('*')

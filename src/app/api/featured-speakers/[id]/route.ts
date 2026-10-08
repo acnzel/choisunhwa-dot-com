@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 const SPEAKER_COLS = 'id, name, title, company, photo_url, bio_short, fields'
 
@@ -39,6 +40,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
   if (!data) return NextResponse.json({ error: '항목 없음' }, { status: 404 })
+  revalidatePublicPages()
   return NextResponse.json({ data })
 }
 
@@ -55,5 +57,6 @@ export async function DELETE(req: NextRequest, { params }: Params) {
     .eq('id', id)
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ success: true })
 }

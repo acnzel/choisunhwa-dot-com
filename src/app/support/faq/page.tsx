@@ -1,9 +1,12 @@
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Faq, FaqCategory } from '@/types'
 import FaqAccordion from './FaqAccordion'
 import JsonLd from '@/components/seo/JsonLd'
 import { pageMeta } from '@/lib/seo'
+
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
 
 export const metadata: Metadata = pageMeta({
   title: '자주 묻는 질문',
@@ -12,7 +15,7 @@ export const metadata: Metadata = pageMeta({
 })
 
 async function getFaqs() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const [{ data: faqs }, { data: categories }] = await Promise.all([
     supabase
       .from('faqs')

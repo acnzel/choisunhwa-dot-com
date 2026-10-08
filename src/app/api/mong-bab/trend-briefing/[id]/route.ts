@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 // 미들웨어에서 admin 인증 완료 후 도달 — 별도 인증 불필요
 
@@ -35,6 +36,7 @@ export async function PATCH(
     .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ ok: true })
 }
 
@@ -52,5 +54,6 @@ export async function DELETE(
     .eq('id', id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ ok: true })
 }

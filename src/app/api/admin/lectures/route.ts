@@ -3,6 +3,7 @@ import { requireAdmin } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { LectureSchema } from '@/lib/validations'
 import { PAGINATION } from '@/constants'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 export async function GET(request: NextRequest) {
   const { error } = await requireAdmin()
@@ -61,5 +62,6 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ data }, { status: 201 })
 }

@@ -2,6 +2,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin'
 import { revalidatePath } from 'next/cache'
+import { revalidatePublicPages } from '@/lib/revalidate'
 import { redirect } from 'next/navigation'
 
 // ─── 강사 ──────────────────────────────────────────────
@@ -16,7 +17,7 @@ export async function toggleSpeakerVisibility(speakerId: string, isVisible: bool
   if (error) return { ok: false, error: error.message }
 
   revalidatePath('/mong-bab/speakers')
-  revalidatePath('/speakers')
+  revalidatePublicPages()
   return { ok: true }
 }
 
@@ -30,7 +31,7 @@ export async function toggleSpeakerBest(speakerId: string, isBest: boolean) {
   if (error) return { ok: false, error: error.message }
 
   revalidatePath('/mong-bab/speakers')
-  revalidatePath('/')
+  revalidatePublicPages()
   return { ok: true }
 }
 
@@ -44,7 +45,7 @@ export async function toggleSpeakerTrending(speakerId: string, isTrending: boole
   if (error) return { ok: false, error: error.message }
 
   revalidatePath('/mong-bab/speakers')
-  revalidatePath('/')
+  revalidatePublicPages()
   return { ok: true }
 }
 
@@ -104,7 +105,7 @@ export async function upsertSpeaker(formData: FormData) {
   }
 
   revalidatePath('/mong-bab/speakers')
-  revalidatePath('/speakers')
+  revalidatePublicPages()
   redirect(`/mong-bab/speakers/${speakerId}?saved=1`)
 }
 
@@ -113,7 +114,7 @@ export async function deleteSpeaker(speakerId: string) {
   const { error } = await supabase.from('speakers').delete().eq('id', speakerId)
   if (error) return { ok: false, error: error.message }
   revalidatePath('/mong-bab/speakers')
-  revalidatePath('/speakers')
+  revalidatePublicPages()
   return { ok: true }
 }
 
@@ -128,7 +129,7 @@ export async function toggleLectureVisibility(lectureId: string, isVisible: bool
 
   if (error) return { ok: false, error: error.message }
   revalidatePath('/mong-bab/lectures')
-  revalidatePath('/lectures')
+  revalidatePublicPages()
   return { ok: true }
 }
 
@@ -176,7 +177,7 @@ export async function upsertLecture(formData: FormData) {
   }
 
   revalidatePath('/mong-bab/lectures')
-  revalidatePath('/lectures')
+  revalidatePublicPages()
   redirect(`/mong-bab/lectures/${lectureId}?saved=1`)
 }
 
@@ -185,7 +186,7 @@ export async function deleteLecture(lectureId: string) {
   const { error } = await supabase.from('lectures').delete().eq('id', lectureId)
   if (error) return { ok: false, error: error.message }
   revalidatePath('/mong-bab/lectures')
-  revalidatePath('/lectures')
+  revalidatePublicPages()
   return { ok: true }
 }
 
