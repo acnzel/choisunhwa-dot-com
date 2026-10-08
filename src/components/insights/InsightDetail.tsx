@@ -2,13 +2,9 @@ import Image from 'next/image'
 import Link from 'next/link'
 import type { Insight } from '@/types'
 import JsonLd from '@/components/seo/JsonLd'
+import { INSIGHT_TYPE_LABEL } from '@/constants'
 import { absoluteUrl, breadcrumbJsonLd, stripHtml, SITE_URL, SITE_NAME } from '@/lib/seo'
 
-const TYPE_LABEL: Record<string, string> = {
-  issue:  '인사이트',
-  report: '현장 스토리',
-  pick:   '에디터 픽',
-}
 const TYPE_COLOR: Record<string, string> = {
   issue:  '#1d4ed8',
   report: '#15803d',
@@ -29,18 +25,19 @@ export default function InsightDetail({ insight }: Props) {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: insight.title,
-    ...(insight.summary ? { description: insight.summary } : {}),
-    ...(insight.thumbnail_url ? { image: [insight.thumbnail_url] } : {}),
-    ...(insight.published_at ? { datePublished: insight.published_at } : {}),
+    // undefined 값은 JSON.stringify 가 생략한다
+    description: insight.summary ?? undefined,
+    image: insight.thumbnail_url ? [insight.thumbnail_url] : undefined,
+    datePublished: insight.published_at ?? undefined,
     dateModified: insight.updated_at ?? insight.published_at ?? undefined,
     inLanguage: 'ko-KR',
     mainEntityOfPage: absoluteUrl(path),
     // 다른 <script> 블록의 @id 참조는 검색엔진이 해석하지 못할 수 있어 인라인으로 둔다
     author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
-    ...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
-    ...(insight.content_html ? { wordCount: stripHtml(insight.content_html).split(' ').length } : {}),
-    ...(insight.source_url ? { isBasedOn: insight.source_url } : {}),
+    keywords: tags.length > 0 ? tags.join(', ') : undefined,
+    wordCount: insight.content_html ? stripHtml(insight.content_html).split(' ').length : undefined,
+    isBasedOn: insight.source_url ?? undefined,
   }
 
   return (
@@ -49,7 +46,7 @@ export default function InsightDetail({ insight }: Props) {
         articleJsonLd,
         breadcrumbJsonLd([
           { name: '홈', path: '/' },
-          { name: TYPE_LABEL[insight.type] ?? '강연 인사이트', path: backHref },
+          { name: INSIGHT_TYPE_LABEL[insight.type], path: backHref },
           { name: insight.title, path },
         ]),
       ]} />
@@ -77,7 +74,7 @@ export default function InsightDetail({ insight }: Props) {
           marginBottom: 32,
         }}
       >
-        ← {TYPE_LABEL[insight.type]} 목록으로
+        ← {INSIGHT_TYPE_LABEL[insight.type]} 목록으로
       </Link>
 
       {/* 타입 뱃지 */}
@@ -91,7 +88,7 @@ export default function InsightDetail({ insight }: Props) {
           borderRadius: 2,
           textTransform: 'uppercase',
         }}>
-          {TYPE_LABEL[insight.type]}
+          {INSIGHT_TYPE_LABEL[insight.type]}
         </span>
       </div>
 

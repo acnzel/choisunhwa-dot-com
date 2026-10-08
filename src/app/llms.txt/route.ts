@@ -1,30 +1,25 @@
-import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { listPublishedInsights } from '@/lib/insights'
 import { SPEAKER_FIELDS } from '@/constants'
-import { SITE_NAME, SITE_DESCRIPTION, CONTACT_EMAIL, absoluteUrl } from '@/lib/seo'
+import { SITE_NAME, SITE_DESCRIPTION, CONTACT_EMAIL, RSS_PATH, absoluteUrl } from '@/lib/seo'
+import type { Insight } from '@/types'
 
 // llms.txt (https://llmstxt.org) — 생성형 AI 가 사이트 구조와 핵심 페이지를 빠르게 파악하도록 돕는 요약
+// 쿠키를 읽지 않는 admin 클라이언트만 써야 revalidate 캐시가 적용된다.
 export const revalidate = 3600
 
 export async function GET() {
-  const supabase = await createClient()
-  const admin = createAdminClient()
-  const [{ count: speakerCount }, { data: insights }] = await Promise.all([
-    supabase.from('speakers').select('id', { count: 'exact', head: true }).eq('is_visible', true),
-    admin
-      .from('insights')
-      .select('id, type, title, summary')
-      .eq('status', 'published')
-      .in('type', ['issue', 'report'])
-      .order('published_at', { ascending: false })
-      .limit(20),
+  const [{ count: speakerCount }, { data }] = await Promise.all([
+    createAdminClient().from('speakers').select('id', { count: 'exact', head: true }).eq('is_visible', true),
+    listPublishedInsights('id, type, title, summary', 20),
   ])
+  const insights = (data ?? []) as unknown as Insight[]
 
   const fieldLinks = SPEAKER_FIELDS
     .map((f) => `- [${f.label} 분야 강사](${absoluteUrl(`/speakers?field=${encodeURIComponent(f.value)}`)})`)
     .join('\n')
 
-  const insightLinks = (insights ?? [])
+  const insightLinks = insights
     .map((i) => `- [${i.title}](${absoluteUrl(`/insights/${i.type}/${i.id}`)})${i.summary ? `: ${i.summary.replace(/\s+/g, ' ')}` : ''}`)
     .join('\n')
 
@@ -57,7 +52,7 @@ ${insightLinks}
 ## Optional
 
 - [사이트맵](${absoluteUrl('/sitemap.xml')})
-- [인사이트 RSS](${absoluteUrl('/feed.xml')})
+- [인사이트 RSS](${absoluteUrl(RSS_PATH)})
 `
 
   return new Response(body, {

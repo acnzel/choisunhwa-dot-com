@@ -166,3 +166,10 @@ export const PAGINATION = {
   DEFAULT_LIMIT: 20,
   MOBILE_SPEAKERS_LIMIT: 10,
 } as const
+
+// ─── 인사이트 ────────────────────────────────────────────
+export const INSIGHT_TYPE_LABEL: Record<string, string> = {
+  issue:  '인사이트',
+  report: '현장 스토리',
+  pick:   '에디터 픽',
+}

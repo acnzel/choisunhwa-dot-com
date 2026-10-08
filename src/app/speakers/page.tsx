@@ -17,12 +17,18 @@ interface SearchParams {
   q?: string
 }
 
-async function getSpeakers(params: SearchParams) {
-  const supabase = await createClient()
-  const page = Math.max(1, Number(params.page ?? 1))
+// 목록 조회와 메타데이터(canonical)가 같은 해석을 쓰도록 한 곳에서 파싱한다
+function parseSpeakerParams(params: SearchParams) {
+  const page = Math.max(1, Number(params.page ?? 1) || 1)
   const rawField = params.field ?? params.category ?? 'all'
   const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
   const q = (params.q ?? '').trim()
+  return { page, field, q }
+}
+
+async function getSpeakers(params: SearchParams) {
+  const supabase = await createClient()
+  const { page, field, q } = parseSpeakerParams(params)
 
   let query = supabase
     .from('speakers')
@@ -59,11 +65,8 @@ export async function generateMetadata({
 }: {
   searchParams: Promise<SearchParams>
 }): Promise<Metadata> {
-  const params = await searchParams
-  const rawField = params.field ?? params.category ?? 'all'
-  const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
+  const { page, field, q } = parseSpeakerParams(await searchParams)
   const fieldLabel = field !== 'all' ? FIELD_MAP[field] : undefined
-  const page = Math.max(1, Number(params.page ?? 1) || 1)
 
   const query = new URLSearchParams()
   if (fieldLabel) query.set('field', field)
@@ -78,7 +81,7 @@ export async function generateMetadata({
 
   return {
     ...pageMeta({ title: page > 1 ? `${title} (${page}페이지)` : title, description, path }),
-    ...((params.q ?? '').trim() ? NOINDEX : {}),
+    ...(q ? NOINDEX : {}),
   }
 }
 

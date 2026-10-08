@@ -88,10 +88,11 @@ export default async function SpeakerDetailPage({ params }: Props) {
     '@id': `${absoluteUrl(`/speakers/${speaker.id}`)}#person`,
     name: speaker.name,
     url: absoluteUrl(`/speakers/${speaker.id}`),
-    ...(speaker.photo_url ? { image: speaker.photo_url } : {}),
-    ...(speaker.title ? { jobTitle: speaker.title } : {}),
-    ...(speaker.company ? { worksFor: { '@type': 'Organization', name: speaker.company } } : {}),
-    ...(bioText ? { description: bioText } : {}),
+    // undefined 값은 JSON.stringify 가 생략한다
+    image: speaker.photo_url ?? undefined,
+    jobTitle: speaker.title || undefined,
+    worksFor: speaker.company ? { '@type': 'Organization', name: speaker.company } : undefined,
+    description: bioText || undefined,
     knowsAbout: [...new Set([
       ...(speaker.fields ?? []).filter((f) => !f.startsWith('~') && FIELD_MAP[f]).map((f) => FIELD_MAP[f]),
       ...lectureTopics,
