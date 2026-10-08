@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Speaker } from '@/types'
 import { buildFieldMap } from '@/constants'
 import { normalizeSpeaker } from '@/lib/utils/speaker'
@@ -12,6 +12,14 @@ import RevealOnScroll from '@/components/RevealOnScroll'
 import JsonLd from '@/components/seo/JsonLd'
 import { pageMeta, absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
 
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
+
+// 빌드 시 미리 만들지 않고 첫 요청 때 만들어 캐시한다
+export function generateStaticParams() {
+  return []
+}
+
 const FIELD_MAP = buildFieldMap()
 
 interface Props {
@@ -19,7 +27,7 @@ interface Props {
 }
 
 async function getSpeaker(id: string): Promise<Speaker | null> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data } = await supabase
     .from('speakers')
     .select('*')

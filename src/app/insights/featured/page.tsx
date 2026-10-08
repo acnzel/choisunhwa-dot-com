@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { FeaturedSpeakerItem } from '@/types'
 import FeaturedSpeakerCard from '@/components/featured/FeaturedSpeakerCard'
 import { pageMeta } from '@/lib/seo'
 
-export const dynamic = 'force-dynamic'
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
 
 export const metadata: Metadata = pageMeta({
   title: '에디터 픽',
@@ -14,7 +15,7 @@ export const metadata: Metadata = pageMeta({
 
 async function getFeaturedSpeakers(): Promise<FeaturedSpeakerItem[]> {
   try {
-    const supabase = await createClient()
+    const supabase = createPublicClient()
     const { data, error } = await supabase
       .from('featured_speakers')
       .select(`

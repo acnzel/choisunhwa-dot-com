@@ -5,6 +5,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 export async function PATCH(
   req: NextRequest,
@@ -71,5 +72,6 @@ export async function PATCH(
     }
   }
 
+  revalidatePublicPages()
   return NextResponse.json({ status: newStatus, message: action === 'approve' ? '승인 완료. 연사 라인업에 등록되었습니다.' : '반려 처리되었습니다.' })
 }

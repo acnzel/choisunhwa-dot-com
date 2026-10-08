@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { NoticeSchema } from '@/lib/validations'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 type Params = { params: Promise<{ id: string }> }
 
@@ -39,6 +40,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .from('notices').update(parsed.data).eq('id', id).select().single()
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ data })
 }
 
@@ -50,5 +52,6 @@ export async function DELETE(_req: NextRequest, { params }: Params) {
   const supabase = createAdminClient()
   const { error: dbError } = await supabase.from('notices').delete().eq('id', id)
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return new NextResponse(null, { status: 204 })
 }

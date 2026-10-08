@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
 import type { InsightType, InsightStatus } from '@/types'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 // ── GET ──────────────────────────────────────────────────────
 export async function GET(req: NextRequest) {
@@ -67,5 +68,6 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ data }, { status: 201 })
 }

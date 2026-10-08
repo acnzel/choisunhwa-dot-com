@@ -5,6 +5,9 @@ import Link from 'next/link'
 import type { Insight, InsightMetaReport } from '@/types'
 import { pageMeta } from '@/lib/seo'
 
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
+
 export const metadata: Metadata = pageMeta({
   title: '현장 스토리',
   description: '실제 진행된 강연의 현장 리포트 — 최선화닷컴이 함께한 현장 스토리',

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { requireAdmin } from '@/lib/auth'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 // 강사 조인 컬럼
 const SPEAKER_COLS = 'id, name, title, company, photo_url, bio_short, fields'
@@ -85,6 +86,7 @@ export async function POST(req: NextRequest) {
     .single()
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ data }, { status: 201 })
 }
 
@@ -103,5 +105,6 @@ export async function DELETE(req: NextRequest) {
     .eq('speaker_id', speaker_id)
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ ok: true })
 }

@@ -1,8 +1,11 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
+import { createPublicClient } from '@/lib/supabase/public'
 import type { Notice } from '@/types'
 import { pageMeta } from '@/lib/seo'
+
+// 공개 페이지 ISR — 관리자 수정 시 revalidatePublicPages() 로 즉시 갱신
+export const revalidate = 86400
 
 export const metadata: Metadata = pageMeta({
   title: '공지사항',
@@ -11,7 +14,7 @@ export const metadata: Metadata = pageMeta({
 })
 
 async function getNotices(): Promise<Notice[]> {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
   const { data } = await supabase
     .from('notices')
     .select('*')

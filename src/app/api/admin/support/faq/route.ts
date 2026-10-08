@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin } from '@/lib/auth'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { FaqSchema } from '@/lib/validations'
+import { revalidatePublicPages } from '@/lib/revalidate'
 
 export async function GET(_req: NextRequest) {
   const { error } = await requireAdmin()
@@ -39,5 +40,6 @@ export async function POST(request: NextRequest) {
     .single()
 
   if (dbError) return NextResponse.json({ error: dbError.message }, { status: 500 })
+  revalidatePublicPages()
   return NextResponse.json({ data }, { status: 201 })
 }
