@@ -9,6 +9,8 @@ import { normalizeSpeaker } from '@/lib/utils/speaker'
 import ShareButton from './ShareButton'
 import ScrollToTop from './ScrollToTop'
 import RevealOnScroll from '@/components/RevealOnScroll'
+import JsonLd from '@/components/seo/JsonLd'
+import { pageMeta, absoluteUrl, breadcrumbJsonLd } from '@/lib/seo'
 
 const FIELD_MAP = buildFieldMap()
 
@@ -33,15 +35,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const speaker = await getSpeaker(id)
   if (!speaker) return { title: '강사를 찾을 수 없습니다' }
-  return {
-    title: `${speaker.name} — ${speaker.title} | 최선화닷컴`,
-    description: speaker.bio_short,
-    openGraph: {
-      title: `${speaker.name} | 최선화닷컴`,
-      description: speaker.bio_short,
-      images: speaker.photo_url ? [speaker.photo_url] : [],
-    },
-  }
+  const role = [speaker.title, speaker.company].filter(Boolean).join(' · ')
+  return pageMeta({
+    // 사이트명은 루트 title 템플릿이 붙인다
+    title: role ? `${speaker.name} — ${role}` : `${speaker.name} 강사`,
+    description: speaker.bio_short || `${speaker.name} 강사 프로필, 강연 주제, 약력을 확인하고 강연을 문의하세요.`,
+    path: `/speakers/${speaker.id}`,
+    images: [speaker.photo_url],
+    type: 'profile',
+  })
 }
 
 export default async function SpeakerDetailPage({ params }: Props) {
@@ -80,8 +82,33 @@ export default async function SpeakerDetailPage({ params }: Props) {
     media:         mediaLinks.length > 0,
   }
 
+  const personJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    '@id': `${absoluteUrl(`/speakers/${speaker.id}`)}#person`,
+    name: speaker.name,
+    url: absoluteUrl(`/speakers/${speaker.id}`),
+    // undefined 값은 JSON.stringify 가 생략한다
+    image: speaker.photo_url ?? undefined,
+    jobTitle: speaker.title || undefined,
+    worksFor: speaker.company ? { '@type': 'Organization', name: speaker.company } : undefined,
+    description: bioText || undefined,
+    knowsAbout: [...new Set([
+      ...(speaker.fields ?? []).filter((f) => !f.startsWith('~') && FIELD_MAP[f]).map((f) => FIELD_MAP[f]),
+      ...lectureTopics,
+    ])],
+  }
+
   return (
     <>
+      <JsonLd data={[
+        personJsonLd,
+        breadcrumbJsonLd([
+          { name: '홈', path: '/' },
+          { name: '강사 라인업', path: '/speakers' },
+          { name: speaker.name, path: `/speakers/${speaker.id}` },
+        ]),
+      ]} />
       <style>{`
         /* 브레드크럼 */
         .breadcrumb-link { transition: color 0.15s; }

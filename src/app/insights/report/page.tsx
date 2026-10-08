@@ -3,11 +3,13 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import InsightCard from '@/components/insights/InsightCard'
 import Link from 'next/link'
 import type { Insight, InsightMetaReport } from '@/types'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '현장 스토리',
   description: '실제 진행된 강연의 현장 리포트 — 최선화닷컴이 함께한 현장 스토리',
-}
+  path: '/insights/report',
+})
 
 async function getReports(): Promise<Insight[]> {
   try {

@@ -2,10 +2,13 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Notice } from '@/types'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '공지사항',
-}
+  description: '최선화닷컴 서비스 소식과 공지사항.',
+  path: '/support/notice',
+})
 
 async function getNotices(): Promise<Notice[]> {
   const supabase = await createClient()

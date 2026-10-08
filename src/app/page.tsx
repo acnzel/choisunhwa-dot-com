@@ -8,9 +8,12 @@ import HeroSpeakerRoller from './HeroSpeakerRoller'
 import SpeakerTabs from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import RevealOnScroll from '@/components/RevealOnScroll'
+import { pageMeta } from '@/lib/seo'
 // FeaturedSection은 홈에서 제거됨 (SpeakerTabs 이달의 강사 탭과 중복)
 
 const FIELD_MAP = buildFieldMap()
+
+export const metadata = pageMeta({ path: '/' })
 
 async function getData() {
   const supabase = await createClient()
@@ -91,7 +94,7 @@ const TRUST_STATS = [
 // ── 프로세스 4단계 (추후 DB/어드민 연동 예정) ──────────────
 const PROCESS_STEPS = [
   { step: '01', title: '의뢰 접수',      desc: '강연 목적, 대상, 예산을 간단히 알려주세요' },
-  { step: '02', title: '24시간 내 연락', desc: '담당자가 직접 연락해 요구사항을 확인합니다' },
+  { step: '02', title: '1–2 영업일 내 연락', desc: '담당자가 직접 연락해 요구사항을 확인합니다' },
   { step: '03', title: '맞춤 강사 제안', desc: '조직에 딱 맞는 강사 2~3명을 추천드립니다' },
   { step: '04', title: '계약 & 진행',    desc: '일정, 장소, 내용 조율 후 강연이 시작됩니다' },
 ]

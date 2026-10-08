@@ -3,13 +3,9 @@ import { createClient } from '@/lib/supabase/server'
 import type { Speaker } from '@/types'
 import { buildFieldMap, getFieldWithAliases, FIELD_ALIASES } from '@/constants'
 import SpeakerList from './SpeakerList'
+import { pageMeta, NOINDEX } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
-
-export const metadata: Metadata = {
-  title: '강사 라인업',
-  description: '최선화닷컴의 검증된 전문 강사들을 만나보세요.',
-}
 
 const PAGE_SIZE = 20
 const FIELD_MAP = buildFieldMap()
@@ -21,12 +17,18 @@ interface SearchParams {
   q?: string
 }
 
-async function getSpeakers(params: SearchParams) {
-  const supabase = await createClient()
-  const page = Math.max(1, Number(params.page ?? 1))
+// 목록 조회와 메타데이터(canonical)가 같은 해석을 쓰도록 한 곳에서 파싱한다
+function parseSpeakerParams(params: SearchParams) {
+  const page = Math.max(1, Number(params.page ?? 1) || 1)
   const rawField = params.field ?? params.category ?? 'all'
   const field = rawField !== 'all' ? (FIELD_ALIASES[rawField] ?? rawField) : 'all'
   const q = (params.q ?? '').trim()
+  return { page, field, q }
+}
+
+async function getSpeakers(params: SearchParams) {
+  const supabase = await createClient()
+  const { page, field, q } = parseSpeakerParams(params)
 
   let query = supabase
     .from('speakers')
@@ -54,6 +56,32 @@ async function getSpeakers(params: SearchParams) {
     totalPages: Math.ceil((count ?? 0) / PAGE_SIZE),
     field,
     q,
+  }
+}
+
+// 분야 필터는 주제별 랜딩으로 색인하고, 검색어(q) 결과는 noindex 로 둔다.
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>
+}): Promise<Metadata> {
+  const { page, field, q } = parseSpeakerParams(await searchParams)
+  const fieldLabel = field !== 'all' ? FIELD_MAP[field] : undefined
+
+  const query = new URLSearchParams()
+  if (fieldLabel) query.set('field', field)
+  if (page > 1) query.set('page', String(page))
+  const qs = query.toString()
+  const path = qs ? `/speakers?${qs}` : '/speakers'
+
+  const title = fieldLabel ? `${fieldLabel} 분야 강사` : '강사 라인업'
+  const description = fieldLabel
+    ? `최선화닷컴에서 ${fieldLabel} 분야 강연이 가능한 검증된 강사를 찾아보세요. 기업 교육·특강·세미나 강사 섭외를 도와드립니다.`
+    : '최선화닷컴의 검증된 전문 강사 라인업. 리더십, 조직문화, 경제, IT, 심리 등 분야별로 기업 교육·특강 강사를 찾아보세요.'
+
+  return {
+    ...pageMeta({ title: page > 1 ? `${title} (${page}페이지)` : title, description, path }),
+    ...(q ? NOINDEX : {}),
   }
 }
 

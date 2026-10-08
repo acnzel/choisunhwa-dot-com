@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import InquiryForm from './InquiryForm'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '강연기획 / 강사섭외 문의',
-  description: '강연 기획 및 강사 섭외를 위한 문의 폼입니다.',
-}
+  description: '기업 교육, 특강, 세미나 강사 섭외를 문의하세요. 강연 목적·대상·예산을 알려주시면 1~2 영업일 내 맞춤 강사를 제안드립니다.',
+  path: '/inquiry/lecture',
+})
 
 interface Props {
   searchParams: Promise<{ speaker?: string; lecture?: string }>

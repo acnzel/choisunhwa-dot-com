@@ -4,9 +4,11 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import GoogleLoginButton from '@/components/auth/GoogleLoginButton'
+import { NOINDEX } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: '로그인',
+  ...NOINDEX,
 }
 
 export default async function LoginPage() {

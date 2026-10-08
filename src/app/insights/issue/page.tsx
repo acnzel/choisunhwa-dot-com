@@ -3,11 +3,8 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Insight } from '@/types'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: '인사이트',
-  description: '최선화닷컴이 큐레이션하는 인사이트 — 강연으로 연결되는 트렌드',
-}
 
 export const revalidate = 60
 
@@ -15,6 +12,15 @@ const PAGE_SIZE = 12
 
 interface SearchParams {
   page?: string
+}
+
+export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
+  const page = Math.max(1, Number((await searchParams).page ?? 1) || 1)
+  return pageMeta({
+    title: page > 1 ? `인사이트 (${page}페이지)` : '인사이트',
+    description: '조직문화, HR, 리더십, 경제·산업 트렌드를 강연 관점에서 정리한 최선화닷컴 인사이트.',
+    path: page > 1 ? `/insights/issue?page=${page}` : '/insights/issue',
+  })
 }
 
 async function getIssues(params: SearchParams) {
