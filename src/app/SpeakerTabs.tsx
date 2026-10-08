@@ -56,12 +56,16 @@ function SpeakerAvatar({ photoUrl, name }: { photoUrl: string | null; name: stri
 }
 
 
-export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [] }: Props) {
-  const searchParams = useSearchParams()
-  const viewParam = searchParams?.get('view')
-  const initTab = viewParam === 'field' ? 1 : viewParam === 'trending' ? 2 : 0
+// ?view= 파라미터로 초기 탭을 정하는 래퍼. useSearchParams 는 정적(ISR) 렌더링에서
+// Suspense fallback 으로 대체되므로, 호출부는 fallback 에 <SpeakerTabs /> 를 넣어 서버 HTML 에 카드가 남게 한다.
+export function SpeakerTabsFromUrl(props: Props) {
+  const viewParam = useSearchParams()?.get('view')
+  const initialTab = viewParam === 'field' ? 1 : viewParam === 'trending' ? 2 : 0
+  return <SpeakerTabs key={initialTab} {...props} initialTab={initialTab} />
+}
 
-  const [activeTab, setActiveTab] = useState(initTab)
+export default function SpeakerTabs({ speakers, fieldMap, trendingSpeakers = [], initialTab = 0 }: Props & { initialTab?: number }) {
+  const [activeTab, setActiveTab] = useState(initialTab)
   const [filterField, setFilterField] = useState<string | null>(null)
   const [page, setPage] = useState(0)
   const [paused, setPaused] = useState(false)

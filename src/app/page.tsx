@@ -5,7 +5,7 @@ import { buildFieldMap } from '@/constants'
 import Link from 'next/link'
 import HeroTicker from './HeroTicker'
 import HeroSpeakerRoller from './HeroSpeakerRoller'
-import SpeakerTabs from './SpeakerTabs'
+import SpeakerTabs, { SpeakerTabsFromUrl } from './SpeakerTabs'
 import TrustStats from './TrustStats'
 import RevealOnScroll from '@/components/RevealOnScroll'
 import { pageMeta } from '@/lib/seo'
@@ -333,8 +333,8 @@ export default async function HomePage() {
             </h2>
             <Link href="/speakers" className="see-all-link">전체 보기 →</Link>
           </div>
-          <Suspense fallback={null}>
-            <SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingForTabs} />
+          <Suspense fallback={<SpeakerTabs speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingForTabs} />}>
+            <SpeakerTabsFromUrl speakers={speakers} fieldMap={FIELD_MAP} trendingSpeakers={trendingForTabs} />
           </Suspense>
         </section>
 
