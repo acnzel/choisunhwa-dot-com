@@ -1,11 +1,13 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import RevealOnScroll from '@/components/RevealOnScroll'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '최선화닷컴 이야기',
-  description: '저희는 강사를 소개하는 것이 아니라, 조직의 필요에 맞는 강연을 설계합니다.',
-}
+  description: '최선화닷컴은 강사를 소개하는 데서 그치지 않고, 조직의 목적과 대상에 맞는 강연을 기획부터 현장 운영·사후 관리까지 설계합니다.',
+  path: '/support/about',
+})
 
 const PROCESS_STEPS = [
   {
@@ -15,7 +17,7 @@ const PROCESS_STEPS = [
   },
   {
     num: '02',
-    title: '24시간 내 연락',
+    title: '1–2 영업일 내 연락',
     desc: '담당자가 직접 연락드립니다.\n더 자세한 상황을 파악하고 방향을 잡아드립니다.',
   },
   {

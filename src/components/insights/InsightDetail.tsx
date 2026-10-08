@@ -1,6 +1,8 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Insight } from '@/types'
+import JsonLd from '@/components/seo/JsonLd'
+import { absoluteUrl, breadcrumbJsonLd, stripHtml, SITE_URL, SITE_NAME } from '@/lib/seo'
 
 const TYPE_LABEL: Record<string, string> = {
   issue:  '인사이트',
@@ -20,9 +22,37 @@ interface Props {
 export default function InsightDetail({ insight }: Props) {
   const labelColor = TYPE_COLOR[insight.type] ?? '#374151'
   const backHref = `/insights/${insight.type}`
+  const path = `/insights/${insight.type}/${insight.id}`
+  const tags: string[] = (insight.meta as Record<string, unknown>)?.tags as string[] ?? []
+
+  const articleJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    headline: insight.title,
+    ...(insight.summary ? { description: insight.summary } : {}),
+    ...(insight.thumbnail_url ? { image: [insight.thumbnail_url] } : {}),
+    ...(insight.published_at ? { datePublished: insight.published_at } : {}),
+    dateModified: insight.updated_at ?? insight.published_at ?? undefined,
+    inLanguage: 'ko-KR',
+    mainEntityOfPage: absoluteUrl(path),
+    // 다른 <script> 블록의 @id 참조는 검색엔진이 해석하지 못할 수 있어 인라인으로 둔다
+    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
+    ...(tags.length > 0 ? { keywords: tags.join(', ') } : {}),
+    ...(insight.content_html ? { wordCount: stripHtml(insight.content_html).split(' ').length } : {}),
+    ...(insight.source_url ? { isBasedOn: insight.source_url } : {}),
+  }
 
   return (
     <article style={{ maxWidth: 760, margin: '0 auto', padding: 'clamp(28px, 5vw, 60px) var(--space-page)' }}>
+      <JsonLd data={[
+        articleJsonLd,
+        breadcrumbJsonLd([
+          { name: '홈', path: '/' },
+          { name: TYPE_LABEL[insight.type] ?? '강연 인사이트', path: backHref },
+          { name: insight.title, path },
+        ]),
+      ]} />
       <style>{`
         .insight-tag-link:hover {
           border-color: var(--color-green) !important;
@@ -102,9 +132,11 @@ export default function InsightDetail({ insight }: Props) {
           paddingBottom: 24,
           borderBottom: '1px solid var(--color-border)',
         }}>
-          {new Date(insight.published_at).toLocaleDateString('ko-KR', {
-            year: 'numeric', month: 'long', day: 'numeric',
-          })}
+          <time dateTime={insight.published_at}>
+            {new Date(insight.published_at).toLocaleDateString('ko-KR', {
+              year: 'numeric', month: 'long', day: 'numeric',
+            })}
+          </time>
           {'  ·  '}
           {insight.meta && 'read_time' in (insight.meta as Record<string, unknown>)
             ? `약 ${(insight.meta as Record<string, unknown>).read_time}분 읽기`
@@ -146,9 +178,23 @@ export default function InsightDetail({ insight }: Props) {
         />
       )}
 
+      {/* 원문 출처 링크 — 자동 생성 브리핑의 근거 기사 */}
+      {insight.source_url && (
+        <p style={{ marginTop: 24, fontSize: 13, color: 'var(--color-muted)' }}>
+          원문 기사:{' '}
+          <a
+            href={insight.source_url}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ color: 'var(--color-subtle)', textDecoration: 'underline' }}
+          >
+            {insight.source_name || '원문 보기'} ↗
+          </a>
+        </p>
+      )}
+
       {/* 태그 → 관련 강사 라인업 연결 */}
       {(() => {
-        const tags: string[] = (insight.meta as Record<string, unknown>)?.tags as string[] ?? []
         if (tags.length === 0) return null
         return (
           <div style={{ marginTop: 48, paddingTop: 32, borderTop: '1px solid var(--color-border)' }}>

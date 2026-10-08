@@ -81,11 +81,13 @@ export default function FaqAccordion({ faqs, categories }: Props) {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
-              {openId === faq.id && (
-                <div className="px-5 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3 whitespace-pre-line">
-                  {faq.answer}
-                </div>
-              )}
+              {/* 닫힌 답변도 DOM 에 남겨 검색엔진·AI 크롤러가 읽을 수 있게 한다 */}
+              <div
+                hidden={openId !== faq.id}
+                className="px-5 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-50 pt-3 whitespace-pre-line"
+              >
+                {faq.answer}
+              </div>
             </div>
           ))}
         </div>

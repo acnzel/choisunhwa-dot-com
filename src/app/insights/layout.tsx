@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import InsightsTabs from './InsightsTabs'
+import InsightsHeroTitle from './InsightsHeroTitle'
 import RevealOnScroll from '@/components/RevealOnScroll'
 
 export const metadata: Metadata = {
@@ -47,14 +48,14 @@ export default function InsightsLayout({ children }: { children: React.ReactNode
               <span style={{ display: 'block', width: '20px', height: '1px', background: 'var(--color-muted)' }} />
               강연 인사이트
             </p>
-            <h1 style={{
+            <InsightsHeroTitle style={{
               fontFamily: 'var(--font-display)', fontWeight: 900,
               fontSize: 'clamp(28px, 4.5vw, 64px)',
               lineHeight: 1.1, letterSpacing: '-0.03em',
             }}>
               트렌드를 읽고,<br />
               <span style={{ color: 'var(--color-rust)', fontWeight: 400 }}>강연으로 답한다.</span>
-            </h1>
+            </InsightsHeroTitle>
           </div>
         </section>
 

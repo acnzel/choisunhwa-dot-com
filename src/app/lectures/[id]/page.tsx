@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import type { Lecture, Speaker } from '@/types'
 import { LECTURE_DURATIONS } from '@/constants'
+import { pageMeta } from '@/lib/seo'
 
 const DURATION_MAP: Record<string, string> = Object.fromEntries(
   LECTURE_DURATIONS.map((d) => [d.value, d.label])
@@ -56,15 +57,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const lecture = await getLecture(id)
   if (!lecture) return { title: '강연을 찾을 수 없습니다' }
-  return {
+  return pageMeta({
     title: lecture.title,
-    description: lecture.summary,
-    openGraph: {
-      title: lecture.title,
-      description: lecture.summary ?? undefined,
-      images: lecture.thumbnail_url ? [lecture.thumbnail_url] : [],
-    },
-  }
+    description: lecture.summary ?? undefined,
+    path: `/lectures/${lecture.id}`,
+    images: [lecture.thumbnail_url],
+  })
 }
 
 // ─── 공통 스타일 ───────────────────────────────────────────────────────────────

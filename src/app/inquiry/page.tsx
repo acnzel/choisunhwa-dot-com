@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '문의하기',
-  description: '강연 기획, 강사 섭외, 강사 등록 문의를 해주세요.',
-}
+  description: '강연 기획·강사 섭외 문의와 강사 등록 문의를 접수합니다. 문의 후 1~2 영업일 이내에 담당자가 연락드립니다.',
+  path: '/inquiry',
+})
 
 const INQUIRY_TYPES = [
   {

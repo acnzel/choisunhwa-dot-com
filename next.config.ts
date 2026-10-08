@@ -24,8 +24,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      // 강연 매거진 → 강연 인사이트 (영구 리다이렉트)
-      { source: '/lectures', destination: '/insights', permanent: true },
+      // 강연 매거진 → 강연 인사이트 (영구 리다이렉트). /insights 를 거치지 않고 최종 목적지로 한 번에 보낸다.
+      { source: '/lectures', destination: '/insights/issue', permanent: true },
+      { source: '/insights', destination: '/insights/issue', permanent: true },
+      // "이 강사 어때요?" 탭 삭제 → 에디터 픽
+      { source: '/insights/pick', destination: '/insights/featured', permanent: true },
     ]
   },
   async headers() {

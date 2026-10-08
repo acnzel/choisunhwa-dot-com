@@ -3,9 +3,11 @@ import Link from 'next/link'
 import SignupForm from './SignupForm'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { NOINDEX } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: '회원가입',
+  ...NOINDEX,
 }
 
 export default async function SignupPage() {

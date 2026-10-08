@@ -2,11 +2,14 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { Faq, FaqCategory } from '@/types'
 import FaqAccordion from './FaqAccordion'
+import JsonLd from '@/components/seo/JsonLd'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
-  title: 'FAQ',
-  description: '자주 묻는 질문을 확인해보세요.',
-}
+export const metadata: Metadata = pageMeta({
+  title: '자주 묻는 질문',
+  description: '최선화닷컴 강연 기획·강사 섭외 서비스에 대해 자주 묻는 질문과 답변.',
+  path: '/support/faq',
+})
 
 async function getFaqs() {
   const supabase = await createClient()
@@ -30,8 +33,19 @@ async function getFaqs() {
 export default async function FaqPage() {
   const { faqs, categories } = await getFaqs()
 
+  const faqJsonLd = faqs.length > 0 && {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.answer },
+    })),
+  }
+
   return (
     <div className="min-h-screen">
+      {faqJsonLd && <JsonLd data={faqJsonLd} />}
       <div className="bg-white border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <h1 className="text-3xl font-bold text-[#1a1a2e]">자주 묻는 질문</h1>

@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import type { Notice } from '@/types'
+import { pageMeta } from '@/lib/seo'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -22,7 +23,8 @@ async function getNotice(id: string): Promise<Notice | null> {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
   const notice = await getNotice(id)
-  return { title: notice?.title ?? '공지사항' }
+  if (!notice) return { title: '공지사항' }
+  return pageMeta({ title: notice.title, path: `/support/notice/${notice.id}` })
 }
 
 export default async function NoticeDetailPage({ params }: Props) {

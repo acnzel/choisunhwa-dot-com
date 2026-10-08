@@ -3,10 +3,12 @@ import Image from 'next/image'
 import type { Metadata } from 'next'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { WIZARD_FIELDS, WIZARD_TARGETS } from '@/constants/matching'
+import { NOINDEX } from '@/lib/seo'
 
 export const metadata: Metadata = {
   title: '매칭 결과',
   description: '조건에 맞는 추천 강사 결과입니다.',
+  ...NOINDEX,
 }
 
 interface Props {

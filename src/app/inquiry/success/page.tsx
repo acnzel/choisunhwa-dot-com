@@ -1,4 +1,11 @@
+import type { Metadata } from 'next'
+import { NOINDEX } from '@/lib/seo'
 import Link from 'next/link'
+
+export const metadata: Metadata = {
+  title: '문의 접수 완료',
+  ...NOINDEX,
+}
 
 export default function InquirySuccessPage() {
   return (

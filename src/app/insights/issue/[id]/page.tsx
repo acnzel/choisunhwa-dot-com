@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { createAdminClient } from '@/lib/supabase/admin'
 import InsightDetail from '@/components/insights/InsightDetail'
+import { insightMetadata } from '@/components/insights/insightMetadata'
 import type { Insight } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -12,13 +13,7 @@ interface Props {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params
-  const admin = createAdminClient()
-  const { data } = await admin.from('insights').select('title, summary').eq('id', id).single()
-  if (!data) return { title: '인사이트' }
-  return {
-    title: data.title,
-    description: data.summary ?? undefined,
-  }
+  return insightMetadata(id, 'issue', '인사이트')
 }
 
 export default async function IssueDetailPage({ params }: Props) {

@@ -2,13 +2,15 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import type { FeaturedSpeakerItem } from '@/types'
 import FeaturedSpeakerCard from '@/components/featured/FeaturedSpeakerCard'
+import { pageMeta } from '@/lib/seo'
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '에디터 픽',
   description: '최선화닷컴 에디터가 직접 엄선한 추천 강사를 만나보세요.',
-}
+  path: '/insights/featured',
+})
 
 async function getFeaturedSpeakers(): Promise<FeaturedSpeakerItem[]> {
   try {

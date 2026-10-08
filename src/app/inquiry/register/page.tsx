@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import RegisterForm from './RegisterForm'
+import { pageMeta } from '@/lib/seo'
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: '강사 등록 문의',
-  description: '강사 등록을 위한 문의 폼입니다.',
-}
+  description: '최선화닷컴에 강사로 등록하고 싶으신 분들을 위한 문의 폼입니다.',
+  path: '/inquiry/register',
+})
 
 export default function SpeakerRegisterPage() {
   return (
