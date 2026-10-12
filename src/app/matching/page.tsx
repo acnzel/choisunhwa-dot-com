@@ -53,10 +53,8 @@ function SelectCard({
 }
 
 // ── Wizard 본체 ──────────────────────────────────────────
-function WizardContent() {
-  const searchParams = useSearchParams()
+function WizardContent({ step }: { step: number }) {
   const router = useRouter()
-  const step = Math.min(Math.max(parseInt(searchParams.get('step') ?? '1', 10), 1), TOTAL_STEPS)
 
   const [selectedFields, setSelectedFields] = useState<WizardFieldId[]>([])
   const [selectedTopics, setSelectedTopics] = useState<string[]>([])
@@ -403,14 +401,19 @@ function WizardContent() {
   )
 }
 
+// ?step= 을 읽는 래퍼. 선택 상태가 단계 이동 사이에 유지되도록 key 없이 step 만 내려준다.
+function WizardFromUrl() {
+  const searchParams = useSearchParams()
+  const step = Math.min(Math.max(parseInt(searchParams.get('step') ?? '1', 10), 1), TOTAL_STEPS)
+  return <WizardContent step={step} />
+}
+
+// useSearchParams 는 정적 렌더링에서 Suspense fallback 으로 대체된다.
+// fallback 에 1단계 화면을 그대로 넣어 서버 HTML 에 매칭 폼 내용이 남게 한다.
 export default function MatchingPage() {
   return (
-    <Suspense fallback={
-      <div style={{ minHeight: '100vh', paddingTop: 'var(--nav-height)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span style={{ color: 'var(--color-muted)', fontSize: '13px' }}>불러오는 중...</span>
-      </div>
-    }>
-      <WizardContent />
+    <Suspense fallback={<WizardContent step={1} />}>
+      <WizardFromUrl />
     </Suspense>
   )
 }
