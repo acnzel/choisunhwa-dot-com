@@ -11,19 +11,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const admin = createAdminClient()
 
   const [{ data: speakers }, { data: lectures }, { data: insights }] = await Promise.all([
-    admin.from('speakers').select('id, created_at').eq('is_visible', true),
+    admin.from('speakers').select('id, updated_at').eq('is_visible', true),
     admin.from('lectures').select('id, created_at').eq('is_visible', true),
     listPublishedInsights('id, type, published_at, updated_at'),
   ])
 
-  // speakers·lectures 테이블에는 updated_at 이 없어 created_at 을 쓴다
   const speakerRoutes: MetadataRoute.Sitemap = (speakers ?? []).map((s) => ({
     url: `${base}/speakers/${s.id}`,
-    lastModified: s.created_at,
+    lastModified: s.updated_at,
     changeFrequency: 'monthly',
     priority: 0.8,
   }))
 
+  // lectures 테이블에는 updated_at 이 없어 created_at 을 쓴다
   const lectureRoutes: MetadataRoute.Sitemap = (lectures ?? []).map((l) => ({
     url: `${base}/lectures/${l.id}`,
     lastModified: l.created_at,
