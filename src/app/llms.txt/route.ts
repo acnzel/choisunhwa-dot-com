@@ -36,6 +36,7 @@ ${SITE_NAME}은 기업·기관의 교육 담당자를 위한 강연 기획 및 �
 
 - [강사 라인업](${absoluteUrl('/speakers')}): 공개된 전체 강사 목록과 분야별 필터
 - [강사 매칭 신청](${absoluteUrl('/matching')}): 조건을 입력하면 추천 강사를 보여주는 매칭
+- [교육 기획안 무료로 받기](${absoluteUrl('/inquiry/plan')}): 교육 인원·대상·고민을 보내면 최선화가 검토한 교육 기획안을 영업일 2일 이내 회신
 - [강연 문의](${absoluteUrl('/inquiry/lecture')}): 강연 기획·강사 섭외 의뢰 폼
 - [최선화닷컴 이야기](${absoluteUrl('/support/about')}): 서비스 소개와 진행 방식
 - [자주 묻는 질문](${absoluteUrl('/support/faq')})

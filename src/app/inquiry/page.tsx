@@ -10,15 +10,26 @@ export const metadata: Metadata = pageMeta({
 
 const INQUIRY_TYPES = [
   {
+    href: '/inquiry/plan',
+    emoji: '📝',
+    title: '교육 기획안 무료로 받기',
+    desc: '교육 인원·대상·고민만 알려주시면 최선화가 검토한 교육 기획안을 영업일 2일 이내에 보내드립니다.',
+    cta: '기획안 신청하기',
+    bg: 'bg-[#1a1a2e]',
+    textColor: 'text-white',
+    descColor: 'text-gray-400',
+    btnClass: 'bg-white text-[#1a1a2e] hover:bg-gray-100',
+  },
+  {
     href: '/inquiry/lecture',
     emoji: '🎤',
     title: '강연기획 / 강사섭외 문의',
     desc: '기업 교육, 특강, 세미나를 위한 강연 기획 및 강사 섭외를 원하시면 여기서 문의해주세요.',
     cta: '강연 문의하기',
-    bg: 'bg-[#1a1a2e]',
-    textColor: 'text-white',
-    descColor: 'text-gray-400',
-    btnClass: 'bg-white text-[#1a1a2e] hover:bg-gray-100',
+    bg: 'bg-white',
+    textColor: 'text-[#1a1a2e]',
+    descColor: 'text-gray-500',
+    btnClass: 'bg-[#1a1a2e] text-white hover:bg-[#16213e]',
   },
   {
     href: '/inquiry/register',
@@ -43,8 +54,8 @@ export default function InquiryPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {INQUIRY_TYPES.map(({ href, emoji, title, desc, cta, bg, textColor, descColor, btnClass }) => (
             <div
               key={href}

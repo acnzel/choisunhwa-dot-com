@@ -17,13 +17,18 @@ export async function sendInquiryConfirmation({
 }: {
   to: string
   name: string
-  inquiryType: 'lecture_plan' | 'recruitment' | 'speaker_register'
+  // plan_request 는 DB 에 lecture_plan 으로 저장되지만 안내 문구가 다르다
+  inquiryType: 'lecture_plan' | 'recruitment' | 'speaker_register' | 'plan_request'
 }) {
   const typeLabel = {
     lecture_plan: '강연기획',
     recruitment: '강사섭외',
     speaker_register: '강사등록',
+    plan_request: '교육 기획안',
   }[inquiryType]
+  const replyNotice = inquiryType === 'plan_request'
+    ? '영업일 기준 <strong>2일 이내</strong>에 최선화가 검토한 교육 기획안을 메일로 보내드리겠습니다.'
+    : '영업일 기준 <strong>1~2일 이내</strong>에 담당자가 연락드리겠습니다.'
 
   return getResend().emails.send({
     from: FROM,
@@ -38,7 +43,7 @@ export async function sendInquiryConfirmation({
         </p>
         <div style="background: #f8f8f8; border-radius: 8px; padding: 20px; margin: 24px 0;">
           <p style="margin: 0; color: #555; font-size: 14px;">
-            ⏱ 영업일 기준 <strong>1~2일 이내</strong>에 담당자가 연락드리겠습니다.
+            ⏱ ${replyNotice}
           </p>
         </div>
         <p style="color: #888; font-size: 13px;">
