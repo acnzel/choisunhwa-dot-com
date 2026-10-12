@@ -94,3 +94,32 @@ test.describe('문의 제출 성공 플로우', () => {
     await expect(page.getByRole('heading', { name: '문의가 접수되었습니다!' })).toBeVisible()
   })
 })
+
+test.describe('교육 기획안 요청', () => {
+  test('기획안 3문항과 연락처 필드가 존재한다', async ({ page }) => {
+    await page.goto('/inquiry/plan')
+    await expect(page.getByRole('heading', { name: '교육 기획안 무료로 받기' })).toBeVisible()
+    for (const name of ['attendee_count', 'target', 'concern', 'name', 'company', 'email', 'phone', 'privacy_agree']) {
+      await expect(page.locator(`[name="${name}"]`)).toBeVisible()
+    }
+  })
+
+  test('기획안 요청 제출 후 기획안 완료 페이지로 이동한다', async ({ page }) => {
+    test.skip(!canWriteDb, '로컬 Supabase 가 아닌 환경에서는 DB 쓰기 테스트를 건너뜀')
+
+    await page.goto('/inquiry/plan')
+    await page.locator('[name="attendee_count"]').fill('120')
+    await page.locator('[name="target"]').selectOption({ label: '팀장 / 중간 관리자' })
+    await page.locator('[name="concern"]').fill('QA 자동화 테스트입니다. 신임 팀장 면담 역량이 고민입니다.')
+    await page.locator('[name="name"]').fill('김담당자')
+    await page.locator('[name="company"]').fill('QA테스트컴퍼니')
+    await page.locator('[name="email"]').fill(`qa_plan_${Date.now()}@test.com`)
+    await page.locator('[name="phone"]').fill('010-0000-0000')
+    await page.locator('[name="privacy_agree"]').check()
+
+    await page.getByRole('button', { name: '기획안 무료로 신청하기' }).click()
+
+    await expect(page).toHaveURL(/\/inquiry\/success\?type=plan/, { timeout: 15000 })
+    await expect(page.getByRole('heading', { name: '기획안 요청이 접수되었습니다!' })).toBeVisible()
+  })
+})

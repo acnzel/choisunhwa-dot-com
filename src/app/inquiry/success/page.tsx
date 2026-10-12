@@ -7,7 +7,13 @@ export const metadata: Metadata = {
   ...NOINDEX,
 }
 
-export default function InquirySuccessPage() {
+interface Props {
+  searchParams: Promise<{ type?: string }>
+}
+
+export default async function InquirySuccessPage({ searchParams }: Props) {
+  const isPlan = (await searchParams).type === 'plan'
+
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="text-center max-w-sm">
@@ -16,11 +22,17 @@ export default function InquirySuccessPage() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-[#1a1a2e]">문의가 접수되었습니다!</h1>
+        <h1 className="text-2xl font-bold text-[#1a1a2e]">
+          {isPlan ? '기획안 요청이 접수되었습니다!' : '문의가 접수되었습니다!'}
+        </h1>
         <p className="mt-3 text-sm text-gray-500 leading-relaxed">
           입력하신 이메일로 접수 확인 메일을 발송했습니다.
           <br />
-          영업일 기준 <strong className="text-gray-700">1~2일 이내</strong>에 담당자가 연락드립니다.
+          {isPlan ? (
+            <>영업일 기준 <strong className="text-gray-700">2일 이내</strong>에 최선화가 검토한 교육 기획안을 보내드립니다.</>
+          ) : (
+            <>영업일 기준 <strong className="text-gray-700">1~2일 이내</strong>에 담당자가 연락드립니다.</>
+          )}
         </p>
         <div className="flex flex-col gap-2 mt-8">
           <Link

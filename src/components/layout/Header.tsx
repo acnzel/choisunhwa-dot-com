@@ -325,7 +325,7 @@ export default function Header() {
           )}
 
           <Link
-            href="/matching?step=1"
+            href="/inquiry/plan"
             style={{
               fontFamily: 'var(--font-body)',
               fontSize: '11px', fontWeight: 700,
@@ -341,8 +341,8 @@ export default function Header() {
             onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--color-rust)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--color-green)')}
           >
-            <span className="hidden sm:inline">매칭 시작하기 →</span>
-            <span className="sm:hidden">매칭 →</span>
+            <span className="hidden sm:inline">기획안 무료로 받기 →</span>
+            <span className="sm:hidden">기획안 →</span>
           </Link>
 
           {/* 모바일 햄버거 */}

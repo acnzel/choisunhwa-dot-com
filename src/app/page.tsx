@@ -282,7 +282,7 @@ export default async function HomePage() {
               </p>
 
               <div className="hero-actions hero-cta" style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-                <Link href="/matching?step=1" className="btn-fill-green">매칭 시작하기 →</Link>
+                <Link href="/inquiry/plan" className="btn-fill-green">교육 기획안 무료로 받기 →</Link>
                 <Link href="/speakers" className="btn-ghost-ink">강사 라인업 보기 →</Link>
               </div>
             </div>
@@ -492,7 +492,7 @@ export default async function HomePage() {
                 <em style={{ display: 'block', color: 'var(--color-rust)', fontStyle: 'normal' }}>지금<br />시작.</em>
               </div>
               <p style={{ fontSize: '12px', fontWeight: 300, color: 'rgba(247,243,238,0.45)', letterSpacing: '0.06em', lineHeight: 1.8 }}>
-                강연 주제 · 대상 · 예산을 알려주시면<br />1–2 영업일 내 맞춤 강사를 제안드립니다.
+                교육 인원 · 대상 · 고민을 알려주시면<br />영업일 2일 이내 교육 기획안을 보내드립니다.
               </p>
             </div>
 
@@ -509,8 +509,8 @@ export default async function HomePage() {
                   <p style={{ fontSize: '13px', fontWeight: 300, color: 'var(--color-subtle)' }}>contact@choisunhwa.com</p>
                 </div>
               </div>
-              <Link href="/inquiry/lecture" className="btn-fill-green" style={{ alignSelf: 'flex-start' }}>
-                문의하기 →
+              <Link href="/inquiry/plan" className="btn-fill-green" style={{ alignSelf: 'flex-start' }}>
+                기획안 무료로 받기 →
               </Link>
             </div>
           </div>

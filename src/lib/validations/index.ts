@@ -21,6 +21,22 @@ export const InquiryFormSchema = z.object({
 
 export type InquiryFormInput = z.infer<typeof InquiryFormSchema>
 
+// ─── 교육 기획안 요청 폼 ─────────────────────────────────
+export const PlanRequestSchema = z.object({
+  name: z.string().min(1, '이름을 입력해주세요').max(50),
+  email: z.string().email('올바른 이메일 형식이 아닙니다'),
+  phone: z
+    .string()
+    .min(1, '연락처를 입력해주세요')
+    .regex(/^[0-9\-+\s]+$/, '올바른 연락처 형식이 아닙니다'),
+  company: z.string().min(1, '회사명을 입력해주세요').max(100),
+  attendee_count: z.coerce.number().int().positive('교육 인원을 입력해주세요'),
+  target: z.string().min(1, '교육 대상을 선택해주세요').max(50),
+  concern: z.string().min(10, '고민을 10자 이상 입력해주세요').max(1000),
+})
+
+export type PlanRequestInput = z.infer<typeof PlanRequestSchema>
+
 // ─── 회원 가입 ────────────────────────────────────────────
 export const SignupSchema = z.object({
   email: z.string().email('올바른 이메일 형식이 아닙니다'),

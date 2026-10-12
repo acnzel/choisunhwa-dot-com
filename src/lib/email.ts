@@ -14,21 +14,31 @@ export async function sendInquiryConfirmation({
   to,
   name,
   inquiryType,
+  planRequest = false,
 }: {
   to: string
   name: string
   inquiryType: 'lecture_plan' | 'recruitment' | 'speaker_register'
+  planRequest?: boolean
 }) {
-  const typeLabel = {
-    lecture_plan: '강연기획',
-    recruitment: '강사섭외',
-    speaker_register: '강사등록',
-  }[inquiryType]
+  const typeLabel = planRequest
+    ? '교육 기획안'
+    : {
+        lecture_plan: '강연기획',
+        recruitment: '강사섭외',
+        speaker_register: '강사등록',
+      }[inquiryType]
+  const subject = planRequest
+    ? `[최선화닷컴] 교육 기획안 요청이 접수되었습니다`
+    : `[최선화닷컴] ${typeLabel} 문의가 접수되었습니다`
+  const replyNotice = planRequest
+    ? '⏱ 영업일 기준 <strong>2일 이내</strong>에 최선화가 검토한 교육 기획안을 메일로 보내드리겠습니다.'
+    : '⏱ 영업일 기준 <strong>1~2일 이내</strong>에 담당자가 연락드리겠습니다.'
 
   return getResend().emails.send({
     from: FROM,
     to,
-    subject: `[최선화닷컴] ${typeLabel} 문의가 접수되었습니다`,
+    subject,
     html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px;">
         <h2 style="color: #111; margin-bottom: 8px;">문의 접수 확인</h2>
@@ -38,7 +48,7 @@ export async function sendInquiryConfirmation({
         </p>
         <div style="background: #f8f8f8; border-radius: 8px; padding: 20px; margin: 24px 0;">
           <p style="margin: 0; color: #555; font-size: 14px;">
-            ⏱ 영업일 기준 <strong>1~2일 이내</strong>에 담당자가 연락드리겠습니다.
+            ${replyNotice}
           </p>
         </div>
         <p style="color: #888; font-size: 13px;">
