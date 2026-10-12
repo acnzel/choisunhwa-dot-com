@@ -14,6 +14,7 @@ const INQUIRY_TYPE_LABEL: Record<string, string> = {
   lecture_plan: '강연기획 문의',
   recruitment:  '강사섭외 문의',
   speaker_register: '강사등록 문의',
+  plan_request: '교육 기획안 요청',
 }
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string; desc: string }> = {

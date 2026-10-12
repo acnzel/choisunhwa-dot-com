@@ -41,6 +41,7 @@ const TYPE_LABELS: Record<string, string> = {
   lecture_plan: '강연기획',
   recruitment: '강사섭외',
   speaker_register: '강사등록',
+  plan_request: '기획안 요청',
 }
 
 export default async function DashboardPage() {

@@ -86,7 +86,7 @@ export interface Lecture {
 }
 
 // ─── 문의 ──────────────────────────────────────────────────
-export type InquiryType = 'lecture_plan' | 'recruitment' | 'speaker_register'
+export type InquiryType = 'lecture_plan' | 'recruitment' | 'speaker_register' | 'plan_request'
 export type InquiryStatus = 'new' | 'confirmed' | 'processing' | 'done'
 
 export interface Inquiry {

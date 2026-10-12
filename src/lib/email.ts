@@ -1,4 +1,5 @@
 import { Resend } from 'resend'
+import type { InquiryType } from '@/types'
 
 // 빌드 시점이 아닌 런타임에 초기화 (Vercel 빌드 에러 방지)
 function getResend() {
@@ -17,8 +18,7 @@ export async function sendInquiryConfirmation({
 }: {
   to: string
   name: string
-  // plan_request 는 DB 에 lecture_plan 으로 저장되지만 안내 문구가 다르다
-  inquiryType: 'lecture_plan' | 'recruitment' | 'speaker_register' | 'plan_request'
+  inquiryType: InquiryType
 }) {
   const typeLabel = {
     lecture_plan: '강연기획',
