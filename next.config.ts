@@ -29,6 +29,8 @@ const nextConfig: NextConfig = {
       { source: '/insights', destination: '/insights/issue', permanent: true },
       // "이 강사 어때요?" 탭 삭제 → 에디터 픽
       { source: '/insights/pick', destination: '/insights/featured', permanent: true },
+      // 중복 강사 신청 폼 정리 → 개인정보 동의가 있는 /speakers/apply 로 일원화
+      { source: '/apply', destination: '/speakers/apply', permanent: true },
     ]
   },
   async headers() {
