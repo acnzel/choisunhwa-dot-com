@@ -8,7 +8,7 @@ T-019 기준 점검 결과.
 - 어드민 로그인 페이지 `/mong-bab/login`도 같은 `GoogleLoginButton`을 사용한다.
 - Google OAuth 시작은 Supabase client `signInWithOAuth({ provider: 'google' })`로 처리한다.
 - OAuth callback은 `/api/auth/callback`에서 `exchangeCodeForSession()`으로 세션을 만든다.
-- 신규 auth user는 `supabase/migrations/003_admin_users.sql`의 `handle_new_user()` trigger로 `profiles`에 생성된다.
+- 신규 auth user는 `supabase/migrations/0032_admin_users.sql`의 `handle_new_user()` trigger로 `profiles`에 생성된다.
 - `/api/auth/callback`은 로그인 성공 후 `profiles`를 upsert해서 `provider`, `status`, `last_login_at`을 갱신한다.
 
 ## 확인 완료

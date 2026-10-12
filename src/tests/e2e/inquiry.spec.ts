@@ -65,7 +65,16 @@ test.describe('강사등록 문의', () => {
   })
 })
 
+// 실제로 DB 에 문의를 쓰는 테스트. 로컬 Supabase 로 띄운 e2e 서버에서만 실행한다.
+// 외부 서버(PLAYWRIGHT_BASE_URL)나 로컬이 아닌 Supabase 를 가리키면 건너뛴다 — 운영 DB 에 테스트 문의가 쌓이는 것을 막는다.
+const supabaseHost = (() => {
+  try { return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').hostname } catch { return '' }
+})()
+const canWriteDb = !process.env.PLAYWRIGHT_BASE_URL && ['127.0.0.1', 'localhost'].includes(supabaseHost)
+
 test.describe('문의 제출 성공 플로우', () => {
+  test.skip(!canWriteDb, '로컬 Supabase 가 아닌 환경에서는 DB 쓰기 테스트를 건너뜀')
+
   test('문의 제출 후 성공 메시지 또는 완료 페이지로 이동한다', async ({ page }) => {
     await page.goto('/inquiry/lecture')
     await page.waitForLoadState('networkidle')
@@ -79,10 +88,9 @@ test.describe('문의 제출 성공 플로우', () => {
 
     await page.getByRole('button', { name: /제출|문의|신청/i }).click()
 
-    await expect(
-      page.getByText(/완료|감사|접수/i)
-        .or(page.getByRole('heading', { name: /완료|감사/i }))
-        .or(page.locator('text=success'))
-    ).toBeVisible({ timeout: 15000 })
+    // 성공 시 서버 액션이 /inquiry/success 로 redirect 한다.
+    // "접수" 같은 단어로만 판정하면 실패 문구("문의 접수에 실패했습니다")에도 통과하므로 이동한 페이지로 확인한다.
+    await expect(page).toHaveURL(/\/inquiry\/success/, { timeout: 15000 })
+    await expect(page.getByRole('heading', { name: '문의가 접수되었습니다!' })).toBeVisible()
   })
 })

@@ -54,7 +54,7 @@ NEXT_PUBLIC_SITE_URL=https://choisunhwa-dot-com.vercel.app
 ## ✅ 완료: @backend — API Routes
 
 ### 추가 파일
-- `supabase/migrations/003_admin_role.sql` — admin role 컬럼 + RLS 정책
+- `supabase/migrations/0031_admin_role.sql` — admin role 컬럼 + RLS 정책
 - `src/lib/validations/index.ts` — Zod 검증 스키마 전체
 - `src/lib/auth.ts` — 어드민 인증 헬퍼 (requireAdmin)
 
@@ -262,7 +262,7 @@ NEXT_PUBLIC_SITE_URL=https://choisunhwa-dot-com.vercel.app
 커밋: `adea52d`
 
 ### 신규 파일
-- `supabase/migrations/004_matching_and_best.sql` — `is_best` 컬럼 + `matching_sessions` 테이블
+- `supabase/migrations/0041_matching_and_best.sql` — `is_best` 컬럼 + `matching_sessions` 테이블
 - `src/app/api/matching/route.ts` — GET /api/matching
 - `src/app/api/matching/click/route.ts` — POST /api/matching/click
 
@@ -277,7 +277,7 @@ Response: {
 ```
 
 ### ⚠️ Supabase 마이그레이션 필요 (스캇 직접 실행)
-`supabase/migrations/004_matching_and_best.sql` 내용을 Supabase SQL Editor에서 실행해야 함.
+`supabase/migrations/0041_matching_and_best.sql` 내용을 Supabase SQL Editor에서 실행해야 함.
 실행 전까지 matching_sessions 로그 저장 안 됨 (API 동작엔 영향 없음).
 
 ### @frontend 연동 사항

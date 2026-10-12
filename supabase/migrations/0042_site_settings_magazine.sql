@@ -39,7 +39,11 @@ ON CONFLICT (key) DO NOTHING;
 -- ============================================================
 -- 매거진 아티클 테이블
 -- ============================================================
-CREATE TYPE IF NOT EXISTS magazine_tab AS ENUM ('editor_pick', 'field_report', 'off_stage', 'coming_up');
+-- Postgres 는 CREATE TYPE IF NOT EXISTS 를 지원하지 않아 존재 여부를 확인해 생성한다
+DO $$ BEGIN
+  CREATE TYPE magazine_tab AS ENUM ('editor_pick', 'field_report', 'off_stage', 'coming_up');
+EXCEPTION WHEN duplicate_object THEN NULL;
+END $$;
 
 CREATE TABLE IF NOT EXISTS public.magazine_articles (
   id           UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
