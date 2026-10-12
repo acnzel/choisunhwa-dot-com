@@ -60,7 +60,7 @@ export default function PlanRequestForm() {
           maxLength={1000}
           rows={5}
           placeholder="예: 신임 팀장들이 팀원 면담을 어려워합니다. 연말 전에 한 번 교육을 하고 싶은데 어떤 주제가 맞을지 모르겠어요."
-          className="w-full px-4 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#1a1a2e] bg-white resize-none"
+          className={`${inputClass} resize-none`}
         />
       </div>
 

@@ -119,7 +119,7 @@ test.describe('교육 기획안 요청', () => {
 
     await page.getByRole('button', { name: '기획안 무료로 신청하기' }).click()
 
-    await expect(page).toHaveURL(/\/inquiry\/success\?type=plan/, { timeout: 15000 })
+    await expect(page).toHaveURL(/\/inquiry\/plan\/success/, { timeout: 15000 })
     await expect(page.getByRole('heading', { name: '기획안 요청이 접수되었습니다!' })).toBeVisible()
   })
 })

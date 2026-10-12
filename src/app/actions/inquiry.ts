@@ -88,12 +88,12 @@ export async function submitPlanRequest(formData: FormData) {
   }
 
   try {
-    await sendInquiryConfirmation({ to: email, name, inquiryType: 'lecture_plan', planRequest: true })
+    await sendInquiryConfirmation({ to: email, name, inquiryType: 'plan_request' })
   } catch (emailError) {
     console.error('이메일 발송 실패:', emailError)
   }
 
-  redirect('/inquiry/success?type=plan')
+  redirect('/inquiry/plan/success')
 }
 
 export async function submitSpeakerRegistration(formData: FormData) {
