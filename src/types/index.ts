@@ -56,6 +56,7 @@ export interface Speaker {
   media_links: SpeakerMediaLink[]
   news_links: string[]
   created_at: string
+  updated_at?: string // migration 015 — sitemap lastmod 용
 }
 
 // ─── 강연 ──────────────────────────────────────────────────
