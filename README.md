@@ -26,6 +26,20 @@ cp .env.example .env.local
 npm run dev
 ```
 
+## E2E 테스트
+
+E2E 는 운영 DB 가 아니라 로컬 Supabase(Docker)를 대상으로 돈다. `.env.test` 가 로컬 DB 를 가리키며, `.env.local`(운영 키)은 읽지 않는다.
+
+```bash
+supabase start        # 로컬 DB 기동 + 마이그레이션·seed.sql 적용 (포트 554xx)
+npm run test:e2e      # 포트 3100 에 테스트 서버를 띄워 실행
+supabase db reset     # 테스트 데이터 초기화가 필요할 때
+supabase stop
+```
+
+- 문의 제출처럼 DB 에 쓰는 테스트는 로컬 Supabase 일 때만 실행되고, `PLAYWRIGHT_BASE_URL` 로 외부 서버를 지정하면 건너뛴다.
+- 테스트 환경에는 `RESEND_API_KEY` 가 없어 확인 메일이 발송되지 않는다.
+
 ## 프로젝트 구조
 
 ```
