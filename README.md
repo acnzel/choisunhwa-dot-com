@@ -30,6 +30,20 @@ npm run dev
 
 E2E 는 운영 DB 가 아니라 로컬 Supabase(Docker)를 대상으로 돈다. `.env.test` 가 로컬 DB 를 가리키며, `.env.local`(운영 키)은 읽지 않는다.
 
+`npm run test:e2e` 는 Next.js 테스트 서버만 자동으로 띄운다. 로컬 Supabase 는 직접 켜야 하며, 꺼진 채로 돌리면 DB 가 필요한 테스트 12건이 "강사 0명" 같은 메시지로 실패한다.
+
+### 사전 준비 (컴퓨터마다 처음 한 번)
+
+1. Docker Desktop 설치 후 실행
+2. Supabase CLI 설치: `brew install supabase/tap/supabase`
+3. `npm install`
+4. Playwright 브라우저 설치: `npx playwright install chromium`
+5. 포트 55420~55429 가 비어 있어야 한다 (`supabase/config.toml`)
+
+`.env.test`·`supabase/seed.sql`·마이그레이션은 레포에 있어 따로 만들 필요가 없다. 첫 `supabase start` 는 Docker 이미지를 받느라 몇 분 걸린다.
+
+### 실행
+
 ```bash
 supabase start        # 로컬 DB 기동 + 마이그레이션·seed.sql 적용 (포트 554xx)
 npm run test:e2e      # 포트 3100 에 테스트 서버를 띄워 실행
