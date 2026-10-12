@@ -1,5 +1,9 @@
 import AdminSidebar from './AdminSidebar'
 
+// 관리자 화면은 항상 최신 데이터를 보여야 한다. 쿠키를 읽지 않는 admin 클라이언트만 쓰는 페이지는
+// Next.js 가 빌드 시점에 정적으로 고정하므로(문의 목록 상태가 갱신되지 않던 원인) 하위 전체를 동적 렌더링한다.
+export const dynamic = 'force-dynamic'
+
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-gray-50">
