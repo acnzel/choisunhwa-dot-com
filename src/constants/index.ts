@@ -116,6 +116,7 @@ export const INQUIRY_TYPES = [
   { value: 'lecture_plan', label: '강연기획 문의' },
   { value: 'recruitment', label: '강사섭외 문의' },
   { value: 'speaker_register', label: '강사등록 문의' },
+  { value: 'plan_request', label: '기획안 요청' },
 ] as const
 
 // ─── 문의 상태 ─────────────────────────────────────────

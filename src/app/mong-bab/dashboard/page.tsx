@@ -1,5 +1,6 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
+import type { InquiryType } from '@/types'
 
 async function getDashboardStats() {
   const supabase = createAdminClient()
@@ -37,10 +38,11 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   done: { label: '완료', color: 'bg-green-100 text-green-700' },
 }
 
-const TYPE_LABELS: Record<string, string> = {
+const TYPE_LABELS: Record<InquiryType, string> = {
   lecture_plan: '강연기획',
   recruitment: '강사섭외',
   speaker_register: '강사등록',
+  plan_request: '기획안 요청',
 }
 
 export default async function DashboardPage() {
@@ -92,7 +94,7 @@ export default async function DashboardPage() {
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
-                    {TYPE_LABELS[inquiry.type] ?? inquiry.type}
+                    {TYPE_LABELS[inquiry.type as InquiryType] ?? inquiry.type}
                   </span>
                   <span className="text-sm text-gray-700">
                     {inquiry.name}

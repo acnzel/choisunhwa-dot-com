@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import type { Inquiry } from '@/types'
 import Link from 'next/link'
 import { NOINDEX } from '@/lib/seo'
+import { INQUIRY_TYPES } from '@/constants'
 
 export const metadata: Metadata = {
   title: '문의 현황 확인',
@@ -10,11 +11,7 @@ export const metadata: Metadata = {
   ...NOINDEX,
 }
 
-const INQUIRY_TYPE_LABEL: Record<string, string> = {
-  lecture_plan: '강연기획 문의',
-  recruitment:  '강사섭외 문의',
-  speaker_register: '강사등록 문의',
-}
+const INQUIRY_TYPE_LABEL: Record<string, string> = Object.fromEntries(INQUIRY_TYPES.map((t) => [t.value, t.label]))
 
 const STATUS_META: Record<string, { label: string; color: string; bg: string; desc: string }> = {
   new:        { label: '접수 완료', color: 'var(--color-green)',  bg: 'rgba(43,66,56,0.08)', desc: '문의가 접수되었습니다. 곧 담당자가 확인합니다.' },

@@ -68,12 +68,11 @@ export async function submitPlanRequest(formData: FormData) {
   }
 
   const { name, email, phone, company, attendee_count, target, concern } = parsed.data
-  // 스키마 변경 없이 기존 문의 테이블에 저장한다. 어드민 문의 목록에서 구분되도록 본문 머리말을 붙인다.
-  const content = `[교육 기획안 요청]\n교육 대상: ${target}\n\n고민:\n${concern}`
+  const content = `교육 대상: ${target}\n\n고민:\n${concern}`
 
   const supabase = await createClient()
   const { error } = await supabase.from('inquiries').insert({
-    type: 'lecture_plan',
+    type: 'plan_request',
     name,
     email,
     phone,
