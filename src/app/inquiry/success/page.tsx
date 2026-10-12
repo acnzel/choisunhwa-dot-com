@@ -18,8 +18,6 @@ export default function InquirySuccessPage() {
         </div>
         <h1 className="text-2xl font-bold text-[#1a1a2e]">문의가 접수되었습니다!</h1>
         <p className="mt-3 text-sm text-gray-500 leading-relaxed">
-          입력하신 이메일로 접수 확인 메일을 발송했습니다.
-          <br />
           영업일 기준 <strong className="text-gray-700">1~2일 이내</strong>에 담당자가 연락드립니다.
         </p>
         <div className="flex flex-col gap-2 mt-8">
