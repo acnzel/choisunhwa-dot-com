@@ -5,14 +5,17 @@ import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useState } from 'react'
 
-const NAV_ITEMS = [
+type BadgeKey = 'pendingBriefing'
+export type NavBadges = Partial<Record<BadgeKey, number | null>>
+
+const NAV_ITEMS: { href: string; label: string; icon: string; badgeKey?: BadgeKey }[] = [
   { href: '/mong-bab/dashboard', label: '대시보드', icon: '📊' },
   { href: '/mong-bab/speakers',              label: '강사 관리',    icon: '🎤' },
   { href: '/mong-bab/speaker-applications', label: '강사 신청 검토', icon: '📝' },
   { href: '/mong-bab/featured-speakers',    label: '에디터 픽',  icon: '⭐' },
   { href: '/mong-bab/lectures',  label: '강연 관리', icon: '📋' },
   { href: '/mong-bab/insights',  label: '인사이트 관리', icon: '✍️' },
-  { href: '/mong-bab/trend-briefing/pending', label: '트렌드 브리핑', icon: '🤖' },
+  { href: '/mong-bab/trend-briefing/pending', label: '트렌드 브리핑', icon: '🤖', badgeKey: 'pendingBriefing' },
   { href: '/mong-bab/newsletter', label: '이슈 뉴스레터', icon: '📨' },
   { href: '/mong-bab/inquiries', label: '문의 관리', icon: '💬' },
   { href: '/mong-bab/members',   label: '회원 관리', icon: '👥' },
@@ -21,11 +24,12 @@ const NAV_ITEMS = [
 
 interface NavContentProps {
   pathname: string
+  badges: NavBadges
   onClose: () => void
   onSignOut: () => void
 }
 
-function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
+function NavContent({ pathname, badges, onClose, onSignOut }: NavContentProps) {
   return (
     <>
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
@@ -51,8 +55,9 @@ function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
       </div>
 
       <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-        {NAV_ITEMS.map(({ href, label, icon }) => {
+        {NAV_ITEMS.map(({ href, label, icon, badgeKey }) => {
           const active = pathname.startsWith(href)
+          const badge = badgeKey ? badges[badgeKey] : null
           return (
             <Link
               key={href}
@@ -66,6 +71,11 @@ function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
             >
               <span className="text-base">{icon}</span>
               {label}
+              {!!badge && (
+                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                  {badge}
+                </span>
+              )}
             </Link>
           )
         })}
@@ -90,7 +100,7 @@ function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
   )
 }
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ badges }: { badges: NavBadges }) {
   const pathname = usePathname()
   const router   = useRouter()
   const [open, setOpen] = useState(false)
@@ -109,7 +119,7 @@ export default function AdminSidebar() {
     <>
       {/* ── 데스크탑 사이드바 ── */}
       <aside className="hidden md:flex w-56 bg-white border-r border-gray-100 flex-col shrink-0 min-h-screen">
-        <NavContent pathname={pathname} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
+        <NavContent pathname={pathname} badges={badges} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
       </aside>
 
       {/* ── 모바일 상단 헤더 바 ── */}
@@ -147,7 +157,7 @@ export default function AdminSidebar() {
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <NavContent pathname={pathname} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
+        <NavContent pathname={pathname} badges={badges} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
       </aside>
     </>
   )

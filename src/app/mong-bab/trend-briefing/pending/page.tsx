@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import PendingList from './PendingList'
 import ManualTrigger from './ManualTrigger'
+import { PENDING_BRIEFING } from '@/lib/trend-briefing/pending'
 
 export const dynamic = 'force-dynamic'
 
@@ -15,8 +16,7 @@ async function getPending() {
   const { data } = await supabase
     .from('insights')
     .select('id, title, summary, source_name, source_url, created_at, meta')
-    .eq('auto_generated', true)
-    .eq('status', 'draft')
+    .match(PENDING_BRIEFING)
     .order('created_at', { ascending: false })
   return data ?? []
 }
