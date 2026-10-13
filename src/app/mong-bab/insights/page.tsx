@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Insight } from '@/types'
+import { NOT_PENDING_BRIEFING } from '@/lib/trend-briefing/pending'
 
 const TYPE_LABEL: Record<string, string> = {
   issue:  '인사이트',
@@ -19,6 +20,11 @@ const STATUS_COLOR: Record<string, string> = {
 }
 
 type TypeFilter = 'all' | 'issue' | 'report' | 'pick'
+// 자동 수집 검수 대기(draft)는 트렌드 브리핑 메뉴에서 처리하므로 이 화면에서는 항상 뺀다
+type SourceFilter = 'all' | 'manual' | 'auto'
+const SOURCE_LABEL: Record<SourceFilter, string> = {
+  all: '전체', manual: '직접 작성', auto: '자동 수집',
+}
 type SortField = 'status' | 'home_featured' | 'created_at'
 type SortDir = 'asc' | 'desc'
 
@@ -30,14 +36,16 @@ const SORT_LABEL: Record<SortField, string> = {
 
 interface Params {
   type?: string
+  source?: string
   page?: string
   sort?: string
   dir?: string
 }
 
-function buildUrl(params: { type?: TypeFilter; page?: number; sort?: SortField; dir?: SortDir }) {
+function buildUrl(params: { type?: TypeFilter; source?: SourceFilter; page?: number; sort?: SortField; dir?: SortDir }) {
   const sp = new URLSearchParams()
   if (params.type && params.type !== 'all') sp.set('type', params.type)
+  if (params.source && params.source !== 'all') sp.set('source', params.source)
   if (params.page && params.page > 1) sp.set('page', String(params.page))
   if (params.sort && params.sort !== 'created_at') sp.set('sort', params.sort)
   if (params.dir && params.dir !== 'desc') sp.set('dir', params.dir)
@@ -45,14 +53,17 @@ function buildUrl(params: { type?: TypeFilter; page?: number; sort?: SortField; 
   return qs ? `/mong-bab/insights?${qs}` : '/mong-bab/insights'
 }
 
-async function getInsights(type: TypeFilter, page: number, sort: SortField, dir: SortDir) {
+async function getInsights(type: TypeFilter, source: SourceFilter, page: number, sort: SortField, dir: SortDir) {
   const admin = createAdminClient()
   let query = admin
     .from('insights')
-    .select('id, type, title, status, home_featured, published_at, created_at', { count: 'exact' })
+    .select('id, type, title, status, home_featured, auto_generated, published_at, created_at', { count: 'exact' })
     .order(sort, { ascending: dir === 'asc' })
 
   if (type !== 'all') query = query.eq('type', type)
+  if (source === 'manual') query = query.eq('auto_generated', false)
+  else if (source === 'auto') query = query.eq('auto_generated', true).neq('status', 'draft')
+  else query = query.or(NOT_PENDING_BRIEFING)
 
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
@@ -74,13 +85,15 @@ export default async function InsightsAdminPage({
   const rawType = params.type ?? 'all'
   const currentType: TypeFilter =
     rawType === 'issue' || rawType === 'report' || rawType === 'pick' ? rawType : 'all'
+  const currentSource: SourceFilter =
+    params.source === 'manual' || params.source === 'auto' ? params.source : 'all'
   const currentPage = Math.max(1, Number(params.page ?? 1) || 1)
   const currentSort: SortField = SORTABLE_FIELDS.includes(params.sort as SortField)
     ? (params.sort as SortField)
     : 'created_at'
   const currentDir: SortDir = params.dir === 'asc' ? 'asc' : 'desc'
 
-  const { items: insights, total, totalPages } = await getInsights(currentType, currentPage, currentSort, currentDir)
+  const { items: insights, total, totalPages } = await getInsights(currentType, currentSource, currentPage, currentSort, currentDir)
 
   return (
     <div>
@@ -103,9 +116,9 @@ export default async function InsightsAdminPage({
       </div>
 
       {/* 필터 탭 */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 16 }}>
+      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
         {(['all', 'issue', 'report', 'pick'] as const).map(t => (
-          <Link key={t} href={buildUrl({ type: t, sort: currentSort, dir: currentDir })} style={{
+          <Link key={t} href={buildUrl({ type: t, source: currentSource, sort: currentSort, dir: currentDir })} style={{
             padding: '4px 14px', borderRadius: 20,
             background: t === currentType ? '#1a1a2e' : '#f3f4f6',
             color: t === currentType ? '#fff' : '#374151',
@@ -114,6 +127,21 @@ export default async function InsightsAdminPage({
             {t === 'all' ? '전체' : TYPE_LABEL[t]}
           </Link>
         ))}
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
+        {(['all', 'manual', 'auto'] as const).map(src => (
+          <Link key={src} href={buildUrl({ type: currentType, source: src, sort: currentSort, dir: currentDir })} style={{
+            padding: '4px 14px', borderRadius: 20,
+            border: '1px solid', borderColor: src === currentSource ? '#1a1a2e' : '#e5e7eb',
+            color: src === currentSource ? '#1a1a2e' : '#6b7280',
+            fontSize: 12, fontWeight: 500, textDecoration: 'none',
+          }}>
+            {SOURCE_LABEL[src]}
+          </Link>
+        ))}
+        <Link href="/mong-bab/trend-briefing/pending" style={{ marginLeft: 'auto', fontSize: 12, color: '#6b7280' }}>
+          검수 대기 중인 자동 수집 기사는 트렌드 브리핑에서 처리합니다 →
+        </Link>
       </div>
 
       {insights.length === 0 ? (
@@ -152,7 +180,7 @@ export default async function InsightsAdminPage({
                     return (
                       <th key={field} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 600, color: '#374151' }}>
                         <Link
-                          href={buildUrl({ type: currentType, sort: field, dir: nextDir })}
+                          href={buildUrl({ type: currentType, source: currentSource, sort: field, dir: nextDir })}
                           style={{ color: active ? '#1a1a2e' : '#374151', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
                         >
                           {SORT_LABEL[field]}
@@ -179,6 +207,11 @@ export default async function InsightsAdminPage({
                     </td>
                     <td style={{ padding: '12px 14px', fontWeight: 500, color: '#1a1a2e', maxWidth: 300 }}>
                       <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {item.auto_generated && (
+                          <span style={{ marginRight: 6, padding: '1px 6px', borderRadius: 4, background: '#f3f4f6', color: '#6b7280', fontSize: 10, fontWeight: 600 }}>
+                            자동
+                          </span>
+                        )}
                         {item.title}
                       </div>
                     </td>
@@ -211,7 +244,7 @@ export default async function InsightsAdminPage({
           {totalPages > 1 && (
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 20 }}>
               {currentPage > 1 ? (
-                <Link href={buildUrl({ type: currentType, page: currentPage - 1, sort: currentSort, dir: currentDir })}
+                <Link href={buildUrl({ type: currentType, source: currentSource, page: currentPage - 1, sort: currentSort, dir: currentDir })}
                   style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #e5e7eb', color: '#374151', fontSize: 12, textDecoration: 'none' }}>
                   이전
                 </Link>
@@ -222,7 +255,7 @@ export default async function InsightsAdminPage({
                 {currentPage} / {totalPages} · 총 {total}건
               </span>
               {currentPage < totalPages ? (
-                <Link href={buildUrl({ type: currentType, page: currentPage + 1, sort: currentSort, dir: currentDir })}
+                <Link href={buildUrl({ type: currentType, source: currentSource, page: currentPage + 1, sort: currentSort, dir: currentDir })}
                   style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #e5e7eb', color: '#374151', fontSize: 12, textDecoration: 'none' }}>
                   다음
                 </Link>
