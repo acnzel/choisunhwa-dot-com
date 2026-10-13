@@ -15,7 +15,7 @@ export function renderHtml(c: NewsletterContent, comment: string, siteUrl: strin
     .map(
       m => `<tr><td style="padding:12px 0;border-top:1px solid #eee;">
 <p style="margin:0;font-size:12px;color:#888;">${m.part}부 · ${esc(m.theme)}</p>
-<p style="margin:4px 0;font-size:15px;font-weight:bold;color:#1a1a2e;">${esc(m.lecture_title)}</p>
+<p style="margin:4px 0;font-size:15px;font-weight:bold;color:#1a1a2e;"><a href="${siteUrl}/speakers/${m.speaker_id}" style="color:#1a1a2e;text-decoration:none;">${esc(m.lecture_title)}</a></p>
 <p style="margin:0;font-size:13px;color:#555;"><a href="${siteUrl}/speakers/${m.speaker_id}" style="color:#1a1a2e;">${esc(m.speaker_name)}</a>${m.speaker_title ? ` · ${esc(m.speaker_title)}` : ''}</p>
 <p style="margin:6px 0 0;font-size:13px;color:#333;">${esc(m.connection)}</p>
 </td></tr>`,
