@@ -8,7 +8,18 @@ export const metadata: Metadata = pageMeta({
   path: '/inquiry/plan',
 })
 
-export default function PlanRequestPage() {
+// 이슈 뉴스레터 CTA 는 ?ref=briefing-<id>&topic=<프로그램 이름> 으로 들어온다.
+const REF_PATTERN = /^briefing-[0-9a-f-]{36}$/
+
+export default async function PlanRequestPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ ref?: string; topic?: string }>
+}) {
+  const { ref, topic } = await searchParams
+  const refCode = ref && REF_PATTERN.test(ref) ? ref : undefined
+  const defaultConcern = refCode && topic ? `뉴스레터에서 본 '${topic.slice(0, 50)}' 프로그램을 우리 회사에 맞춰 보고 싶습니다.` : undefined
+
   return (
     <div className="min-h-screen">
       <div className="bg-white border-b border-gray-100">
@@ -23,7 +34,7 @@ export default function PlanRequestPage() {
         </div>
       </div>
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <PlanRequestForm />
+        <PlanRequestForm refCode={refCode} defaultConcern={defaultConcern} />
       </div>
     </div>
   )
