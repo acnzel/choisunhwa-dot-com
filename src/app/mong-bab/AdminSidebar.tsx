@@ -20,11 +20,12 @@ const NAV_ITEMS = [
 
 interface NavContentProps {
   pathname: string
+  pendingBriefingCount: number | null
   onClose: () => void
   onSignOut: () => void
 }
 
-function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
+function NavContent({ pathname, pendingBriefingCount, onClose, onSignOut }: NavContentProps) {
   return (
     <>
       <div className="p-5 border-b border-gray-100 flex items-center justify-between">
@@ -65,6 +66,11 @@ function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
             >
               <span className="text-base">{icon}</span>
               {label}
+              {href === '/mong-bab/trend-briefing/pending' && !!pendingBriefingCount && (
+                <span className={`ml-auto text-xs px-2 py-0.5 rounded-full ${active ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-500'}`}>
+                  {pendingBriefingCount}
+                </span>
+              )}
             </Link>
           )
         })}
@@ -89,7 +95,7 @@ function NavContent({ pathname, onClose, onSignOut }: NavContentProps) {
   )
 }
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ pendingBriefingCount }: { pendingBriefingCount: number | null }) {
   const pathname = usePathname()
   const router   = useRouter()
   const [open, setOpen] = useState(false)
@@ -108,7 +114,7 @@ export default function AdminSidebar() {
     <>
       {/* ── 데스크탑 사이드바 ── */}
       <aside className="hidden md:flex w-56 bg-white border-r border-gray-100 flex-col shrink-0 min-h-screen">
-        <NavContent pathname={pathname} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
+        <NavContent pathname={pathname} pendingBriefingCount={pendingBriefingCount} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
       </aside>
 
       {/* ── 모바일 상단 헤더 바 ── */}
@@ -146,7 +152,7 @@ export default function AdminSidebar() {
           open ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        <NavContent pathname={pathname} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
+        <NavContent pathname={pathname} pendingBriefingCount={pendingBriefingCount} onClose={() => setOpen(false)} onSignOut={handleSignOut} />
       </aside>
     </>
   )
