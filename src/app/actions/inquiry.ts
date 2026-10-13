@@ -69,6 +69,9 @@ export async function submitPlanRequest(formData: FormData) {
 
   const { name, email, phone, company, attendee_count, target, concern } = parsed.data
   const content = `교육 대상: ${target}\n\n고민:\n${concern}`
+  // 뉴스레터 CTA 유입만 ref 를 남긴다. 일반 요청에는 키 자체를 넣지 않는다.
+  const ref = formData.get('ref')
+  const refField = typeof ref === 'string' && /^briefing-[0-9a-f-]{36}$/.test(ref) ? { ref } : {}
 
   const supabase = await createClient()
   const { error } = await supabase.from('inquiries').insert({
@@ -80,6 +83,7 @@ export async function submitPlanRequest(formData: FormData) {
     attendee_count,
     content,
     status: 'new',
+    ...refField,
   })
 
   if (error) {

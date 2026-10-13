@@ -122,4 +122,24 @@ test.describe('교육 기획안 요청', () => {
     await expect(page).toHaveURL(/\/inquiry\/plan\/success/, { timeout: 15000 })
     await expect(page.getByRole('heading', { name: '기획안 요청이 접수되었습니다!' })).toBeVisible()
   })
+
+  test('뉴스레터 CTA 로 들어오면 고민란이 채워지고 유입 출처와 함께 접수된다', async ({ page }) => {
+    test.skip(!canWriteDb, '로컬 Supabase 가 아닌 환경에서는 DB 쓰기 테스트를 건너뜀')
+
+    const ref = 'briefing-00000000-0000-4000-8000-000000000001'
+    await page.goto(`/inquiry/plan?ref=${ref}&topic=${encodeURIComponent('포용적 채용과 조직문화 전략')}`)
+    await expect(page.locator('[name="ref"]')).toHaveValue(ref)
+    await expect(page.locator('[name="concern"]')).toHaveValue(/포용적 채용과 조직문화 전략/)
+
+    await page.locator('[name="attendee_count"]').fill('40')
+    await page.locator('[name="target"]').selectOption({ label: '팀장 / 중간 관리자' })
+    await page.locator('[name="name"]').fill('김담당자')
+    await page.locator('[name="company"]').fill('QA테스트컴퍼니')
+    await page.locator('[name="email"]').fill(`qa_plan_ref_${Date.now()}@test.com`)
+    await page.locator('[name="phone"]').fill('010-0000-0000')
+    await page.locator('[name="privacy_agree"]').check()
+
+    await page.getByRole('button', { name: '기획안 무료로 신청하기' }).click()
+    await expect(page).toHaveURL(/\/inquiry\/plan\/success/, { timeout: 15000 })
+  })
 })

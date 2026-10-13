@@ -9,7 +9,7 @@ const initialState = { error: '' }
 const inputClass =
   'w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl focus:outline-none focus:border-[#1a1a2e] bg-white'
 
-export default function PlanRequestForm() {
+export default function PlanRequestForm({ refCode, defaultConcern }: { refCode?: string; defaultConcern?: string }) {
   const [state, formAction, pending] = useActionState(
     async (_prev: typeof initialState, formData: FormData) => {
       try {
@@ -24,6 +24,7 @@ export default function PlanRequestForm() {
 
   return (
     <form action={formAction} className="space-y-6">
+      {refCode && <input type="hidden" name="ref" value={refCode} />}
       {/* 기획안 3문항: 인원 · 대상 · 고민 */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
@@ -59,6 +60,7 @@ export default function PlanRequestForm() {
           minLength={10}
           maxLength={1000}
           rows={5}
+          defaultValue={defaultConcern}
           placeholder="예: 신임 팀장들이 팀원 면담을 어려워합니다. 연말 전에 한 번 교육을 하고 싶은데 어떤 주제가 맞을지 모르겠어요."
           className={`${inputClass} resize-none`}
         />
