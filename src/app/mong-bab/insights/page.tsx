@@ -1,6 +1,7 @@
 import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Insight } from '@/types'
+import { NOT_PENDING_BRIEFING } from '@/lib/trend-briefing/pending'
 
 const TYPE_LABEL: Record<string, string> = {
   issue:  '인사이트',
@@ -62,7 +63,7 @@ async function getInsights(type: TypeFilter, source: SourceFilter, page: number,
   if (type !== 'all') query = query.eq('type', type)
   if (source === 'manual') query = query.eq('auto_generated', false)
   else if (source === 'auto') query = query.eq('auto_generated', true).neq('status', 'draft')
-  else query = query.or('auto_generated.eq.false,status.neq.draft')
+  else query = query.or(NOT_PENDING_BRIEFING)
 
   const from = (page - 1) * PAGE_SIZE
   const to = from + PAGE_SIZE - 1
