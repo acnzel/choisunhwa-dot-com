@@ -45,4 +45,20 @@ describe('applicationToSpeaker', () => {
     ])
     expect(row.media_links).toEqual([{ title: '영상', url: 'https://youtu.be/x' }])
   })
+
+  it('학력은 [학력] 경력으로, 강연 주제는 lecture_histories 로 옮긴다', () => {
+    const row = applicationToSpeaker({
+      name: '홍길동',
+      education: '서울대 경영학 석사',
+      lecture_topics: 'AI 시대의 리더십 / 소통법\n번아웃 회복',
+    })
+    expect(row.careers).toEqual([{ year: '', content: '[학력] 서울대 경영학 석사' }])
+    expect(row.lecture_histories).toEqual([
+      { org_name: 'AI 시대의 리더십' },
+      { org_name: '소통법' },
+      { org_name: '번아웃 회복' },
+    ])
+    expect(row).not.toHaveProperty('education')
+    expect(row).not.toHaveProperty('lecture_topics')
+  })
 })
