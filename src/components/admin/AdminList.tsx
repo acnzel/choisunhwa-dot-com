@@ -95,12 +95,15 @@ export interface FilterTab {
  */
 export function FilterBar({
   tabs = [],
+  secondaryTabs = [],
   action,
   q,
   hidden = {},
   placeholder = '검색',
 }: {
   tabs?: FilterTab[]
+  /** 두 번째 기준의 필터(예: 출처). 테두리만 있는 탭으로 구분해 보여 준다. */
+  secondaryTabs?: FilterTab[]
   action: string
   q: string
   hidden?: Record<string, string>
@@ -125,6 +128,23 @@ export function FilterBar({
           </Link>
         ))}
       </div>
+      )}
+      {secondaryTabs.length > 0 && (
+        <div className="flex flex-wrap gap-2 md:border-l md:border-gray-100 md:pl-3">
+          {secondaryTabs.map((t) => (
+            <Link
+              key={t.label}
+              href={t.href}
+              className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                t.active
+                  ? 'border-[#1a1a2e] text-[#1a1a2e] font-semibold'
+                  : 'border-gray-200 text-gray-500 hover:border-gray-400'
+              }`}
+            >
+              {t.label}
+            </Link>
+          ))}
+        </div>
       )}
       <form action={action} className="md:ml-auto">
         {Object.entries(hidden).map(([k, v]) => (

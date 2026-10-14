@@ -2,33 +2,34 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import Link from 'next/link'
 import type { Insight } from '@/types'
 import { NOT_PENDING_BRIEFING } from '@/lib/trend-briefing/pending'
+import ClickableRow from '@/components/admin/ClickableRow'
+import { AdminListHeader, FilterBar, Pagination, StatTiles, StatusBadge, type BadgeTone } from '@/components/admin/AdminList'
+import { ADMIN_PAGE_SIZE, parsePage, sanitizeSearch } from '@/lib/admin-list'
 
-const TYPE_LABEL: Record<string, string> = {
-  issue:  '인사이트',
-  report: '현장 스토리',
-  pick:   '에디터 픽',
+const BASE_PATH = '/mong-bab/insights'
+
+const TYPE_META: Record<string, { label: string; tone: BadgeTone }> = {
+  issue: { label: '인사이트', tone: 'blue' },
+  report: { label: '현장 스토리', tone: 'green' },
+  pick: { label: '에디터 픽', tone: 'orange' },
 }
-const STATUS_LABEL: Record<string, string> = {
-  draft:     '임시저장',
-  pending:   '발행 대기',
-  published: '발행됨',
+type InsightStatus = 'draft' | 'pending' | 'published'
+const STATUS_META: Record<InsightStatus, { label: string; tone: BadgeTone }> = {
+  draft: { label: '임시저장', tone: 'gray' },
+  pending: { label: '발행 대기', tone: 'yellow' },
+  published: { label: '발행됨', tone: 'green' },
 }
-const STATUS_COLOR: Record<string, string> = {
-  draft:     '#9ca3af',
-  pending:   '#f59e0b',
-  published: '#10b981',
-}
+const STATUSES = Object.keys(STATUS_META) as InsightStatus[]
 
 type TypeFilter = 'all' | 'issue' | 'report' | 'pick'
 // 자동 수집 검수 대기(draft)는 트렌드 브리핑 메뉴에서 처리하므로 이 화면에서는 항상 뺀다
 type SourceFilter = 'all' | 'manual' | 'auto'
 const SOURCE_LABEL: Record<SourceFilter, string> = {
-  all: '전체', manual: '직접 작성', auto: '자동 수집',
+  all: '전체 출처', manual: '직접 작성', auto: '자동 수집',
 }
 type SortField = 'status' | 'home_featured' | 'created_at'
 type SortDir = 'asc' | 'desc'
 
-const PAGE_SIZE = 20
 const SORTABLE_FIELDS: SortField[] = ['status', 'home_featured', 'created_at']
 const SORT_LABEL: Record<SortField, string> = {
   status: '상태', home_featured: '홈 노출', created_at: '등록일',
@@ -37,42 +38,71 @@ const SORT_LABEL: Record<SortField, string> = {
 interface Params {
   type?: string
   source?: string
+  status?: string
+  q?: string
   page?: string
   sort?: string
   dir?: string
 }
 
-function buildUrl(params: { type?: TypeFilter; source?: SourceFilter; page?: number; sort?: SortField; dir?: SortDir }) {
-  const sp = new URLSearchParams()
-  if (params.type && params.type !== 'all') sp.set('type', params.type)
-  if (params.source && params.source !== 'all') sp.set('source', params.source)
-  if (params.page && params.page > 1) sp.set('page', String(params.page))
-  if (params.sort && params.sort !== 'created_at') sp.set('sort', params.sort)
-  if (params.dir && params.dir !== 'desc') sp.set('dir', params.dir)
-  const qs = sp.toString()
-  return qs ? `/mong-bab/insights?${qs}` : '/mong-bab/insights'
+interface UrlState {
+  type: TypeFilter
+  source: SourceFilter
+  status: InsightStatus | 'all'
+  q: string
+  page?: number
+  sort: SortField
+  dir: SortDir
 }
 
-async function getInsights(type: TypeFilter, source: SourceFilter, page: number, sort: SortField, dir: SortDir) {
-  const admin = createAdminClient()
-  let query = admin
-    .from('insights')
-    .select('id, type, title, status, home_featured, auto_generated, published_at, created_at', { count: 'exact' })
-    .order(sort, { ascending: dir === 'asc' })
+function buildUrl(s: UrlState) {
+  const sp = new URLSearchParams()
+  if (s.type !== 'all') sp.set('type', s.type)
+  if (s.source !== 'all') sp.set('source', s.source)
+  if (s.status !== 'all') sp.set('status', s.status)
+  if (s.q) sp.set('q', s.q)
+  if (s.page && s.page > 1) sp.set('page', String(s.page))
+  if (s.sort !== 'created_at') sp.set('sort', s.sort)
+  if (s.dir !== 'desc') sp.set('dir', s.dir)
+  const qs = sp.toString()
+  return qs ? `${BASE_PATH}?${qs}` : BASE_PATH
+}
 
+// 유형·출처·검색 조건을 건 기본 쿼리. 목록과 상태별 건수가 같은 조건을 쓴다.
+function baseQuery(columns: string, head: boolean, type: TypeFilter, source: SourceFilter, q: string) {
+  let query = createAdminClient().from('insights').select(columns, { count: 'exact', head })
   if (type !== 'all') query = query.eq('type', type)
   if (source === 'manual') query = query.eq('auto_generated', false)
   else if (source === 'auto') query = query.eq('auto_generated', true).neq('status', 'draft')
   else query = query.or(NOT_PENDING_BRIEFING)
+  if (q) query = query.ilike('title', `%${q}%`)
+  return query
+}
 
-  const from = (page - 1) * PAGE_SIZE
-  const to = from + PAGE_SIZE - 1
-  const { data, count } = await query.range(from, to)
+async function getStatusCounts(type: TypeFilter, source: SourceFilter, q: string) {
+  const results = await Promise.all(STATUSES.map((s) => baseQuery('id', true, type, source, q).eq('status', s)))
+  const counts = Object.fromEntries(STATUSES.map((s, i) => [s, results[i].count ?? 0])) as Record<InsightStatus, number>
+  return { counts, total: Object.values(counts).reduce((a, b) => a + b, 0) }
+}
+
+async function getInsights(s: UrlState & { page: number }) {
+  let query = baseQuery(
+    'id, type, title, status, home_featured, auto_generated, published_at, created_at',
+    false,
+    s.type,
+    s.source,
+    s.q,
+  )
+  if (s.status !== 'all') query = query.eq('status', s.status)
+
+  const from = (s.page - 1) * ADMIN_PAGE_SIZE
+  const { data, count } = await query
+    .order(s.sort, { ascending: s.dir === 'asc' })
+    .range(from, from + ADMIN_PAGE_SIZE - 1)
 
   return {
-    items: (data as Insight[]) ?? [],
-    total: count ?? 0,
-    totalPages: Math.max(1, Math.ceil((count ?? 0) / PAGE_SIZE)),
+    items: (data as unknown as Insight[]) ?? [],
+    totalPages: Math.max(1, Math.ceil((count ?? 0) / ADMIN_PAGE_SIZE)),
   }
 }
 
@@ -83,189 +113,165 @@ export default async function InsightsAdminPage({
 }) {
   const params = await searchParams
   const rawType = params.type ?? 'all'
-  const currentType: TypeFilter =
-    rawType === 'issue' || rawType === 'report' || rawType === 'pick' ? rawType : 'all'
-  const currentSource: SourceFilter =
-    params.source === 'manual' || params.source === 'auto' ? params.source : 'all'
-  const currentPage = Math.max(1, Number(params.page ?? 1) || 1)
-  const currentSort: SortField = SORTABLE_FIELDS.includes(params.sort as SortField)
-    ? (params.sort as SortField)
-    : 'created_at'
-  const currentDir: SortDir = params.dir === 'asc' ? 'asc' : 'desc'
+  const state: UrlState & { page: number } = {
+    type: rawType === 'issue' || rawType === 'report' || rawType === 'pick' ? rawType : 'all',
+    source: params.source === 'manual' || params.source === 'auto' ? params.source : 'all',
+    status: STATUSES.includes(params.status as InsightStatus) ? (params.status as InsightStatus) : 'all',
+    q: sanitizeSearch(params.q),
+    page: parsePage(params.page),
+    sort: SORTABLE_FIELDS.includes(params.sort as SortField) ? (params.sort as SortField) : 'created_at',
+    dir: params.dir === 'asc' ? 'asc' : 'desc',
+  }
+  // 필터를 바꾸면 1페이지로 돌아간다
+  const link = (patch: Partial<UrlState>) => buildUrl({ ...state, page: undefined, ...patch })
 
-  const { items: insights, total, totalPages } = await getInsights(currentType, currentSource, currentPage, currentSort, currentDir)
+  const [{ counts, total }, { items, totalPages }] = await Promise.all([
+    getStatusCounts(state.type, state.source, state.q),
+    getInsights(state),
+  ])
+
+  const tiles = [
+    { label: '전체', value: total, href: link({ status: 'all' }), active: state.status === 'all' },
+    ...STATUSES.map((s) => ({
+      label: STATUS_META[s].label,
+      value: counts[s],
+      href: link({ status: s }),
+      active: state.status === s,
+    })),
+  ]
+
+  const hidden: Record<string, string> = {}
+  if (state.type !== 'all') hidden.type = state.type
+  if (state.source !== 'all') hidden.source = state.source
+  if (state.status !== 'all') hidden.status = state.status
+  if (state.sort !== 'created_at') hidden.sort = state.sort
+  if (state.dir !== 'desc') hidden.dir = state.dir
+
+  const filtered = state.q || state.type !== 'all' || state.source !== 'all' || state.status !== 'all'
 
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div>
-          <h1 style={{ fontSize: 20, fontWeight: 700, color: '#1a1a2e' }}>인사이트 관리</h1>
-          <p style={{ fontSize: 13, color: '#6b7280', marginTop: 4 }}>
-            인사이트 · 현장 스토리 · 에디터 픽
-          </p>
-        </div>
-        <Link
-          href="/mong-bab/insights/new"
-          style={{
-            padding: '8px 18px', background: '#1a1a2e', color: '#fff',
-            borderRadius: 8, fontSize: 13, fontWeight: 600, textDecoration: 'none',
-          }}
-        >
-          + 새 콘텐츠
-        </Link>
-      </div>
+    <div className="p-6">
+      <AdminListHeader
+        title="인사이트 관리"
+        count={total}
+        action={
+          <Link
+            href="/mong-bab/insights/new"
+            className="px-4 py-2 bg-[#1a1a2e] text-white text-sm font-medium rounded-xl hover:bg-[#16213e] transition-colors"
+          >
+            + 새 콘텐츠
+          </Link>
+        }
+      />
 
-      {/* 필터 탭 */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-        {(['all', 'issue', 'report', 'pick'] as const).map(t => (
-          <Link key={t} href={buildUrl({ type: t, source: currentSource, sort: currentSort, dir: currentDir })} style={{
-            padding: '4px 14px', borderRadius: 20,
-            background: t === currentType ? '#1a1a2e' : '#f3f4f6',
-            color: t === currentType ? '#fff' : '#374151',
-            fontSize: 12, fontWeight: 500, textDecoration: 'none',
-          }}>
-            {t === 'all' ? '전체' : TYPE_LABEL[t]}
-          </Link>
-        ))}
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
-        {(['all', 'manual', 'auto'] as const).map(src => (
-          <Link key={src} href={buildUrl({ type: currentType, source: src, sort: currentSort, dir: currentDir })} style={{
-            padding: '4px 14px', borderRadius: 20,
-            border: '1px solid', borderColor: src === currentSource ? '#1a1a2e' : '#e5e7eb',
-            color: src === currentSource ? '#1a1a2e' : '#6b7280',
-            fontSize: 12, fontWeight: 500, textDecoration: 'none',
-          }}>
-            {SOURCE_LABEL[src]}
-          </Link>
-        ))}
-        <Link href="/mong-bab/trend-briefing/pending" style={{ marginLeft: 'auto', fontSize: 12, color: '#6b7280' }}>
+      <StatTiles tiles={tiles} />
+
+      <FilterBar
+        tabs={(['all', 'issue', 'report', 'pick'] as const).map((t) => ({
+          label: t === 'all' ? '전체 유형' : TYPE_META[t].label,
+          href: link({ type: t }),
+          active: state.type === t,
+        }))}
+        secondaryTabs={(['all', 'manual', 'auto'] as const).map((src) => ({
+          label: SOURCE_LABEL[src],
+          href: link({ source: src }),
+          active: state.source === src,
+        }))}
+        action={BASE_PATH}
+        q={state.q}
+        hidden={hidden}
+        placeholder="제목 검색"
+      />
+
+      <p className="text-xs text-gray-400 mb-3 text-right">
+        <Link href="/mong-bab/trend-briefing/pending" className="hover:text-gray-600">
           검수 대기 중인 자동 수집 기사는 트렌드 브리핑에서 처리합니다 →
         </Link>
+      </p>
+
+      <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-gray-100 bg-gray-50">
+                <th className="text-left px-4 py-3 font-medium text-gray-500 whitespace-nowrap">유형</th>
+                <th className="text-left px-4 py-3 font-medium text-gray-500">제목</th>
+                {SORTABLE_FIELDS.map((field) => {
+                  const active = state.sort === field
+                  const nextDir: SortDir = active && state.dir === 'desc' ? 'asc' : 'desc'
+                  return (
+                    <th key={field} className="text-left px-4 py-3 font-medium whitespace-nowrap">
+                      <Link
+                        href={link({ sort: field, dir: nextDir })}
+                        className={`inline-flex items-center gap-1 ${active ? 'text-[#1a1a2e]' : 'text-gray-500'}`}
+                      >
+                        {SORT_LABEL[field]}
+                        <span className={`text-[10px] ${active ? 'text-[#1a1a2e]' : 'text-gray-300'}`}>
+                          {active ? (state.dir === 'desc' ? '▼' : '▲') : '▲▼'}
+                        </span>
+                      </Link>
+                    </th>
+                  )
+                })}
+                <th className="px-4 py-3" />
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-50">
+              {items.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-gray-400">
+                    {filtered || state.page > 1 ? (
+                      '해당 조건의 인사이트가 없습니다.'
+                    ) : (
+                      <>
+                        아직 등록된 인사이트가 없습니다.
+                        <br />
+                        <Link href="/mong-bab/insights/new" className="text-[#1a1a2e] mt-2 inline-block">
+                          첫 콘텐츠 등록하기 →
+                        </Link>
+                      </>
+                    )}
+                  </td>
+                </tr>
+              ) : (
+                items.map((item) => {
+                  const type = TYPE_META[item.type]
+                  const status = STATUS_META[item.status as InsightStatus]
+                  return (
+                    <ClickableRow key={item.id} href={`${BASE_PATH}/${item.id}/edit`}>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <StatusBadge label={type?.label ?? item.type} tone={type?.tone} />
+                      </td>
+                      <td className="px-4 py-3 max-w-md">
+                        <p className="font-medium text-gray-800 truncate">
+                          {item.auto_generated && (
+                            <span className="mr-1.5 px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 text-[10px] font-semibold align-middle">
+                              자동
+                            </span>
+                          )}
+                          {item.title}
+                        </p>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <StatusBadge label={status?.label ?? item.status} tone={status?.tone} />
+                      </td>
+                      <td className="px-4 py-3 text-center text-gray-500">{item.home_featured ? '✅' : '—'}</td>
+                      <td className="px-4 py-3 text-gray-400 whitespace-nowrap text-xs">
+                        {new Date(item.created_at).toLocaleDateString('ko-KR')}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="text-xs text-[#1a1a2e]">→ 수정</span>
+                      </td>
+                    </ClickableRow>
+                  )
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {insights.length === 0 ? (
-        <div style={{
-          textAlign: 'center', padding: '60px 0',
-          color: '#9ca3af', fontSize: 14,
-        }}>
-          {total === 0 && currentPage === 1 ? (
-            <>
-              아직 등록된 인사이트가 없습니다.<br />
-              <Link href="/mong-bab/insights/new" style={{ color: '#1a1a2e', marginTop: 8, display: 'inline-block' }}>
-                첫 콘텐츠 등록하기 →
-              </Link>
-            </>
-          ) : (
-            '해당 조건의 인사이트가 없습니다.'
-          )}
-        </div>
-      ) : (
-        <>
-          <div style={{ border: '1px solid #e5e7eb', borderRadius: 10, overflow: 'hidden' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-              <thead>
-                <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                  {(['유형', '제목', 'status', 'home_featured', 'created_at', ''] as const).map(h => {
-                    if (h === '유형' || h === '제목' || h === '') {
-                      return (
-                        <th key={h} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 600, color: '#374151' }}>
-                          {h === '' ? '' : h}
-                        </th>
-                      )
-                    }
-                    const field = h as SortField
-                    const active = currentSort === field
-                    const nextDir: SortDir = active && currentDir === 'desc' ? 'asc' : 'desc'
-                    return (
-                      <th key={field} style={{ padding: '10px 14px', textAlign: 'left', fontWeight: 600, color: '#374151' }}>
-                        <Link
-                          href={buildUrl({ type: currentType, source: currentSource, sort: field, dir: nextDir })}
-                          style={{ color: active ? '#1a1a2e' : '#374151', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 4 }}
-                        >
-                          {SORT_LABEL[field]}
-                          <span style={{ fontSize: 10, color: active ? '#1a1a2e' : '#d1d5db' }}>
-                            {active ? (currentDir === 'desc' ? '▼' : '▲') : '▲▼'}
-                          </span>
-                        </Link>
-                      </th>
-                    )
-                  })}
-                </tr>
-              </thead>
-              <tbody>
-                {insights.map((item, idx) => (
-                  <tr key={item.id} style={{ borderBottom: idx < insights.length - 1 ? '1px solid #f3f4f6' : 'none' }}>
-                    <td style={{ padding: '12px 14px' }}>
-                      <span style={{
-                        padding: '2px 10px', borderRadius: 20, fontSize: 11, fontWeight: 600,
-                        background: item.type === 'issue' ? '#eff6ff' : item.type === 'report' ? '#f0fdf4' : '#fdf4ff',
-                        color: item.type === 'issue' ? '#1d4ed8' : item.type === 'report' ? '#15803d' : '#7e22ce',
-                      }}>
-                        {TYPE_LABEL[item.type]}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px 14px', fontWeight: 500, color: '#1a1a2e', maxWidth: 300 }}>
-                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {item.auto_generated && (
-                          <span style={{ marginRight: 6, padding: '1px 6px', borderRadius: 4, background: '#f3f4f6', color: '#6b7280', fontSize: 10, fontWeight: 600 }}>
-                            자동
-                          </span>
-                        )}
-                        {item.title}
-                      </div>
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      <span style={{ color: STATUS_COLOR[item.status], fontWeight: 600, fontSize: 12 }}>
-                        ● {STATUS_LABEL[item.status]}
-                      </span>
-                    </td>
-                    <td style={{ padding: '12px 14px', textAlign: 'center' }}>
-                      {item.home_featured ? '✅' : '—'}
-                    </td>
-                    <td style={{ padding: '12px 14px', color: '#6b7280', fontSize: 12 }}>
-                      {new Date(item.created_at).toLocaleDateString('ko-KR')}
-                    </td>
-                    <td style={{ padding: '12px 14px' }}>
-                      <Link
-                        href={`/mong-bab/insights/${item.id}/edit`}
-                        style={{ color: '#1a1a2e', fontSize: 12, fontWeight: 600 }}
-                      >
-                        수정
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* 페이지네이션 */}
-          {totalPages > 1 && (
-            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 6, marginTop: 20 }}>
-              {currentPage > 1 ? (
-                <Link href={buildUrl({ type: currentType, source: currentSource, page: currentPage - 1, sort: currentSort, dir: currentDir })}
-                  style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #e5e7eb', color: '#374151', fontSize: 12, textDecoration: 'none' }}>
-                  이전
-                </Link>
-              ) : (
-                <span style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #f3f4f6', color: '#d1d5db', fontSize: 12 }}>이전</span>
-              )}
-              <span style={{ fontSize: 12, color: '#6b7280', padding: '0 8px' }}>
-                {currentPage} / {totalPages} · 총 {total}건
-              </span>
-              {currentPage < totalPages ? (
-                <Link href={buildUrl({ type: currentType, source: currentSource, page: currentPage + 1, sort: currentSort, dir: currentDir })}
-                  style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #e5e7eb', color: '#374151', fontSize: 12, textDecoration: 'none' }}>
-                  다음
-                </Link>
-              ) : (
-                <span style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid #f3f4f6', color: '#d1d5db', fontSize: 12 }}>다음</span>
-              )}
-            </div>
-          )}
-        </>
-      )}
+      <Pagination page={state.page} totalPages={totalPages} hrefFor={(p) => buildUrl({ ...state, page: p })} />
     </div>
   )
 }

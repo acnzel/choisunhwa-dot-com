@@ -125,7 +125,7 @@ export default function PendingList({ items: initial }: Props) {
                   <button
                     onClick={() => handlePublish(item.id)}
                     disabled={isProcessing}
-                    className="px-4 py-2 text-sm font-bold bg-[#1D4229] text-white rounded-xl hover:bg-[#163520] disabled:opacity-50 transition-colors"
+                    className="px-4 py-2 text-sm font-bold bg-[#1a1a2e] text-white rounded-xl hover:bg-[#16213e] disabled:opacity-50 transition-colors"
                   >
                     {processing === item.id ? '처리 중…' : '✅ 게시'}
                   </button>
@@ -184,7 +184,7 @@ export default function PendingList({ items: initial }: Props) {
             <div className="sticky bottom-0 bg-gray-50 px-6 py-4 flex gap-3 rounded-b-2xl border-t border-gray-100">
               <button
                 onClick={() => { handlePublish(preview.id); setPreview(null) }}
-                className="flex-1 py-2.5 bg-[#1D4229] text-white font-bold rounded-xl text-sm hover:bg-[#163520] transition-colors"
+                className="flex-1 py-2.5 bg-[#1a1a2e] text-white font-bold rounded-xl text-sm hover:bg-[#16213e] transition-colors"
               >
                 ✅ 게시하기
               </button>
