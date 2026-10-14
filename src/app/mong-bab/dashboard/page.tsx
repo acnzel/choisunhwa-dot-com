@@ -52,7 +52,7 @@ export default async function DashboardPage() {
     { label: '전체 회원', value: stats.totalMembers, href: '/mong-bab/members', icon: '👥' },
     { label: '등록 강사', value: stats.totalSpeakers, href: '/mong-bab/speakers', icon: '🎤' },
     { label: '강연 커리큘럼', value: stats.totalLectures, href: '/mong-bab/lectures', icon: '📋' },
-    { label: '신규 문의', value: stats.newInquiries, href: '/mong-bab/inquiries', icon: '💬', highlight: stats.newInquiries > 0 },
+    { label: '신규 문의', value: stats.newInquiries, href: '/mong-bab/inquiries?status=new', icon: '💬', highlight: stats.newInquiries > 0 },
   ]
 
   return (
