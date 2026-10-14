@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createAdminClient } from '@/lib/supabase/admin'
 import type { Inquiry, InquiryMemo } from '@/types'
-import { INQUIRY_TYPES, INQUIRY_STATUSES } from '@/constants'
+import { INQUIRY_TYPES, INQUIRY_STATUSES, BUDGET_RANGES } from '@/constants'
 import InquiryDetail from './InquiryDetail'
 
 interface Props {
@@ -35,6 +35,7 @@ export default async function InquiryDetailPage({ params }: Props) {
 
   const typeMap = Object.fromEntries(INQUIRY_TYPES.map((t) => [t.value, t.label]))
   const statusMap = Object.fromEntries(INQUIRY_STATUSES.map((s) => [s.value, s.label]))
+  const budgetMap: Record<string, string> = Object.fromEntries(BUDGET_RANGES.map((b) => [b.value, b.label]))
 
   return (
     <div className="p-6 max-w-3xl">
@@ -49,9 +50,14 @@ export default async function InquiryDetailPage({ params }: Props) {
       {/* 기본 정보 */}
       <div className="bg-white rounded-2xl border border-gray-100 p-6 mb-5">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
-            {typeMap[inquiry.type] ?? inquiry.type}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs px-2.5 py-1 bg-gray-100 text-gray-600 rounded-full">
+              {typeMap[inquiry.type] ?? inquiry.type}
+            </span>
+            {inquiry.ref?.startsWith('briefing-') && (
+              <span className="text-xs px-2.5 py-1 bg-purple-100 text-purple-700 rounded-full">뉴스레터 유입</span>
+            )}
+          </div>
           <span className="text-xs text-gray-400">
             {inquiry.created_at ? new Date(inquiry.created_at).toLocaleString('ko-KR') : '-'}
           </span>
@@ -100,7 +106,7 @@ export default async function InquiryDetailPage({ params }: Props) {
           {inquiry.budget_range && (
             <div className="grid grid-cols-3 gap-2">
               <dt className="text-gray-400">예산</dt>
-              <dd className="col-span-2 text-gray-700">{inquiry.budget_range}</dd>
+              <dd className="col-span-2 text-gray-700">{budgetMap[inquiry.budget_range] ?? inquiry.budget_range}</dd>
             </div>
           )}
           <div className="grid grid-cols-3 gap-2 pt-2 border-t border-gray-50">

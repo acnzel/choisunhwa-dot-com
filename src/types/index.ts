@@ -105,6 +105,7 @@ export interface Inquiry {
   file_url?: string
   status: InquiryStatus
   assigned_admin_id?: string
+  ref?: string | null // 유입 출처. 뉴스레터 CTA 는 briefing-<id>
   created_at?: string // DB 생성값, 선택적
 }
 
