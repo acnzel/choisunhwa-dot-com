@@ -20,6 +20,7 @@ export interface Application {
   fee_range?: string
   status: ApplicationStatus
   admin_note?: string
+  reviewed_at?: string
   created_at: string
 }
 
