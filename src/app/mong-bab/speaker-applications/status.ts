@@ -21,6 +21,8 @@ export interface Application {
   status: ApplicationStatus
   admin_note?: string
   reviewed_at?: string
+  /** 승인 시 등록된 강사. 강사를 지우면 null */
+  speaker_id?: string | null
   created_at: string
 }
 

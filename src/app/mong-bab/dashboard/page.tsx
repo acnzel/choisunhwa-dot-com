@@ -77,7 +77,10 @@ export default async function DashboardPage() {
       {/* 최근 문의 */}
       <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
-          <h2 className="font-semibold text-[#1a1a2e]">최근 문의</h2>
+          <h2 className="font-semibold text-[#1a1a2e]">
+            최근 문의
+            <span className="ml-2 text-xs font-normal text-gray-400">전체 {stats.totalInquiries}건</span>
+          </h2>
           <Link href="/mong-bab/inquiries" className="text-xs text-gray-400 hover:text-[#1a1a2e]">
             전체 보기 →
           </Link>

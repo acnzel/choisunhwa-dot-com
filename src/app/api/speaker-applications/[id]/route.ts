@@ -52,10 +52,10 @@ export async function PATCH(
   }
 
   // 대기 상태일 때만 바꾼다. 두 어드민이 동시에 처리해도 한 번만 반영된다.
-  async function markReviewed(status: 'approved' | 'rejected') {
+  async function markReviewed(status: 'approved' | 'rejected', speakerId?: string) {
     return admin
       .from('speaker_applications')
-      .update({ status, ...review })
+      .update({ status, ...review, ...(speakerId ? { speaker_id: speakerId } : {}) })
       .eq('id', id)
       .eq('status', 'pending')
       .select('id')
@@ -78,7 +78,7 @@ export async function PATCH(
     return NextResponse.json({ error: `강사 등록 실패: ${insertErr?.message ?? '알 수 없는 오류'}` }, { status: 500 })
   }
 
-  const { data: updated, error: updateErr } = await markReviewed('approved')
+  const { data: updated, error: updateErr } = await markReviewed('approved', speaker.id)
   if (updateErr || !updated?.length) {
     await admin.from('speakers').delete().eq('id', speaker.id)
     return updateErr
