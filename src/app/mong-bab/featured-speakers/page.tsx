@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import type { FeaturedSpeakerItem } from '@/types'
+import { AdminListHeader } from '@/components/admin/AdminList'
 
 // ── 강사 검색용 최소 타입 ───────────────────────────────────
 interface SpeakerOption {
@@ -194,26 +195,22 @@ export default function FeaturedSpeakersAdminPage() {
   const selectedSpeaker = speakers.find(s => s.id === form.speaker_id) ?? null
 
   return (
-    <div style={{ padding: '32px 28px', maxWidth: '900px' }}>
+    <div className="p-6 max-w-4xl">
       {/* 헤더 */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px' }}>
-        <div>
-          <h1 style={{ fontSize: '22px', fontWeight: 700, color: '#1a1a2e', margin: 0 }}>⭐ 에디터 픽</h1>
-          <p style={{ fontSize: '13px', color: '#6b7280', marginTop: '4px' }}>
-            홈 메인 및 인사이트 탭에 노출할 강사를 관리합니다.
-          </p>
-        </div>
-        <button
-          onClick={openAdd}
-          style={{
-            padding: '10px 20px', fontSize: '13px', fontWeight: 600,
-            background: '#1a1a2e', color: '#fff', border: 'none',
-            borderRadius: '8px', cursor: 'pointer',
-          }}
-        >
-          + 강사 추가
-        </button>
-      </div>
+      <AdminListHeader
+        title="에디터 픽"
+        count={items.length}
+        unit="명"
+        action={
+          <button
+            onClick={openAdd}
+            className="px-4 py-2 bg-[#1a1a2e] text-white text-sm font-medium rounded-xl hover:bg-[#16213e] transition-colors"
+          >
+            + 강사 추가
+          </button>
+        }
+      />
+      <p className="text-xs text-gray-400 -mt-4 mb-6">홈 메인 및 인사이트 탭에 노출할 강사를 관리합니다.</p>
 
       {/* 에러 */}
       {error && !modal && (

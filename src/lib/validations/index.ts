@@ -118,3 +118,18 @@ export const MemoSchema = z.object({
 })
 
 export type MemoInput = z.infer<typeof MemoSchema>
+
+// ─── 강사 신청 검토 (어드민) ─────────────────────────────
+// 거절은 사유가 있어야 한다. 재신청이 들어왔을 때 이전 판단 근거로 쓰인다.
+export const SpeakerApplicationReviewSchema = z.discriminatedUnion('action', [
+  z.object({
+    action: z.literal('approve'),
+    admin_note: z.string().trim().max(1000).optional(),
+  }),
+  z.object({
+    action: z.literal('reject'),
+    admin_note: z.string().trim().min(1, '거절 사유를 입력해주세요').max(1000),
+  }),
+])
+
+export type SpeakerApplicationReviewInput = z.infer<typeof SpeakerApplicationReviewSchema>

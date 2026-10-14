@@ -17,12 +17,19 @@ interface Params {
   page?: string
 }
 
-async function getStatusCounts() {
+function searchFilter(q: string) {
+  const like = `%${q}%`
+  return `name.ilike.${like},company.ilike.${like},email.ilike.${like},content.ilike.${like}`
+}
+
+// 건수는 검색어를 반영한다 (검색 결과가 상태별로 몇 건인지 보이도록)
+async function getStatusCounts(q: string) {
   const supabase = createAdminClient()
   const results = await Promise.all(
-    INQUIRY_STATUSES.map((s) =>
-      supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', s.value),
-    ),
+    INQUIRY_STATUSES.map((s) => {
+      const query = supabase.from('inquiries').select('id', { count: 'exact', head: true }).eq('status', s.value)
+      return q ? query.or(searchFilter(q)) : query
+    }),
   )
   const counts = Object.fromEntries(INQUIRY_STATUSES.map((s, i) => [s.value, results[i].count ?? 0]))
   const total = Object.values(counts).reduce((a, b) => a + b, 0)
@@ -37,10 +44,7 @@ async function getInquiries(status: InquiryStatus | 'all', q: string, page: numb
     .order('created_at', { ascending: false })
 
   if (status !== 'all') query = query.eq('status', status)
-  if (q) {
-    const like = `%${q}%`
-    query = query.or(`name.ilike.${like},company.ilike.${like},email.ilike.${like},content.ilike.${like}`)
-  }
+  if (q) query = query.or(searchFilter(q))
 
   const from = (page - 1) * ADMIN_PAGE_SIZE
   const { data, count } = await query.range(from, from + ADMIN_PAGE_SIZE - 1)
@@ -59,7 +63,7 @@ export default async function AdminInquiriesPage({ searchParams }: { searchParam
   const page = parsePage(params.page)
 
   const [{ counts, total }, { items, totalPages }] = await Promise.all([
-    getStatusCounts(),
+    getStatusCounts(q),
     getInquiries(status, q, page),
   ])
 
