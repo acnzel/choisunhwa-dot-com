@@ -271,6 +271,14 @@ export default function ApplicationList({ items, emptyText }: { items: Applicati
                     {selected.admin_note}
                   </p>
                 )}
+                {selected.status === 'approved' && selected.speaker_id && (
+                  <Link
+                    href={`/mong-bab/speakers/${selected.speaker_id}`}
+                    className="inline-block mt-2 font-semibold text-[#1a1a2e] underline"
+                  >
+                    등록된 강사 정보 보기 →
+                  </Link>
+                )}
               </div>
             )}
           </div>

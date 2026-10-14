@@ -227,8 +227,8 @@ export default function SpeakerFilterTable({ speakers, fieldMap }: Props) {
             <tbody className="divide-y divide-gray-50">
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-12 text-gray-400">
-                    {search || visFilter !== 'all' || bestFilter !== 'all'
+                  <td colSpan={8} className="text-center py-12 text-gray-400">
+                    {search || visFilter !== 'all' || bestFilter !== 'all' || trendFilter !== 'all'
                       ? '검색 결과가 없습니다.'
                       : '등록된 강사가 없습니다.'}
                   </td>
